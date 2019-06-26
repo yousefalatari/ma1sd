@@ -1,6 +1,6 @@
 Package: mxisd
-Maintainer: Kamax.io <foss@kamax.io>
-Homepage: https://github.com/kamax-matrix/mxisd
+Maintainer: ma1uta <sablintolya@gmail.com>
+Homepage: https://github.com/ma1uta/mxisd
 Description: Federated Matrix Identity Server
 Architecture: all
 Section: net

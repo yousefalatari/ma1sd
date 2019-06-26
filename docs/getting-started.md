@@ -47,7 +47,7 @@ Install via:
 - [NixOS](install/nixos.md)
 - [Sources](build.md)
 
-See the [Latest release](https://github.com/kamax-matrix/mxisd/releases/latest) for links to each.
+See the [Latest release](https://github.com/ma1uta/ma1sd/releases/latest) for links to each.
 
 ## Configure
 > **NOTE**: Please view the install instruction for your platform, as this step might be optional or already handled for you.

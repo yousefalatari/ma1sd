@@ -1,10 +1,10 @@
-# Sample configuration file explaining the minimum required keys to be set to run mxisd
+# Sample configuration file explaining the minimum required keys to be set to run ma1sd
 #
-# For a complete list of options, see https://github.com/kamax-matrix/mxisd/docs/README.md
+# For a complete list of options, see https://github.com/ma1uta/ma1sd/docs/README.md
 #
 # Please follow the Getting Started guide if this is your first time using/configuring mxisd
 #
-#  -- https://github.com/kamax-matrix/mxisd/blob/master/docs/getting-started.md#getting-started
+#  -- https://github.com/ma1uta/ma1sd/blob/master/docs/getting-started.md#getting-started
 #
 
 #######################
@@ -58,13 +58,13 @@ storage:
 # Identity Stores #
 ###################
 # If you are using synapse standalone and do not have an Identity store,
-# see https://github.com/kamax-matrix/mxisd/blob/master/docs/stores/synapse.md#synapse-identity-store
+# see https://github.com/ma1uta/ma1sd/blob/master/docs/stores/synapse.md#synapse-identity-store
 #
 # If you would like to integrate with your AD/Samba/LDAP server,
-# see https://github.com/kamax-matrix/mxisd/blob/master/docs/stores/ldap.md
+# see https://github.com/ma1uta/ma1sd/blob/master/docs/stores/ldap.md
 #
 # For any other Identity store, or to simply discover them,
-# see https://github.com/kamax-matrix/mxisd/blob/master/docs/stores/README.md
+# see https://github.com/ma1uta/ma1sd/blob/master/docs/stores/README.md
 
 
 #################################################
@@ -73,10 +73,10 @@ storage:
 # This is mandatory to deal with anything e-mail related.
 #
 # For an introduction to sessions, invites and 3PIDs in general,
-# see https://github.com/kamax-matrix/mxisd/blob/master/docs/threepids/session/session.md#3pid-sessions
+# see https://github.com/ma1uta/ma1sd/blob/master/docs/threepids/session/session.md#3pid-sessions
 #
 # If you would like to change the content of the notifications,
-# see https://github.com/kamax-matrix/mxisd/blob/master/docs/threepids/notification/template-generator.md
+# see https://github.com/ma1uta/ma1sd/blob/master/docs/threepids/notification/template-generator.md
 #
 #### E-mail connector
 threepid:

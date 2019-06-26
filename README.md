@@ -1,6 +1,6 @@
-mxisd - Federated Matrix Identity Server
+ma1sd - Federated Matrix Identity Server
 ----------------------------------------
-![Travis-CI build status](https://travis-ci.org/kamax-matrix/mxisd.svg?branch=master)  
+![Travis-CI build status](https://travis-ci.org/ma1uta/mxisd.svg?branch=master)  
 
 - [Overview](#overview)
 - [Features](#features)
@@ -8,18 +8,18 @@ mxisd - Federated Matrix Identity Server
 - [Getting Started](#getting-started)
 - [Support](#support)
 - [Contribute](#contribute)
-- [Powered by mxisd](#powered-by-mxisd)
+- [Powered by ma1sd](#powered-by-ma1sd)
 - [FAQ](#faq)
 - [Contact](#contact)
 
 ---
 
-**This project is no longer maintained. See the [End of Life notice](EOL.md#end-of-life-notice) for alternatives.**
+* This project is a fork of the https://github.com/kamax-matrix/mxisd which has been archived and no longer supported. *
 
 ---
 
 # Overview
-mxisd is a Federated Matrix Identity server for self-hosted Matrix infrastructures with [enhanced features](#features).
+ma1sd is a Federated Matrix Identity server for self-hosted Matrix infrastructures with [enhanced features](#features).
 As an enhanced Identity service, it implements the [Identity service API](https://matrix.org/docs/spec/identity_service/r0.2.0.html)
 and several [extra features](#features) that greatly enhance user experience within Matrix.
 It is the one stop shop for anything regarding Authentication, Directory and Identity management in Matrix built in a
@@ -85,31 +85,23 @@ See the [dedicated document](docs/getting-started.md)
 A basic troubleshooting guide is available [here](docs/troubleshooting.md).
 
 ## Community
-Over Matrix: [#mxisd:kamax.io](https://matrix.to/#/#mxisd:kamax.io) ([Preview](https://view.matrix.org/room/!NPRUEisLjcaMtHIzDr:kamax.io/))
+Over Matrix: [#ma1sd:ru-matrix.org](https://matrix.to/#/#ma1sd:ru-matrix.org) ([Preview](https://view.matrix.org/room/!CxwBdgAlaphCARnKTA:ru-matrix.org/))
 
 ## Commercial
-If you would prefer professional support/custom development for mxisd and/or for Matrix in general, including other open
-source technologies/products:
-- Visit our [website](https://www.kamax.io/) to get in touch with us and get a quote.
-- Come in our general Matrix room: [#kamax-matrix:kamax.io](https://matrix.to/#/#kamax-matrix:kamax.io)
+Sorry, I cannot provide commercial support (at least now). But always try to help you.
+
+Don't hesitate to ask about project and feel free to create issues at https://github.com/ma1uta/mxisd
 
 # Contribute 
 You can contribute as a community member by:
-- Giving us feedback about your usage of mxisd, even if it seems unimportant or if all is working well!
-- Opening issues for any weird behaviour or bug. mxisd should feel natural, let us know if it does not!
+- Giving us feedback about your usage of ma1sd/mxisd, even if it seems unimportant or if all is working well!
+- Opening issues for any weird behaviour or bug. ma1sd/mxisd should feel natural, let us know if it does not!
 - Helping us improve the documentation: tell us what is good or not good (in an issue or in Matrix), or make a PR with
 changes you feel improve the doc.
 - Contribute code directly: we love contributors! All your contributions will be licensed under AGPLv3.
-- [Donate!](https://liberapay.com/maximusdor/) Any donation is welcome, regardless how small or big, and will directly
-be used for the fixed costs and developer time of mxisd.
 
-You can contribute as an organisation/corporation by:
-- Get a [support contract](#commercial). This is the best way you can help us as it ensures mxisd is
-maintained regularly and you get direct access to the support team.
-- Sponsoring new features or bug fixes. [Get in touch](#contact) so we can discuss it further.
-
-# Powered by mxisd
-The following projects use mxisd under the hood for some or all their features. Check them out!
+# Powered by ma1sd
+The following projects can use ma1sd under the hood for some or all their features. Check them out!
 - [matrix-docker-ansible-deploy](https://github.com/spantaleev/matrix-docker-ansible-deploy)
 - [matrix-register-bot](https://github.com/krombel/matrix-register-bot)
 
@@ -118,5 +110,4 @@ See the [dedicated document](docs/faq.md)
 
 # Contact
 Get in touch via:
-- Matrix: [#mxisd:kamax.io](https://matrix.to/#/#mxisd:kamax.io)
-- Email: see our website: [Kamax.io](https://www.kamax.io)
+- Matrix: [#ma1sd:ru-matrix.org](https://matrix.to/#/#ma1sd:ru-matrix.org)

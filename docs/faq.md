@@ -13,7 +13,7 @@ first basic setup running which relies on you reading the documentation in the r
 **IMPORTANT**: Be aware that mxisd tries to fit within the current protocol and existing products and basic understanding
 of the Matrix protocol is required for some advanced features.
 
-If all fails, come over to [the project room](https://matrix.to/#/#mxisd:kamax.io) and we'll do our best to get you
+If all fails, come over to [the project room](https://matrix.to/#/#ma1sd:ru-matrix.org) and we'll do our best to get you
 started and answer questions you might have.
 
 ### What kind of setup is mxisd really designed for?

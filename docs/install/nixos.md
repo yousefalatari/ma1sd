@@ -1,3 +1,9 @@
+---
+
+** Outdated due to migrating to fork. **
+
+---
+
 # NixOS package
 mxisd is available as a NixOS package in the official repos.
 

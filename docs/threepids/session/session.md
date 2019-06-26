@@ -135,7 +135,7 @@ This configuration would disable 3PID sessions altogether, preventing users from
 and any subsequent actions that requires them, like adding them to their profiles.
   
 This would be used if mxisd is also performing authentication for the Homeserver, typically with synapse and the
-[REST password provider](https://github.com/kamax-matrix/matrix-synapse-rest-auth), where 3PID mappings would be
+[REST password provider](https://github.com/ma1uta/matrix-synapse-rest-password-provider), where 3PID mappings would be
 auto-populated.
 
 Use the following values to enable this mode:

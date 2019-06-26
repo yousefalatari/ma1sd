@@ -58,7 +58,7 @@ Specific placeholders:
 
 ## Templates
 mxisd comes with a set of builtin templates to easily get started. Those templates can be found
-[in the repository](https://github.com/kamax-matrix/mxisd/tree/master/src/main/resources/threepids). If you want to use
+[in the repository](https://github.com/ma1uta/ma1sd/tree/master/src/main/resources/threepids). If you want to use
 customized templates, we recommend using the builtin templates as a starting point.
 
 > **NOTE**: The link above point to the latest version of the built-in templates. Those might be different from your
