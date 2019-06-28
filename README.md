@@ -90,7 +90,7 @@ Over Matrix: [#ma1sd:ru-matrix.org](https://matrix.to/#/#ma1sd:ru-matrix.org) ([
 ## Commercial
 Sorry, I cannot provide commercial support (at least now). But always try to help you.
 
-Don't hesitate to ask about project and feel free to create issues at https://github.com/ma1uta/mxisd
+Don't hesitate to ask about project and feel free to create issues at https://github.com/ma1uta/ma1sd
 
 # Contribute 
 You can contribute as a community member by:

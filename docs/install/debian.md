@@ -3,7 +3,7 @@
 - Any distribution that supports Java 8
 
 ## Install
-1. Download the [latest release](https://github.com/ma1uta/mxisd/releases/latest)
+1. Download the [latest release](https://github.com/ma1uta/ma1sd/releases/latest)
 2. Run:
 ```bash
 dpkg -i /path/to/downloaded/mxisd.deb

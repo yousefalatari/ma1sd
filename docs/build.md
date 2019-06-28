@@ -12,8 +12,8 @@
 
 ### Build
 ```bash
-git clone https://github.com/ma1uta/mxisd.git
-cd mxisd
+git clone https://github.com/ma1uta/ma1sd.git
+cd ma1sd
 ./gradlew build
 ```
 
