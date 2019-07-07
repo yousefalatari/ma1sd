@@ -82,8 +82,6 @@ buildscript {
 
 repositories {
     jcenter()
-    maven { url "https://kamax.io/maven/releases/" }
-    maven { url "https://kamax.io/maven/snapshots/" }
 }
 
 dependencies {
@@ -96,14 +94,16 @@ dependencies {
     // Config management
     compile 'org.yaml:snakeyaml:1.23'
 
-    // Matrix Java SDK
-    compile 'io.kamax:matrix-java-sdk:0.0.14-8-g0e57ec6'
+    // Dependencies from old Matrix-java-sdk
+    compile 'org.apache.commons:commons-lang3:3.8.1'
+    compile 'com.squareup.okhttp3:okhttp:3.12.0'
+    compile 'commons-codec:commons-codec:1.11'
 
     // ORMLite
     compile 'com.j256.ormlite:ormlite-jdbc:5.0'
 
     // ed25519 handling
-    compile 'net.i2p.crypto:eddsa:0.1.0'
+    compile 'net.i2p.crypto:eddsa:0.3.0'
 
     // LDAP connector
     compile 'org.apache.directory.api:api-all:1.0.0'

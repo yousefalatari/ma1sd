@@ -50,7 +50,7 @@ public class Ed25519KeyManager implements KeyManager {
     private final KeyStore store;
 
     public Ed25519KeyManager(KeyStore store) {
-        this.keySpecs = EdDSANamedCurveTable.getByName(EdDSANamedCurveTable.CURVE_ED25519_SHA512);
+        this.keySpecs = EdDSANamedCurveTable.ED_25519_CURVE_SPEC;
         this.store = store;
 
         if (!store.getCurrentKey().isPresent()) {
