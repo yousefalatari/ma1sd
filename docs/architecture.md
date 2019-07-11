@@ -16,7 +16,7 @@ TCP 443
           +<---------------------------------<+
           |
           |   +-------------------+
- TCP 8090 +-> | mxisd             |
+ TCP 8090 +-> | ma1sd             |
               |                   |
               | - Profile's 3PIDs |
               | - 3PID Invites    |
@@ -25,7 +25,7 @@ TCP 443
              TCP 443
                 |  +------------------------+
                 |  | Remote Federated       |
-                |  | mxisd servers          |
+                |  | ma1sd servers          |
                 |  |                        |
                 +--> - 3PID Invites         |
                    +------------------------+

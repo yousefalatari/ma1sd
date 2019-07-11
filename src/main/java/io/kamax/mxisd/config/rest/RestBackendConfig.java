@@ -33,8 +33,8 @@ public class RestBackendConfig {
 
     public static class IdentityEndpoints {
 
-        private String single = "/_mxisd/backend/api/v1/identity/single";
-        private String bulk = "/_mxisd/backend/api/v1/identity/bulk";
+        private String single = "/_ma1sd/backend/api/v1/identity/single";
+        private String bulk = "/_ma1sd/backend/api/v1/identity/bulk";
 
         public String getSingle() {
             return single;
@@ -56,9 +56,9 @@ public class RestBackendConfig {
 
     public static class ProfileEndpoints {
 
-        private String displayName = "/_mxisd/backend/api/v1/profile/displayName";
-        private String threepids = "/_mxisd/backend/api/v1/profile/threepids";
-        private String roles = "/_mxisd/backend/api/v1/profile/roles";
+        private String displayName = "/_ma1sd/backend/api/v1/profile/displayName";
+        private String threepids = "/_ma1sd/backend/api/v1/profile/threepids";
+        private String roles = "/_ma1sd/backend/api/v1/profile/roles";
 
         public String getDisplayName() {
             return displayName;
@@ -88,8 +88,8 @@ public class RestBackendConfig {
 
     public static class Endpoints {
 
-        private String auth = "/_mxisd/backend/api/v1/auth/login";
-        private String directory = "/_mxisd/backend/api/v1/directory/user/search";
+        private String auth = "/_ma1sd/backend/api/v1/auth/login";
+        private String directory = "/_ma1sd/backend/api/v1/directory/user/search";
         private IdentityEndpoints identity = new IdentityEndpoints();
         private ProfileEndpoints profile = new ProfileEndpoints();
 

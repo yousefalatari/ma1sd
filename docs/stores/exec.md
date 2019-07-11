@@ -42,7 +42,7 @@
 | [Profile](../features/profile.md)               | Yes       |
 
 This Identity Store lets you run arbitrary commands to handle the various requests in each support feature.  
-It is the most versatile Identity store of mxisd, allowing you to connect any kind of logic with any executable/script.
+It is the most versatile Identity store of ma1sd, allowing you to connect any kind of logic with any executable/script.
 
 ## Overview
 Each request can be mapping to a fully customizable command configuration.  
@@ -190,7 +190,7 @@ The following types are available:
 exec:
   auth:
     enabled: true
-    command: '/opt/mxisd-exec/auth.sh'
+    command: '/opt/ma1sd-exec/auth.sh'
     args: ['{localpart}']
     input:
       type: 'plain'
@@ -198,7 +198,7 @@ exec:
   env:
     DOMAIN: '{domain}'
 ```
-With Authentication enabled, run `/opt/mxisd-exec/auth.sh` when validating credentials, providing:
+With Authentication enabled, run `/opt/ma1sd-exec/auth.sh` when validating credentials, providing:
 - A single command-line argument to provide the `localpart` as username 
 - A plain text string with the password token for standard input, which will be replaced by the password to check
 - A single environment variable `DOMAIN` containing Matrix ID domain, if given

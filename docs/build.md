@@ -17,12 +17,12 @@ cd ma1sd
 ./gradlew build
 ```
 
-Create a new configuration file by coping `mxisd.example.yaml` to `mxisd.yaml` and edit to your needs.  
+Create a new configuration file by coping `ma1sd.example.yaml` to `ma1sd.yaml` and edit to your needs.  
 For advanced configuration, see the [Configure section](configure.md).
 
 Start the server in foreground to validate the build and configuration:
 ```bash
-java -jar build/libs/mxisd.jar
+java -jar build/libs/ma1sd.jar
 ```
 
 Ensure the signing key is available:
@@ -34,9 +34,9 @@ $ curl 'http://localhost:8090/_matrix/identity/api/v1/pubkey/ed25519:0'
 
 Test basic recursive lookup (requires Internet connection with access to TCP 443):
 ```bash
-$ curl 'http://localhost:8090/_matrix/identity/api/v1/lookup?medium=email&address=mxisd-federation-test@kamax.io'
+$ curl 'http://localhost:8090/_matrix/identity/api/v1/lookup?medium=email&address=ma1sd-federation-test@kamax.io'
 
-{"address":"mxisd-federation-test@kamax.io","medium":"email","mxid":"@mxisd-lookup-test:kamax.io",...}
+{"address":"ma1sd-federation-test@kamax.io","medium":"email","mxid":"@ma1sd-lookup-test:kamax.io",...}
 ```
 
 If you enabled LDAP, you can also validate your config with a similar request after replacing the `address` value with
@@ -56,7 +56,7 @@ Requirements:
 - fakeroot
 - dpkg-deb
 
-[Build mxisd](#build) then:
+[Build ma1sd](#build) then:
 ```bash
 ./gradlew debBuild
 ```
@@ -64,7 +64,7 @@ You will find the debian package in `build/dist`.
 Then follow the instruction in the [Debian package](install/debian.md) document.
 
 ## Docker image
-[Build mxisd](#build) then:
+[Build ma1sd](#build) then:
 ```bash
 ./gradlew dockerBuild
 ```

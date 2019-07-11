@@ -17,19 +17,19 @@ For NetIQ, replace all the `ldap` prefix in the configuration by `netiq`.
 
 ## Getting started
 ### Base
-To use your LDAP backend, add the bare minimum configuration in mxisd config file:
+To use your LDAP backend, add the bare minimum configuration in ma1sd config file:
 ```yaml
 ldap:
   enabled: true
   connection:
     host: 'ldapHostnameOrIp'
     port: 389
-    bindDn: 'CN=My Mxisd User,OU=Users,DC=example,DC=org'
+    bindDn: 'CN=My User,OU=Users,DC=example,DC=org'
     bindPassword: 'TheUserPassword'
     baseDNs:
       - 'OU=Users,DC=example,DC=org'
 ```
-These are standard LDAP connection configuration. mxisd will try to connect on port default port 389 without encryption.
+These are standard LDAP connection configuration. ma1sd will try to connect on port default port 389 without encryption.
 
 If you would like to use several Base DNs, simply add more entries under `baseDNs`.
 
@@ -89,7 +89,7 @@ ldap:
 #### 3PIDs
 You can also change the attribute lists for 3PID, like email or phone numbers.
 
-The following example would overwrite the [default list of attributes](../../src/main/java/io/kamax/mxisd/config/ldap/LdapConfig.java#L64)
+The following example would overwrite the [default list of attributes](../../src/main/java/io/kamax/ma1sd/config/ldap/LdapConfig.java#L64)
 for emails and phone number:
 ```yaml
 ldap:

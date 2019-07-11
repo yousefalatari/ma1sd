@@ -27,8 +27,8 @@ if [[ -n "$CONF_FILE_PATH" ]] && [ ! -f "$CONF_FILE_PATH" ]; then
         echo >> "$CONF_FILE_PATH"
     fi
 
-    echo "Starting mxisd..."
+    echo "Starting ma1sd..."
     echo
 fi
 
-exec java -jar /app/mxisd.jar -c /etc/mxisd/mxisd.yaml
+exec java -jar /app/ma1sd.jar -c /etc/ma1sd/ma1sd.yaml

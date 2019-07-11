@@ -3,7 +3,7 @@
 - [Basic](#basic)
   - [Overview](#overview)
   - [synapse](#synapse)
-  - [mxisd](#mxisd)
+  - [ma1sd](#ma1sd)
   - [Validate](#validate)
   - [Next steps](#next-steps)
     - [Profile auto-fil](#profile-auto-fill)
@@ -16,15 +16,15 @@
     - [DNS Overwrite](#dns-overwrite)
 
 ## Description
-Authentication is an enhanced feature of mxisd to ensure coherent and centralized identity management.  
-It allows to use Identity stores configured in mxisd to authenticate users on your Homeserver.
+Authentication is an enhanced feature of ma1sd to ensure coherent and centralized identity management.  
+It allows to use Identity stores configured in ma1sd to authenticate users on your Homeserver.
 
 Authentication is divided into two parts:
 - [Basic](#basic): authenticate with a regular username.
 - [Advanced](#advanced): same as basic with extra abilities like authenticate using a 3PID or do username rewrite.
 
 ## Basic
-Authentication by username is possible by linking synapse and mxisd together using a specific module for synapse, also
+Authentication by username is possible by linking synapse and ma1sd together using a specific module for synapse, also
 known as password provider.
 
 ### Overview
@@ -33,7 +33,7 @@ An overview of the Basic Authentication process:
                                                                                     Identity stores
  Client                                                                             +------+
    |                                            +-------------------------+    +--> | LDAP |
-   |   +---------------+  /_matrix/identity     | mxisd                   |    |    +------+
+   |   +---------------+  /_matrix/identity     | ma1sd                   |    |    +------+
    +-> | Reverse proxy | >------------------+   |                         |    |
        +--|------------+                    |   |                         |    |    +--------+
           |                                 +-----> Check ID stores     >------+--> | SQL DB |
@@ -55,14 +55,14 @@ Performed on [synapse with REST auth module](https://github.com/kamax-io/matrix-
 - Install the [password provider](https://github.com/kamax-io/matrix-synapse-rest-auth)
 - Edit your **synapse** configuration:
   - As described by the auth module documentation
-  - Set `endpoint` to `http://mxisdAddress:8090` - Replace `mxisdAddress` by an IP/host name that provides a direct
-  connection to mxisd.  
+  - Set `endpoint` to `http://ma1sdAddress:8090` - Replace `ma1sdAddress` by an IP/host name that provides a direct
+  connection to ma1sd.  
   This **MUST NOT** be a public address, and SHOULD NOT go through a reverse proxy.
 - Restart synapse
 
-### mxisd
+### ma1sd
 - Configure and enable at least one [Identity store](../stores/README.md)
-- Restart mxisd
+- Restart ma1sd
 
 ### Validate
 Login on the Homeserver using credentials present in one of your Identity stores.
@@ -93,7 +93,7 @@ This is performed by intercepting the Homeserver endpoint `/_matrix/client/r0/lo
             |                            |     Step 1    +---------------------------+     Step 2
             |                            |               |                           |
 Client+---->| /_matrix/client/r0/login +---------------->|                           | Look up address  +---------+
-            |                      ^     |               |  mxisd - Identity server  +----------------->| Backend |
+            |                      ^     |               |  ma1sd - Identity server  +----------------->| Backend |
             |                      |     |               |                           |                  +---------+
             | /_matrix/* +--+      +---------------------+                           |
             |               |            |               +---------------+-----------+
@@ -110,7 +110,7 @@ Client+---->| /_matrix/client/r0/login +---------------->|                      
 ```
 
 Steps of user authentication using a 3PID:
-1. The intercepted login request is directly sent to mxisd instead of the Homeserver.
+1. The intercepted login request is directly sent to ma1sd instead of the Homeserver.
 2. Identity stores are queried for a matching user identity in order to modify the request to use the user name.
 3. The Homeserver, from which the request was intercepted, is queried using the request at previous step.
    Its address is resolved using the DNS Overwrite feature to reach its internal address on a non-encrypted port.
@@ -129,7 +129,7 @@ The specific configuration to put under the relevant `VirtualHost`:
 ```apache
 ProxyPass /_matrix/client/r0/login http://localhost:8090/_matrix/client/r0/login
 ```
-`ProxyPreserveHost` or equivalent **must** be enabled to detect to which Homeserver mxisd should talk to when building results.
+`ProxyPreserveHost` or equivalent **must** be enabled to detect to which Homeserver ma1sd should talk to when building results.
 
 Your VirtualHost should now look similar to:
 ```apache
@@ -188,10 +188,10 @@ server {
 
 #### DNS Overwrite
 
-Just like you need to configure a reverse proxy to send client requests to mxisd, you also need to configure mxisd with
+Just like you need to configure a reverse proxy to send client requests to ma1sd, you also need to configure ma1sd with
 the internal IP of the Homeserver so it can talk to it directly to integrate its directory search.
 
-To do so, put the following configuration in your mxisd configuration:
+To do so, put the following configuration in your ma1sd configuration:
 ```yaml
 dns:
   overwrite:
@@ -214,7 +214,7 @@ The following features are available after you have a working Advanced setup:
 - Username rewrite: Allows you to rewrite the username of a regular login/pass authentication to a 3PID, that then gets resolved using the regular lookup process. Most common use case is to allow login with numerical usernames on synapse, which is not possible out of the box.
 
 #### Username rewrite
-In mxisd config:
+In ma1sd config:
 ```yaml
 auth:
   rewrite:

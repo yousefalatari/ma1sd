@@ -11,7 +11,7 @@ The following capabilities are provided in this feature:
 > **NOTE:** Make sure you are familiar with [configuration format and rules](../../configure.md).
 
 Integration as an Application service is a three steps process:
-1. Create the baseline mxisd configuration to allow integration.
+1. Create the baseline ma1sd configuration to allow integration.
 2. Integrate with the homeserver.
 3. Configure the specific capabilities, if applicable.
 
@@ -22,11 +22,11 @@ Under the `appsvc` namespace:
 | Key                   | Type    | Required | Default | Purpose                                                        |
 |-----------------------|---------|----------|---------|----------------------------------------------------------------|
 | `enabled`             | boolean | No       | `false` | Globally enable/disable the feature                            |
-| `user.main`           | string  | No       | `mxisd` | Localpart for the main appservice user                         |
+| `user.main`           | string  | No       | `ma1sd` | Localpart for the main appservice user                         |
 | `endpoint.toHS.url`   | string  | Yes      | *None*  | Base URL to the Homeserver                                     |
 | `endpoint.toHS.token` | string  | Yes      | *None*  | Token to use when sending requests to the Homeserver           |
-| `endpoint.toAS.url`   | string  | Yes      | *None*  | Base URL to mxisd from the Homeserver                          |
-| `endpoint.toAS.token` | string  | Yes      | *None*  | Token for the Homeserver to use when sending requests to mxisd |
+| `endpoint.toAS.url`   | string  | Yes      | *None*  | Base URL to ma1sd from the Homeserver                          |
+| `endpoint.toAS.token` | string  | Yes      | *None*  | Token for the Homeserver to use when sending requests to ma1sd |
 
 #### Example
 ```yaml
@@ -46,7 +46,7 @@ Under the `appsvc.registration.synapse` namespace:
 
 | Key    | Type   | Required | Default            | Purpose                                                                  |
 |--------|--------|----------|--------------------|--------------------------------------------------------------------------|
-| `id`   | string | No       | `appservice-mxisd` | The unique, user-defined ID of this application service. See spec.       |
+| `id`   | string | No       | `appservice-ma1sd` | The unique, user-defined ID of this application service. See spec.       |
 | `file` | string | Yes      | *None*             | If defined, the synapse registration file that should be created/updated |
 
 ##### Example 
@@ -54,17 +54,17 @@ Under the `appsvc.registration.synapse` namespace:
 appsvc:
   registration:
     synapse:
-      file: '/etc/matrix-synapse/mxisd-appservice-registration.yaml'
+      file: '/etc/matrix-synapse/ma1sd-appservice-registration.yaml'
 ```
 
 Edit your `homeserver.yaml` and add a new entry to the appservice config file, which should look something like this:
 ```yaml
 app_service_config_files:
-  - '/etc/matrix-synapse/mxisd-appservice-registration.yaml'
+  - '/etc/matrix-synapse/ma1sd-appservice-registration.yaml'
   - ...
 ```
 
-Restart synapse when done to register mxisd.
+Restart synapse when done to register ma1sd.
 
 #### Others
 See your Homeserver documentation on how to integrate.
@@ -86,9 +86,9 @@ appsvc:
 #### Use
 The following steps assume:
 - `matrix.domain` set to `example.org`
-- `appsvc.user.main` set to `mxisd` or not set
+- `appsvc.user.main` set to `ma1sd` or not set
 
-1. Invite `@mxisd:example.org` to a new direct chat
+1. Invite `@ma1sd:example.org` to a new direct chat
 2. Type `!help` to get all available commands
 
 ### Email Notification about room invites by Matrix IDs
@@ -100,7 +100,7 @@ account was already provisioned on the Homeserver.
 - At least one email entry in the identity store for each user that could be invited.
 
 #### Configuration
-In your mxisd config file:
+In your ma1sd config file:
 ```yaml
 synapseSql:
   enabled: false ## Do not use this line if Synapse is used as an Identity Store

@@ -9,7 +9,7 @@ provide your own custom templates.
 Templates for the following events/actions are available:
 - [3PID invite](../../features/identity.md)
 - [3PID session: validation](../session/session.md)
-- [3PID session: fraudulent unbind](https://github.com/kamax-matrix/mxisd/wiki/mxisd-and-your-privacy#improving-your-privacy-one-commit-at-the-time)
+- [3PID session: fraudulent unbind](https://github.com/kamax-matrix/ma1sd/wiki/ma1sd-and-your-privacy#improving-your-privacy-one-commit-at-the-time)
 - [Matrix ID invite](../../features/experimental/application-service.md#email-notification-about-room-invites-by-matrix-ids)
 
 ## Placeholders
@@ -57,7 +57,7 @@ Specific placeholders:
 | `NEXT_URL`         | URL to redirect to after the sessions has been validated.                            |
 
 ## Templates
-mxisd comes with a set of builtin templates to easily get started. Those templates can be found
+ma1sd comes with a set of builtin templates to easily get started. Those templates can be found
 [in the repository](https://github.com/ma1uta/ma1sd/tree/master/src/main/resources/threepids). If you want to use
 customized templates, we recommend using the builtin templates as a starting point.
 

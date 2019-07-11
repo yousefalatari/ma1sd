@@ -4,18 +4,18 @@
 - [Backuo](#backup)
 
 ## Overview
-This document gives various information for the day-to-day management and operations of mxisd.
+This document gives various information for the day-to-day management and operations of ma1sd.
 
 ## Maintenance
-mxisd does not require any maintenance task to run at optimal performance.
+ma1sd does not require any maintenance task to run at optimal performance.
 
 ## Backup
 ### Run
-mxisd requires all file in its configuration and data directory to be backed up.  
+ma1sd requires all file in its configuration and data directory to be backed up.  
 They are usually located at:
-- `/etc/mxisd`
-- `/var/lib/mxisd`
+- `/etc/ma1sd`
+- `/var/lib/ma1sd`
 
 ### Restore
-Reinstall mxisd, restore the two folders above in the appropriate location (depending on your install method) and you
-will be good to go. Simply start mxisd to restore functionality.
+Reinstall ma1sd, restore the two folders above in the appropriate location (depending on your install method) and you
+will be good to go. Simply start ma1sd to restore functionality.

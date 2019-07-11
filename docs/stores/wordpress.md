@@ -29,9 +29,9 @@ define('JWT_AUTH_SECRET_KEY', 'your-top-secret-key');
 
 #### Rewrite of `index.php`
 Wordpress is normally configured with rewrite of `index.php` so it does not appear in URLs.  
-If this is not the case for your installation, the mxisd URL will need to be appended with `/index.php`
+If this is not the case for your installation, the ma1sd URL will need to be appended with `/index.php`
 
-### mxisd
+### ma1sd
 Enable in the configuration:
 ```yaml
 wordpress:

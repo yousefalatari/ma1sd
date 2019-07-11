@@ -1,6 +1,6 @@
 ma1sd - Federated Matrix Identity Server
 ----------------------------------------
-![Travis-CI build status](https://travis-ci.org/ma1uta/mxisd.svg?branch=master)  
+![Travis-CI build status](https://travis-ci.org/ma1uta/ma1sd.svg?branch=master)  
 
 - [Overview](#overview)
 - [Features](#features)
@@ -25,11 +25,11 @@ and several [extra features](#features) that greatly enhance user experience wit
 It is the one stop shop for anything regarding Authentication, Directory and Identity management in Matrix built in a
 single coherent product.
 
-mxisd is specifically designed to connect to an existing on-premise Identity store (AD/Samba/LDAP, SQL Database,
+ma1sd is specifically designed to connect to an existing on-premise Identity store (AD/Samba/LDAP, SQL Database,
 Web services/app, etc.) and ease the integration of a Matrix infrastructure within an existing one.  
-Check [our FAQ entry](docs/faq.md#what-kind-of-setup-is-mxisd-really-designed-for) to know if mxisd is a good fit for you.
+Check [our FAQ entry](docs/faq.md#what-kind-of-setup-is-ma1sd-really-designed-for) to know if ma1sd is a good fit for you.
 
-The core principle of mxisd is to map between Matrix IDs and 3PIDs (Third-Party IDentifiers) for the Homeserver and its
+The core principle of ma1sd is to map between Matrix IDs and 3PIDs (Third-Party IDentifiers) for the Homeserver and its
 users. 3PIDs can be anything that uniquely and globally identify a user, like:
 - Email address
 - Phone number
@@ -75,7 +75,7 @@ As an enhanced Identity service:
 - Users can directly find each other using whatever attribute is relevant within your Identity store
 - Federate your Identity server so you can discover others and/or others can discover you
 
-Also, check [our FAQ entry](docs/faq.md#what-kind-of-setup-is-mxisd-really-designed-for) to know if mxisd is a good fit for you.
+Also, check [our FAQ entry](docs/faq.md#what-kind-of-setup-is-ma1sd-really-designed-for) to know if ma1sd is a good fit for you.
 
 # Getting started
 See the [dedicated document](docs/getting-started.md)
@@ -94,8 +94,8 @@ Don't hesitate to ask about project and feel free to create issues at https://gi
 
 # Contribute 
 You can contribute as a community member by:
-- Giving us feedback about your usage of ma1sd/mxisd, even if it seems unimportant or if all is working well!
-- Opening issues for any weird behaviour or bug. ma1sd/mxisd should feel natural, let us know if it does not!
+- Giving us feedback about your usage of ma1sd, even if it seems unimportant or if all is working well!
+- Opening issues for any weird behaviour or bug. ma1sd should feel natural, let us know if it does not!
 - Helping us improve the documentation: tell us what is good or not good (in an issue or in Matrix), or make a PR with
 changes you feel improve the doc.
 - Contribute code directly: we love contributors! All your contributions will be licensed under AGPLv3.

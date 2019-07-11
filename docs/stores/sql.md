@@ -80,7 +80,7 @@ sql:
         type: <string>
         value: <string>
 ```
-For each query, `type` can be used to tell mxisd how to process the ID column:
+For each query, `type` can be used to tell ma1sd how to process the ID column:
 - `localpart` will append the `matrix.domain` to it
 - `mxid` will use the ID as-is. If it is not a valid Matrix ID, the search will fail.
 
@@ -114,7 +114,7 @@ sql:
     medium:
      mediumTypeExample: <dedicated query>
 ```
-`type` is used to tell mxisd how to process the returned `uid` column containing the User ID:
+`type` is used to tell ma1sd how to process the returned `uid` column containing the User ID:
 - `localpart` will build a full Matrix ID using the `matrix.domain` value.
 - `mxid` will use the ID as-is. If it is not a valid Matrix ID, lookup(s) will fail.
 
@@ -135,7 +135,7 @@ sql:
     
 
 ```
-For the `role` query, `type` can be used to tell mxisd how to inject the User ID in the query:
+For the `role` query, `type` can be used to tell ma1sd how to inject the User ID in the query:
 - `localpart` will extract and set only the localpart.
 - `mxid` will use the ID as-is.
 

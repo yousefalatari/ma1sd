@@ -20,13 +20,13 @@ To integrate this backend with your webapp, you will need to implement the REST 
 |--------------------------------------|------------------------------------------------|------------------------------------------------------|
 | `rest.enabled`                       | `false`                                        | Globally enable/disable the REST backend             |
 | `rest.host`                          | *None*                                         | Default base URL to use for the different endpoints. |
-| `rest.endpoints.auth`                | `/_mxisd/backend/api/v1/auth/login`            | Validate credentials and get user profile            |
-| `rest.endpoints.directory`           | `/_mxisd/backend/api/v1/directory/user/search` | Search for users by arbitrary input                  |
-| `rest.endpoints.identity.single`     | `/_mxisd/backend/api/v1/identity/single`       | Endpoint to query a single 3PID                      |
-| `rest.endpoints.identity.bulk`       | `/_mxisd/backend/api/v1/identity/bulk`         | Endpoint to query a list of 3PID                     |
-| `rest.endpoints.profile.displayName` | `/_mxisd/backend/api/v1/profile/displayName`   | Query the display name for a Matrix ID
-| `rest.endpoints.profile.threepids`   | `/_mxisd/backend/api/v1/profile/threepids`     | Query the 3PIDs for a Matrix ID
-| `rest.endpoints.profile.roles`       | `/_mxisd/backend/api/v1/profile/roles`         | Query the Roles for a Matrix ID
+| `rest.endpoints.auth`                | `/_ma1sd/backend/api/v1/auth/login`            | Validate credentials and get user profile            |
+| `rest.endpoints.directory`           | `/_ma1sd/backend/api/v1/directory/user/search` | Search for users by arbitrary input                  |
+| `rest.endpoints.identity.single`     | `/_ma1sd/backend/api/v1/identity/single`       | Endpoint to query a single 3PID                      |
+| `rest.endpoints.identity.bulk`       | `/_ma1sd/backend/api/v1/identity/bulk`         | Endpoint to query a list of 3PID                     |
+| `rest.endpoints.profile.displayName` | `/_ma1sd/backend/api/v1/profile/displayName`   | Query the display name for a Matrix ID
+| `rest.endpoints.profile.threepids`   | `/_ma1sd/backend/api/v1/profile/threepids`     | Query the 3PIDs for a Matrix ID
+| `rest.endpoints.profile.roles`       | `/_ma1sd/backend/api/v1/profile/roles`         | Query the Roles for a Matrix ID
 
 Endpoint values can handle two formats:
 - URL Path starting with `/` that gets happened to the `rest.host`

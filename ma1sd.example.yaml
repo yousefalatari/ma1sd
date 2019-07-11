@@ -2,7 +2,7 @@
 #
 # For a complete list of options, see https://github.com/ma1uta/ma1sd/docs/README.md
 #
-# Please follow the Getting Started guide if this is your first time using/configuring mxisd
+# Please follow the Getting Started guide if this is your first time using/configuring ma1sd
 #
 #  -- https://github.com/ma1uta/ma1sd/blob/master/docs/getting-started.md#getting-started
 #
@@ -30,28 +30,28 @@ matrix:
 # /!\ THIS MUST **NOT** BE YOUR HOMESERVER KEYS FILE /!\
 # If this path does not exist, it will be auto-generated.
 #
-# During testing, /var/tmp/mxisd/keys is a possible value
+# During testing, /var/tmp/ma1sd/keys is a possible value
 # For production, recommended location shall be one of the following:
-#   - /var/lib/mxisd/keys
-#   - /var/opt/mxisd/keys
-#   - /var/local/mxisd/keys
+#   - /var/lib/ma1sd/keys
+#   - /var/opt/ma1sd/keys
+#   - /var/local/ma1sd/keys
 #
 key:
   path: ''
 
 
-# Path to the SQLite DB file for mxisd internal storage
+# Path to the SQLite DB file for ma1sd internal storage
 # /!\ THIS MUST **NOT** BE YOUR HOMESERVER DATABASE /!\
 #
 # Examples:
-#  - /var/opt/mxisd/store.db
-#  - /var/local/mxisd/store.db
-#  - /var/lib/mxisd/store.db
+#  - /var/opt/ma1sd/store.db
+#  - /var/local/ma1sd/store.db
+#  - /var/lib/ma1sd/store.db
 #
 storage:
   provider:
     sqlite:
-      database: '/path/to/mxisd.db'
+      database: '/path/to/ma1sd.db'
 
 
 ###################

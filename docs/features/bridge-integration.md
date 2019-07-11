@@ -1,11 +1,11 @@
 # Bridge Integration
-To help natural bridge integration into the regular usage of a Matrix client, mxisd provides a way for bridge to reply
+To help natural bridge integration into the regular usage of a Matrix client, ma1sd provides a way for bridge to reply
 to 3PID queries if no mapping was found, allowing seamless bridging to a network.
 
 This is performed by implementing a specific endpoint on the bridge to map a 3PID lookup to a virtual user.
 
 **NOTE**: This document is incomplete and might be misleading. In doubt, come in our Matrix room.  
-You can also look at our [Email Bridge README](https://github.com/kamax-matrix/matrix-appservice-email#mxisd) for an example
+You can also look at our [Email Bridge README](https://github.com/kamax-matrix/matrix-appservice-email#ma1sd) for an example
 of working configuration.
 
 ## Configuration

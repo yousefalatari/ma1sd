@@ -36,7 +36,7 @@ public class MxisdStandaloneExec {
     private static final Logger log = LoggerFactory.getLogger("App");
 
     public static void main(String[] args) {
-        String logLevel = System.getenv("MXISD_LOG_LEVEL");
+        String logLevel = System.getenv("MA1SD_LOG_LEVEL");
         if (StringUtils.isNotBlank(logLevel)) {
             System.setProperty("org.slf4j.simpleLogger.log.io.kamax.mxisd", logLevel);
         }

@@ -1,6 +1,6 @@
 # Concepts
 - [Matrix](#matrix)
-- [mxisd](#mxisd)
+- [ma1sd](#ma1sd)
 
 ## Matrix
 The following concepts are part of the Matrix ecosystem and specification.
@@ -15,7 +15,7 @@ A 3PID is a globally unique canonical identifier which is made of:
 - Medium, which describes what network it belongs to (Email, Phone, Twitter, Discord, etc.)
 - Address, the actual value people typically use on a daily basis.
 
-mxisd core mission is to map those identifiers to Matrix User IDs.
+ma1sd core mission is to map those identifiers to Matrix User IDs.
 
 ### Homeserver
 Where a user **account and data** are stored.
@@ -34,10 +34,10 @@ An Identity server:
 ### 3PID session
 The fact to validate a 3PID (email, phone number, etc.) via the introduction of a token which was sent to the 3PID address.
 
-## mxisd
-The following concepts are specific to mxisd.
+## ma1sd
+The following concepts are specific to ma1sd.
 
 ### Identity store
 Where your user accounts and 3PID mappings are stored.
 
-mxisd itself **DOES NOT STORE** user accounts or 3PID mappings.
+ma1sd itself **DOES NOT STORE** user accounts or 3PID mappings.

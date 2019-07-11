@@ -27,12 +27,12 @@ Two configuration keys are available that accept paths to HTML templates:
 - `failure`
 
 ### Serving static assets
-mxisd will not serve any static asset (images, JS, CSS, etc.). If such are needed, you will need to serve them using the
-reverse proxy sitting in front of mxisd using a path outside of the `/_matrix/identity/` namespace. We advise using
+ma1sd will not serve any static asset (images, JS, CSS, etc.). If such are needed, you will need to serve them using the
+reverse proxy sitting in front of ma1sd using a path outside of the `/_matrix/identity/` namespace. We advise using
 the base path `/static/` for such use cases, allowing to remain under the same hostname/origin.
 
 You can also serve such assets using absolute URL, possibly under other domains, but be aware of Cross-Origin restrictions
-in browsers which are out of scope of mxisd.
+in browsers which are out of scope of ma1sd.
 
 ## Placeholders
 ### Success

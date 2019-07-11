@@ -22,9 +22,9 @@ By enabling this feature, you can by default:
 - Search for users which you are not in contact with yet. Super useful for corporations who want to give Matrix access
 internally, so users can just find themselves **prior** to having any common room(s)
 - Add extra attributes of your backend to extend the search
-- Include your homeserver search results to those found by mxisd
+- Include your homeserver search results to those found by ma1sd
 
-By integrating mxisd, you get the default behaviour and a bunch of extras, ensuring your users will always find each other.
+By integrating ma1sd, you get the default behaviour and a bunch of extras, ensuring your users will always find each other.
 
 ## Overview
 This is performed by intercepting the Homeserver endpoint `/_matrix/client/r0/user_directory/search` like so:
@@ -33,7 +33,7 @@ This is performed by intercepting the Homeserver endpoint `/_matrix/client/r0/us
 Client --> | Reverse proxy                                                                         Step 2
            |                                              Step 1    +-------------------------+
            |   /_matrix/client/r0/user_directory/search ----------> |                         |  Search in   +---------+
-           |                        /\                              | mxisd - Identity server | -----------> | Backend |
+           |                        /\                              | ma1sd - Identity server | -----------> | Backend |
            |   /_matrix/*            \----------------------------- |                         |  all users   +---------+
            |        |            Step 4: Send back merged results   +-------------------------+
            +        |                                                            |
@@ -44,7 +44,7 @@ Client --> | Reverse proxy                                                      
                          +------------+   /_matrix/client/r0/user_directory/search
 ```
 Steps:
-1. The intercepted request is directly sent to mxisd instead of the Homeserver.
+1. The intercepted request is directly sent to ma1sd instead of the Homeserver.
 2. Identity stores are queried for any match on the search value sent by the client.
 3. The Homeserver, from which the request was intercepted, is queried using the same request as the client.
    Its address is resolved using the DNS Overwrite feature to reach its internal address on a non-encrypted port.
@@ -52,7 +52,7 @@ Steps:
 which directly answered the request.
 
 ## Requirements
-- Reverse proxy setup, which you should already have in place if you use mxisd
+- Reverse proxy setup, which you should already have in place if you use ma1sd
 - At least one compatible [Identity store](../stores/README.md) enabled
   
 ## Configuration
@@ -62,7 +62,7 @@ The specific configuration to put under the relevant `VirtualHost`:
 ```apache
 ProxyPass /_matrix/client/r0/user_directory/ http://0.0.0.0:8090/_matrix/client/r0/user_directory/
 ```
-`ProxyPreserveHost` or equivalent must be enabled to detect to which Homeserver mxisd should talk to when building
+`ProxyPreserveHost` or equivalent must be enabled to detect to which Homeserver ma1sd should talk to when building
 results.
 
 Your `VirtualHost` should now look like this:
@@ -118,7 +118,7 @@ server {
 ```
 
 ### DNS Overwrite
-Just like you need to configure a reverse proxy to send client requests to mxisd, you also need to configure mxisd with
+Just like you need to configure a reverse proxy to send client requests to ma1sd, you also need to configure ma1sd with
 the internal IP of the Homeserver so it can talk to it directly to integrate its directory search.
 
 To do so, use the following configuration:
@@ -136,7 +136,7 @@ dns:
 ## Next steps
 ### Homeserver results
 You can configure if the Homeserver should be queried at all when doing a directory search.  
-To disable Homeserver results, set the following in mxisd configuration file:
+To disable Homeserver results, set the following in ma1sd configuration file:
 ```yaml
 directory:
   exclude:

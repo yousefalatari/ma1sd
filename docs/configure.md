@@ -41,7 +41,7 @@ matrix:
 Create a list under the label `myOtherServers` containing two Identity servers: `https://other1.example.org` and `https://other2.example.org`.
 
 ## Server
-- `server.name`: Public hostname of mxisd, if different from the Matrix domain.
+- `server.name`: Public hostname of ma1sd, if different from the Matrix domain.
 - `server.port`: HTTP port to listen on (unencrypted)
 - `server.publicUrl`: Defaults to `https://{server.name}`
 
@@ -68,7 +68,7 @@ notification:
     msisdn: 'raw'
 ```
 - Emails notifications would use the `sendgrid` handler, which define its own configuration under `notification.handlers.sendgrid`
-- Phone notification would use the `raw` handler, basic default built-in handler in mxisd
+- Phone notification would use the `raw` handler, basic default built-in handler in ma1sd
 
 ### Handlers
 - `notification.handers.<handler ID>`: Handler-specific configuration for the given handler ID. Repeatable.

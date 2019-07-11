@@ -1,5 +1,5 @@
 /*
- * mxisd - Matrix Identity Server Daemon
+ * ma1sd - Matrix Identity Server Daemon
  * Copyright (C) 2017 Kamax Sarl
  *
  * https://www.kamax.io/
@@ -25,16 +25,16 @@ apply plugin: 'application'
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'idea'
 
-def confFileName = "mxisd.example.yaml"
+def confFileName = "ma1sd.example.yaml"
 def distDir = "${project.buildDir}/dist"
 
-def debBinPath = "/usr/lib/mxisd"
-def debConfPath = "/etc/mxisd"
-def debDataPath = "/var/lib/mxisd"
+def debBinPath = "/usr/lib/ma1sd"
+def debConfPath = "/etc/ma1sd"
+def debDataPath = "/var/lib/ma1sd"
 def debSystemdPath = "/etc/systemd/system"
 
 def debConfFileName = confFileName
-def debStartScriptFilename = "mxisd"
+def debStartScriptFilename = "ma1sd"
 
 def debBuildBasePath = "${project.buildDir}/tmp/debian"
 def debBuildDebianPath = "${debBuildBasePath}/DEBIAN"
@@ -43,18 +43,18 @@ def debBuildConfPath = "${debBuildBasePath}${debConfPath}"
 def debBuildDataPath = "${debBuildBasePath}${debDataPath}"
 def debBuildSystemdPath = "${debBuildBasePath}${debSystemdPath}"
 
-def dockerImageName = "kamax/mxisd"
-def dockerImageTag = "${dockerImageName}:${mxisdVersion()}"
+def dockerImageName = "ma1uta/ma1sd"
+def dockerImageTag = "${dockerImageName}:${ma1sdVersion()}"
 
 group = 'io.kamax'
 mainClassName = 'io.kamax.mxisd.MxisdStandaloneExec'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
-String mxisdVersion() {
+String ma1sdVersion() {
     def versionPattern = Pattern.compile("v(\\d+\\.)?(\\d+\\.)?(\\d+)(-.*)?")
 
-    String version = System.getenv('MXISD_BUILD_VERSION')
+    String version = System.getenv('MA1SD_BUILD_VERSION')
     if (version == null || version.size() == 0) {
         version = gitVersion()
     }
@@ -160,7 +160,7 @@ dependencies {
 jar {
     manifest {
         attributes(
-                'Implementation-Version': mxisdVersion()
+                'Implementation-Version': ma1sdVersion()
         )
     }
 }
@@ -173,7 +173,7 @@ shadowJar {
 
 task debBuild(dependsOn: shadowJar) {
     doLast {
-        String debVersion = mxisdVersion()
+        String debVersion = ma1sdVersion()
         println "Version for package: ${debVersion}"
         mkdir distDir
         mkdir debBuildBasePath
@@ -184,7 +184,7 @@ task debBuild(dependsOn: shadowJar) {
         mkdir debBuildSystemdPath
 
         copy {
-            from "${project.buildDir}/libs/mxisd.jar"
+            from "${project.buildDir}/libs/ma1sd.jar"
             into debBuildBinPath
         }
 
@@ -232,7 +232,7 @@ task debBuild(dependsOn: shadowJar) {
         ant.replace(
                 file: "${debBuildDebianPath}/postinst",
                 token: '%DEB_CONF_FILE%',
-                value: "${debConfPath}/mxisd.yaml"
+                value: "${debConfPath}/ma1sd.yaml"
         )
 
         ant.chmod(
@@ -246,7 +246,7 @@ task debBuild(dependsOn: shadowJar) {
         )
 
         copy {
-            from "${project.file('src/systemd/mxisd.service')}"
+            from "${project.file('src/systemd/ma1sd.service')}"
             into debBuildSystemdPath
         }
 

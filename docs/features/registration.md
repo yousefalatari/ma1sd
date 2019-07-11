@@ -13,7 +13,7 @@
 ## Overview
 **NOTE**: This feature is beta: it is considered stable enough for production but is incomplete and may contain bugs.
 
-Registration is an enhanced feature of mxisd to control registrations involving 3PIDs on a Homeserver based on policies:
+Registration is an enhanced feature of ma1sd to control registrations involving 3PIDs on a Homeserver based on policies:
 - Match pending 3PID invites on the server
 - Match 3PID pattern, like a specific set of domains for emails
 - In further releases, use 3PIDs found in Identity stores
@@ -28,7 +28,7 @@ As such, it relies on the homeserver to require 3PIDs with the registration flow
 This feature is not part of the Matrix Identity Server spec.
 
 ## Integration
-mxisd needs to be integrated at several levels for this feature to work:
+ma1sd needs to be integrated at several levels for this feature to work:
 - Reverse proxy: intercept the 3PID register endpoints and act on them
 - Homeserver: require 3PID to be part of the registration data
 

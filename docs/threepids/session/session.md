@@ -30,11 +30,11 @@ by a 3PID, allowing it to be resolved to a Matrix ID.
 
 ## Restrictions
 ### Bindings
-mxisd does not store bindings directly. While a user can see its email, phone number or any other 3PID in its
+ma1sd does not store bindings directly. While a user can see its email, phone number or any other 3PID in its
 settings/profile, it does **NOT** mean it is published/saved anywhere or can be used to invite/search the user.
 
 Identity stores are the ones holding such data, irrelevant if a user added a 3PID to their profile. When queried for
-bindings, mxisd will query Identity stores which are responsible to store this kind of information.
+bindings, ma1sd will query Identity stores which are responsible to store this kind of information.
 
 Therefore, by default, any 3PID added to a user profile which is NOT within a configured and enabled Identity backend
 will simply not be usable for search or invites, **even on the same Homeserver!**  
@@ -60,7 +60,7 @@ Example: a user from Homeserver `example.org` adds an email `john@gmail.com`.
 If a federated lookup was performed, Identity servers would try to find the 3PID bind at the `gmail.com` server, and
 not `example.org`.
 
-As mxisd is built for self-hosted use cases, mainly for orgs/corps, this is usually not a problem for emails.  
+As ma1sd is built for self-hosted use cases, mainly for orgs/corps, this is usually not a problem for emails.  
 Sadly, there is currently no mechanism to make this work for phone numbers. 
 
 ## Notifications
@@ -68,7 +68,7 @@ Sadly, there is currently no mechanism to make this work for phone numbers.
 Identity server that received the request. This is usually done by means of a URL to visit for email or a short number
 received by SMS for phone numbers.
 
-mxisd use two components for this:
+ma1sd use two components for this:
 - Generator which produces the message to be sent with the necessary information the user needs to validate their session.
 - Connector which actually send the notification (e.g. SMTP for email).
 
@@ -134,7 +134,7 @@ on how to configure/customize/brand those pages to your liking.
 This configuration would disable 3PID sessions altogether, preventing users from validating emails and/or phone numbers
 and any subsequent actions that requires them, like adding them to their profiles.
   
-This would be used if mxisd is also performing authentication for the Homeserver, typically with synapse and the
+This would be used if ma1sd is also performing authentication for the Homeserver, typically with synapse and the
 [REST password provider](https://github.com/ma1uta/matrix-synapse-rest-password-provider), where 3PID mappings would be
 auto-populated.
 

@@ -7,11 +7,11 @@
 - [Submit an issue](#submit-an-issue)
 
 ## Purpose
-This document describes basic troubleshooting steps for mxisd.
+This document describes basic troubleshooting steps for ma1sd.
 
 ## Logs
 ### Locations
-mxisd logs to `STDOUT` (Standard Output) and `STDERR` (Standard Error) only, which gets redirected
+ma1sd logs to `STDOUT` (Standard Output) and `STDERR` (Standard Error) only, which gets redirected
 to log file(s) depending on your system.
 
 If you use the [Debian package](install/debian.md), this goes to `syslog`.  
@@ -22,13 +22,13 @@ For any other platform, please refer to your package maintainer.
 ### Increase verbosity
 To increase log verbosity and better track issues, the following means are available:
 - Add the `-v` command line parameter
-- Use the environment variable and value `MXISD_LOG_LEVEL=debug`
+- Use the environment variable and value `MA1SD_LOG_LEVEL=debug`
 
 ### Reading them
 Before reporting an issue, it is important to produce clean and complete logs so they can be understood.
 
 It is usually useless to try to troubleshoot an issue based on a single log line. Any action or API request
-in mxisd would trigger more than one log lines, and those would be considered necessary context to
+in ma1sd would trigger more than one log lines, and those would be considered necessary context to
 understand what happened.
 
 You may also find things called *stacktraces*. Those are important to pin-point bugs and the likes and should
