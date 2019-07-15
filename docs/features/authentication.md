@@ -49,10 +49,10 @@ An overview of the Basic Authentication process:
               |   user profiles          |    If valid credentials and supported by Identity store(s)
               +--------------------------+
 ```
-Performed on [synapse with REST auth module](https://github.com/kamax-io/matrix-synapse-rest-auth/blob/master/README.md)
+Performed on [synapse with REST auth module](https://github.com/ma1uta/matrix-synapse-rest-password-provider/blob/master/README.md)
 
 ### Synapse
-- Install the [password provider](https://github.com/kamax-io/matrix-synapse-rest-auth)
+- Install the [password provider](https://github.com/ma1uta/matrix-synapse-rest-password-provider)
 - Edit your **synapse** configuration:
   - As described by the auth module documentation
   - Set `endpoint` to `http://ma1sdAddress:8090` - Replace `ma1sdAddress` by an IP/host name that provides a direct

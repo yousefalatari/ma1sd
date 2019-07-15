@@ -8,7 +8,7 @@
 ## Fetch
 Pull the latest stable image:
 ```bash
-docker pull kamax/ma1sd
+docker pull ma1uta/ma1sd
 ```
 
 ## Configure
@@ -22,10 +22,10 @@ Use the following command after adapting to your needs:
 - The volumes host paths
 
 ```bash
-docker run --rm -e MATRIX_DOMAIN=example.org -v /data/ma1sd/etc:/etc/ma1sd -v /data/ma1sd/var:/var/ma1sd -p 8090:8090 -t kamax/ma1sd
+docker run --rm -e MATRIX_DOMAIN=example.org -v /data/ma1sd/etc:/etc/ma1sd -v /data/ma1sd/var:/var/ma1sd -p 8090:8090 -t ma1uta/ma1sd
 ```
 
-For more info, including the list of possible tags, see [the public repository](https://hub.docker.com/r/kamax/mxisd/)
+For more info, including the list of possible tags, see [the public repository](https://hub.docker.com/r/ma1uta/ma1sd/)
 
 ## Troubleshoot
 Please read the [Troubleshooting guide](../troubleshooting.md).

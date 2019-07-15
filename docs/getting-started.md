@@ -32,7 +32,7 @@ If you use synapse:
 
 For maximum integration, it is best to have your Homeserver and ma1sd reachable via the same public hostname.
 
-Be aware of a [NAT/Reverse proxy gotcha](https://github.com/kamax-matrix/ma1sd/wiki/Gotchas#nating) if you use the same
+Be aware of a [NAT/Reverse proxy gotcha](https://github.com/ma1uta/ma1sd/wiki/Gotchas#nating) if you use the same
 host.
 
 The following Quick Start guide assumes you will host the Homeserver and ma1sd under the same hostname.  
