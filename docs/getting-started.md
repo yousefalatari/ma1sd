@@ -131,7 +131,7 @@ trusted_third_party_id_servers:
 It is **highly recommended** to remove `matrix.org` and `vector.im` (or any other default entry) from your configuration
 so only your own Identity server is authoritative for your HS.
 
-## Validate
+## Validate (Under reconstruction)
 **NOTE:** In case your homeserver has no working federation, step 5 will not happen. If step 4 took place, consider
 your installation validated.
 

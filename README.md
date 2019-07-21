@@ -10,6 +10,7 @@ ma1sd - Federated Matrix Identity Server
 - [Contribute](#contribute)
 - [Powered by ma1sd](#powered-by-ma1sd)
 - [FAQ](#faq)
+- [Migration from mxisd](#migration-from-mxisd)
 - [Contact](#contact)
 
 ---
@@ -107,6 +108,10 @@ The following projects can use ma1sd under the hood for some or all their featur
 
 # FAQ
 See the [dedicated document](docs/faq.md)
+
+# Migration from mxisd
+
+See the [migration guide](docs/migration-from-mxisd.md)
 
 # Contact
 Get in touch via:
