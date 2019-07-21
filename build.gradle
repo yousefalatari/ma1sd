@@ -24,6 +24,7 @@ apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'idea'
+apply plugin: 'com.github.ben-manes.versions'
 
 def confFileName = "ma1sd.example.yaml"
 def distDir = "${project.buildDir}/dist"
@@ -77,6 +78,7 @@ buildscript {
 
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.3'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.21.0'
     }
 }
 
