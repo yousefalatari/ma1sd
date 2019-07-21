@@ -77,7 +77,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.3'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:5.1.0'
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.21.0'
     }
 }
@@ -91,18 +91,18 @@ dependencies {
     compile 'org.slf4j:slf4j-simple:1.7.25'
 
     // Easy file management
-    compile 'commons-io:commons-io:2.5'
+    compile 'commons-io:commons-io:2.6'
 
     // Config management
-    compile 'org.yaml:snakeyaml:1.23'
+    compile 'org.yaml:snakeyaml:1.24'
 
     // Dependencies from old Matrix-java-sdk
-    compile 'org.apache.commons:commons-lang3:3.8.1'
-    compile 'com.squareup.okhttp3:okhttp:3.12.0'
-    compile 'commons-codec:commons-codec:1.11'
+    compile 'org.apache.commons:commons-lang3:3.9'
+    compile 'com.squareup.okhttp3:okhttp:4.0.1'
+    compile 'commons-codec:commons-codec:1.12'
 
     // ORMLite
-    compile 'com.j256.ormlite:ormlite-jdbc:5.0'
+    compile 'com.j256.ormlite:ormlite-jdbc:5.1'
 
     // ed25519 handling
     compile 'net.i2p.crypto:eddsa:0.3.0'
@@ -111,13 +111,13 @@ dependencies {
     compile 'org.apache.directory.api:api-all:1.0.0'
 
     // DNS lookups
-    compile 'dnsjava:dnsjava:2.1.8'
+    compile 'dnsjava:dnsjava:2.1.9'
 
     // HTTP connections
-    compile 'org.apache.httpcomponents:httpclient:4.5.3'
+    compile 'org.apache.httpcomponents:httpclient:4.5.9'
 
     // Phone numbers validation
-    compile 'com.googlecode.libphonenumber:libphonenumber:8.7.1'
+    compile 'com.googlecode.libphonenumber:libphonenumber:8.10.15'
 
     // E-mail sending
     compile 'javax.mail:javax.mail-api:1.6.2'
@@ -127,36 +127,36 @@ dependencies {
     compile 'com.google.firebase:firebase-admin:5.3.0'
 
     // Connection Pool
-    compile 'com.mchange:c3p0:0.9.5.2'
+    compile 'com.mchange:c3p0:0.9.5.4'
 
     // SQLite
-    compile 'org.xerial:sqlite-jdbc:3.20.0'
+    compile 'org.xerial:sqlite-jdbc:3.28.0'
 
     // PostgreSQL
-    compile 'org.postgresql:postgresql:42.2.5'
+    compile 'org.postgresql:postgresql:42.2.6'
 
     // MariaDB/MySQL
-    compile 'org.mariadb.jdbc:mariadb-java-client:2.1.2'
+    compile 'org.mariadb.jdbc:mariadb-java-client:2.4.2'
 
     // Twilio SDK for SMS
-    compile 'com.twilio.sdk:twilio:7.14.5'
+    compile 'com.twilio.sdk:twilio:7.40.1'
 
     // SendGrid SDK to send emails from GCE
     compile 'com.sendgrid:sendgrid-java:2.2.2'
 
     // ZT-Exec for exec identity store
-    compile 'org.zeroturnaround:zt-exec:1.10'
+    compile 'org.zeroturnaround:zt-exec:1.11'
 
     // HTTP server
-    compile 'io.undertow:undertow-core:2.0.16.Final'
+    compile 'io.undertow:undertow-core:2.0.22.Final'
 
     // Command parser for AS interface
     implementation 'commons-cli:commons-cli:1.4'
 
-    testCompile 'junit:junit:4.12'
-    testCompile 'com.github.tomakehurst:wiremock:2.8.0'
-    testCompile 'com.unboundid:unboundid-ldapsdk:4.0.9'
-    testCompile 'com.icegreen:greenmail:1.5.9'
+    testCompile 'junit:junit:4.13-beta-3'
+    testCompile 'com.github.tomakehurst:wiremock:2.24.0'
+    testCompile 'com.unboundid:unboundid-ldapsdk:4.0.11'
+    testCompile 'com.icegreen:greenmail:1.5.10'
 }
 
 jar {
