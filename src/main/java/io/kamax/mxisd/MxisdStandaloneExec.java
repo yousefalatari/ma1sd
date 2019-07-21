@@ -73,20 +73,20 @@ public class MxisdStandaloneExec {
             }
 
             if (Objects.isNull(cfg)) {
-                cfg = YamlConfigLoader.tryLoadFromFile("mxisd.yaml").orElseGet(MxisdConfig::new);
+                cfg = YamlConfigLoader.tryLoadFromFile("ma1sd.yaml").orElseGet(MxisdConfig::new);
             }
 
-            log.info("mxisd starting");
+            log.info("ma1sd starting");
             log.info("Version: {}", Mxisd.Version);
 
             HttpMxisd mxisd = new HttpMxisd(cfg);
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 mxisd.stop();
-                log.info("mxisd stopped");
+                log.info("ma1sd stopped");
             }));
             mxisd.start();
 
-            log.info("mxisd started");
+            log.info("ma1sd started");
         } catch (ConfigurationException e) {
             log.error(e.getDetailedMessage());
             log.error(e.getMessage());
