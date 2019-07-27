@@ -73,8 +73,8 @@ public abstract class GenericNotificationHandler<A extends ThreePidConnector, B 
     }
 
     @Override
-    public void sendForFraudulentUnbind(ThreePid tpid) {
-        send(connector, tpid.getAddress(), generator.getForFraudulentUnbind(tpid));
+    public void sendForUnbind(ThreePid tpid) {
+        send(connector, tpid.getAddress(), generator.getForNotificationUnbind(tpid));
     }
 
 }

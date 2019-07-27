@@ -78,8 +78,8 @@ public class NotificationManager {
         ensureMedium(session.getThreePid().getMedium()).sendForValidation(session);
     }
 
-    public void sendForFraudulentUnbind(ThreePid tpid) throws NotImplementedException {
-        ensureMedium(tpid.getMedium()).sendForFraudulentUnbind(tpid);
+    public void sendForUnbind(ThreePid tpid) throws NotImplementedException {
+        ensureMedium(tpid.getMedium()).sendForUnbind(tpid);
     }
 
 }

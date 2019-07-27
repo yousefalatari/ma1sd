@@ -129,10 +129,10 @@ public class EmailSendGridNotificationHandler extends PlaceholderNotificationGen
     }
 
     @Override
-    public void sendForFraudulentUnbind(ThreePid tpid) {
-        EmailTemplate template = cfg.getTemplates().getSession().getUnbind().getFraudulent();
+    public void sendForUnbind(ThreePid tpid) {
+        EmailTemplate template = cfg.getTemplates().getSession().getUnbind();
         if (StringUtils.isAllBlank(template.getBody().getText(), template.getBody().getHtml())) {
-            throw new FeatureNotAvailable("No template has been configured for fraudulent unbind notifications");
+            throw new FeatureNotAvailable("No template has been configured for unbind notifications");
         }
 
         Email email = getEmail();

@@ -37,6 +37,6 @@ public interface NotificationGenerator {
 
     String getForValidation(IThreePidSession session);
 
-    String getForFraudulentUnbind(ThreePid tpid);
+    String getForNotificationUnbind(ThreePid tpid);
 
 }

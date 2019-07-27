@@ -115,24 +115,10 @@ public class EmailSendGridConfig {
 
     public static class Templates {
 
-        public static class TemplateSessionUnbind {
-
-            private EmailTemplate fraudulent = new EmailTemplate();
-
-            public EmailTemplate getFraudulent() {
-                return fraudulent;
-            }
-
-            public void setFraudulent(EmailTemplate fraudulent) {
-                this.fraudulent = fraudulent;
-            }
-
-        }
-
         public static class TemplateSession {
 
             private EmailTemplate validation = new EmailTemplate();
-            private TemplateSessionUnbind unbind = new TemplateSessionUnbind();
+            private EmailTemplate unbind = new EmailTemplate();
 
             public EmailTemplate getValidation() {
                 return validation;
@@ -142,11 +128,11 @@ public class EmailSendGridConfig {
                 this.validation = validation;
             }
 
-            public TemplateSessionUnbind getUnbind() {
+            public EmailTemplate getUnbind() {
                 return unbind;
             }
 
-            public void setUnbind(TemplateSessionUnbind unbind) {
+            public void setUnbind(EmailTemplate unbind) {
                 this.unbind = unbind;
             }
 

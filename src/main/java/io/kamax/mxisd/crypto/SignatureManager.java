@@ -26,6 +26,7 @@ import io.kamax.matrix.event.EventKey;
 import io.kamax.matrix.json.MatrixJson;
 
 import java.nio.charset.StandardCharsets;
+import java.security.PublicKey;
 import java.util.Objects;
 
 public interface SignatureManager {
@@ -106,4 +107,13 @@ public interface SignatureManager {
      */
     Signature sign(byte[] data);
 
+    /**
+     * Verify the data.
+     *
+     * @param publicKey public key to verify
+     * @param signature signature to verify
+     * @param data      the data to verify
+     * @return {@code true} if signature is valid, else {@code false}
+     */
+    boolean verify(PublicKey publicKey, String signature, byte[] data);
 }

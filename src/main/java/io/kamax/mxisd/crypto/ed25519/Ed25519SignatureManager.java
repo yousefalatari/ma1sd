@@ -33,7 +33,9 @@ import net.i2p.crypto.eddsa.EdDSAEngine;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.SignatureException;
+import java.util.Base64;
 
 public class Ed25519SignatureManager implements SignatureManager {
 
@@ -92,4 +94,15 @@ public class Ed25519SignatureManager implements SignatureManager {
         }
     }
 
+    @Override
+    public boolean verify(PublicKey publicKey, String signature, byte[] data) {
+        try {
+            EdDSAEngine signEngine = new EdDSAEngine(MessageDigest.getInstance(keyMgr.getKeySpecs().getHashAlgorithm()));
+            signEngine.initVerify(publicKey);
+            signEngine.update(data);
+            return signEngine.verify(Base64.getDecoder().decode(signature));
+        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

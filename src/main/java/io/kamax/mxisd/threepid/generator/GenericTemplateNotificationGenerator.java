@@ -79,9 +79,9 @@ public abstract class GenericTemplateNotificationGenerator extends PlaceholderNo
     }
 
     @Override
-    public String getForFraudulentUnbind(ThreePid tpid) {
-        log.info("Generating notification content for fraudulent unbind");
-        return populateForFraudulentUndind(tpid, getTemplateContent(cfg.getSession().getUnbind().getFraudulent()));
+    public String getForNotificationUnbind(ThreePid tpid) {
+        log.info("Generating notification content for unbind");
+        return populateForNotificationUndind(tpid, getTemplateContent(cfg.getSession().getUnbind().getNotification()));
     }
 
 }

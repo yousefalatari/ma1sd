@@ -9,7 +9,7 @@ provide your own custom templates.
 Templates for the following events/actions are available:
 - [3PID invite](../../features/identity.md)
 - [3PID session: validation](../session/session.md)
-- [3PID session: fraudulent unbind](https://github.com/kamax-matrix/ma1sd/wiki/ma1sd-and-your-privacy#improving-your-privacy-one-commit-at-the-time)
+- [3PID session: unbind](https://github.com/kamax-matrix/ma1sd/wiki/ma1sd-and-your-privacy#improving-your-privacy-one-commit-at-the-time)
 - [Matrix ID invite](../../features/experimental/application-service.md#email-notification-about-room-invites-by-matrix-ids)
 
 ## Placeholders
@@ -71,7 +71,7 @@ under the namespace `threepid.medium.<medium>.generators.template`.
 Under such namespace, the following keys are available:
 - `invite`: Path to the 3PID invite notification template
 - `session.validation`: Path to the 3PID session validation notification template
-- `session.unbind.fraudulent`: Path to the 3PID session fraudulent unbind notification template
+- `session.unbind`: Path to the 3PID session unbind notification template
 - `generic.matrixId`: Path to the Matrix ID invite notification template
 - `placeholder`: Map of key/values to set static values for some placeholders.
 
@@ -104,7 +104,7 @@ threepid:
           session:
             validation: '/path/to/validate-template.eml'
             unbind:
-              fraudulent: '/path/to/unbind-fraudulent-template.eml'
+              notification: '/path/to/unbind-notification-template.eml'
           generic:
             matrixId: '/path/to/mxid-invite-template.eml'
           placeholder:

@@ -103,8 +103,8 @@ session:
     validation:
       enabled: true
     unbind:
-      fraudulent:
-        sendWarning: true
+      notification:
+        enabled: true
 
 # DO NOT COPY/PASTE AS-IS IN YOUR CONFIGURATION
 # CONFIGURATION EXAMPLE
@@ -115,11 +115,7 @@ are allowed to do in terms of 3PID sessions. The policy has a global on/off swit
 
 ---
 
-`unbind.fraudulent` controls warning notifications if an illegal/fraudulent 3PID removal is attempted on the Identity server.  
-This is directly related to synapse disregard for privacy and new GDPR laws in Europe in an attempt to inform users about
-potential privacy leaks.
-
-For more information, see the corresponding [synapse issue](https://github.com/matrix-org/synapse/issues/4540).
+`unbind` controls warning notifications for 3PID removal.  
 
 ### Web views
 Once a user click on a validation link, it is taken to the Identity Server validation page where the token is submitted.  

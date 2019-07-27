@@ -127,7 +127,7 @@ public abstract class PlaceholderNotificationGenerator {
                 .replace("%NEXT_URL%", validationLink);
     }
 
-    protected String populateForFraudulentUndind(ThreePid tpid, String input) {
+    protected String populateForNotificationUndind(ThreePid tpid, String input) {
         return populateForCommon(tpid, input);
     }
 

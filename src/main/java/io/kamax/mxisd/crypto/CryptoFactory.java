@@ -58,5 +58,4 @@ public class CryptoFactory {
     public static SignatureManager getSignatureManager(MxisdConfig cfg, Ed25519KeyManager keyMgr) {
         return new Ed25519SignatureManager(cfg, keyMgr);
     }
-
 }

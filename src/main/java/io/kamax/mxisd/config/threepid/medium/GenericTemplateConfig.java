@@ -41,16 +41,25 @@ public class GenericTemplateConfig {
 
         public static class SessionUnbind {
 
-            private String fraudulent;
+            private String validation;
 
-            public String getFraudulent() {
-                return fraudulent;
+            private String notification;
+
+            public String getValidation() {
+                return validation;
             }
 
-            public void setFraudulent(String fraudulent) {
-                this.fraudulent = fraudulent;
+            public void setValidation(String validation) {
+                this.validation = validation;
             }
 
+            public String getNotification() {
+                return notification;
+            }
+
+            public void setNotification(String notification) {
+                this.notification = notification;
+            }
         }
 
         private String validation;

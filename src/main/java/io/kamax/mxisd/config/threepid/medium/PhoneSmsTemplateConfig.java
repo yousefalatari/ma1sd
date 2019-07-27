@@ -30,7 +30,8 @@ public class PhoneSmsTemplateConfig extends GenericTemplateConfig {
     public PhoneSmsTemplateConfig() {
         setInvite("classpath:/threepids/sms/invite-template.txt");
         getSession().setValidation("classpath:/threepids/sms/validate-template.txt");
-        getSession().getUnbind().setFraudulent("classpath:/threepids/sms/unbind-fraudulent.txt");
+        getSession().getUnbind().setValidation("classpath:/threepids/sms/unbind-validation.txt");
+        getSession().getUnbind().setNotification("classpath:/threepids/sms/unbind-notification.txt");
     }
 
     public PhoneSmsTemplateConfig build() {
@@ -39,7 +40,8 @@ public class PhoneSmsTemplateConfig extends GenericTemplateConfig {
         log.info("Session:");
         log.info("  Validation: {}", getSession().getValidation());
         log.info("  Unbind:");
-        log.info("    Fraudulent: {}", getSession().getUnbind().getFraudulent());
+        log.info("    Validation: {}", getSession().getUnbind().getValidation());
+        log.info("    Notification: {}", getSession().getUnbind().getNotification());
 
         return this;
     }

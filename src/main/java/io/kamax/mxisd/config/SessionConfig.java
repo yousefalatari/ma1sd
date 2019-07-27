@@ -46,30 +46,15 @@ public class SessionConfig {
 
         public static class PolicyUnbind {
 
-            public static class PolicyUnbindFraudulent {
+            private boolean enabled = true;
 
-                private boolean sendWarning = true;
-
-                public boolean getSendWarning() {
-                    return sendWarning;
-                }
-
-                public void setSendWarning(boolean sendWarning) {
-                    this.sendWarning = sendWarning;
-                }
+            public boolean getEnabled() {
+                return enabled;
             }
 
-
-            private PolicyUnbindFraudulent fraudulent = new PolicyUnbindFraudulent();
-
-            public PolicyUnbindFraudulent getFraudulent() {
-                return fraudulent;
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
             }
-
-            public void setFraudulent(PolicyUnbindFraudulent fraudulent) {
-                this.fraudulent = fraudulent;
-            }
-
         }
 
         public Policy() {

@@ -20,32 +20,48 @@
 
 package io.kamax.mxisd.session;
 
+import static io.kamax.mxisd.config.SessionConfig.Policy.PolicyTemplate;
+
 import com.google.gson.JsonObject;
 import io.kamax.matrix.MatrixID;
 import io.kamax.matrix.ThreePid;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.json.GsonUtil;
+import io.kamax.matrix.json.MatrixJson;
 import io.kamax.mxisd.config.MatrixConfig;
 import io.kamax.mxisd.config.SessionConfig;
+import io.kamax.mxisd.crypto.SignatureManager;
 import io.kamax.mxisd.exception.BadRequestException;
 import io.kamax.mxisd.exception.NotAllowedException;
+import io.kamax.mxisd.exception.RemoteHomeServerException;
 import io.kamax.mxisd.exception.SessionNotValidatedException;
 import io.kamax.mxisd.exception.SessionUnknownException;
 import io.kamax.mxisd.lookup.SingleLookupReply;
 import io.kamax.mxisd.lookup.SingleLookupRequest;
 import io.kamax.mxisd.lookup.ThreePidValidation;
+import io.kamax.mxisd.matrix.HomeserverFederationResolver;
 import io.kamax.mxisd.notification.NotificationManager;
 import io.kamax.mxisd.storage.IStorage;
 import io.kamax.mxisd.storage.dao.IThreePidSessionDao;
 import io.kamax.mxisd.threepid.session.ThreePidSession;
+import net.i2p.crypto.eddsa.EdDSAPublicKey;
+import net.i2p.crypto.eddsa.spec.EdDSANamedCurveSpec;
+import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
+import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Calendar;
 import java.util.Optional;
-
-import static io.kamax.mxisd.config.SessionConfig.Policy.PolicyTemplate;
 
 public class SessionManager {
 
@@ -55,17 +71,26 @@ public class SessionManager {
     private MatrixConfig mxCfg;
     private IStorage storage;
     private NotificationManager notifMgr;
+    private HomeserverFederationResolver resolver;
+    private CloseableHttpClient client;
+    private SignatureManager signatureManager;
 
     public SessionManager(
-            SessionConfig cfg,
-            MatrixConfig mxCfg,
-            IStorage storage,
-            NotificationManager notifMgr
+        SessionConfig cfg,
+        MatrixConfig mxCfg,
+        IStorage storage,
+        NotificationManager notifMgr,
+        HomeserverFederationResolver resolver,
+        CloseableHttpClient client,
+        SignatureManager signatureManager
     ) {
         this.cfg = cfg;
         this.mxCfg = mxCfg;
         this.storage = storage;
         this.notifMgr = notifMgr;
+        this.resolver = resolver;
+        this.client = client;
+        this.signatureManager = signatureManager;
     }
 
     private ThreePidSession getSession(String sid, String secret) {
@@ -98,7 +123,8 @@ public class SessionManager {
                 ThreePidSession session = new ThreePidSession(dao.get());
                 log.info("We already have a session for {}: {}", tpid, session.getId());
                 if (session.getAttempt() < attempt) {
-                    log.info("Received attempt {} is greater than stored attempt {}, sending validation communication", attempt, session.getAttempt());
+                    log.info("Received attempt {} is greater than stored attempt {}, sending validation communication", attempt,
+                        session.getAttempt());
                     notifMgr.sendForValidation(session);
                     log.info("Sent validation notification to {}", tpid);
                     session.increaseAttempt();
@@ -166,7 +192,7 @@ public class SessionManager {
         }
 
         log.info("Session {}: Binding of {}:{} to Matrix ID {} is accepted",
-                session.getId(), session.getThreePid().getMedium(), session.getThreePid().getAddress(), mxid.getId());
+            session.getId(), session.getThreePid().getMedium(), session.getThreePid().getAddress(), mxid.getId());
 
         SingleLookupRequest request = new SingleLookupRequest();
         request.setType(session.getThreePid().getMedium());
@@ -174,7 +200,7 @@ public class SessionManager {
         return new SingleLookupReply(request, mxid);
     }
 
-    public void unbind(JsonObject reqData) {
+    public void unbind(String auth, JsonObject reqData) {
         _MatrixID mxid;
         try {
             mxid = MatrixID.asAcceptable(GsonUtil.getStringOrThrow(reqData, "mxid"));
@@ -186,6 +212,128 @@ public class SessionManager {
         String secret = GsonUtil.getStringOrNull(reqData, "client_secret");
         ThreePid tpid = GsonUtil.get().fromJson(GsonUtil.getObj(reqData, "threepid"), ThreePid.class);
 
+        if (StringUtils.isNotBlank(sid) && StringUtils.isNotBlank(secret)) {
+            checkSession(sid, secret, tpid, mxid);
+        } else if (StringUtils.isNotBlank(auth)) {
+            checkAuthorization(auth, reqData);
+        } else {
+            throw new NotAllowedException("Unable to validate request");
+        }
+
+        // TODO make invalid all 3PID with specified medium and address.
+    }
+
+    private void checkAuthorization(String auth, JsonObject reqData) {
+        if (!auth.startsWith("X-Matrix ")) {
+            throw new NotAllowedException("Wrong authorization header");
+        }
+
+        if (StringUtils.isBlank(mxCfg.getTrustedIdServer())) {
+            throw new NotAllowedException("Unable to verify request, missing `matrix.trustedIdServer` variable");
+        }
+
+        String[] params = auth.substring("X-Matrix ".length()).split(",");
+
+        String origin = null;
+        String key = null;
+        String sig = null;
+        for (String param : params) {
+            String[] paramItems = param.split("=");
+            String paramKey = paramItems[0];
+            String paramValue = paramItems[1];
+            switch (paramKey) {
+                case "origin":
+                    origin = removeQuotes(paramValue);
+                    break;
+                case "key":
+                    key = removeQuotes(paramValue);
+                    break;
+                case "sig":
+                    sig = removeQuotes(paramValue);
+                    break;
+                default:
+                    log.error("Unknown parameter: {}", param);
+                    throw new BadRequestException("Authorization with unknown parameter");
+            }
+        }
+
+        if (StringUtils.isBlank(origin) || StringUtils.isBlank(key) || StringUtils.isBlank(sig)) {
+            log.error("Missing required parameters");
+            throw new BadRequestException("Missing required header parameters");
+        }
+
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("method", "POST");
+        jsonObject.addProperty("uri", "/_matrix/identity/api/v1/3pid/unbind");
+        jsonObject.addProperty("origin", origin);
+        jsonObject.addProperty("destination_is", mxCfg.getTrustedIdServer());
+        jsonObject.add("content", reqData);
+
+        String canonical = MatrixJson.encodeCanonical(jsonObject);
+
+        String originUrl = resolver.resolve(origin).toString();
+
+        validateServerKey(key, sig, canonical, originUrl);
+    }
+
+    private String removeQuotes(String origin) {
+        return origin.startsWith("\"") && origin.endsWith("\"") ? origin.substring(1, origin.length() - 1) : origin;
+    }
+
+    private void validateServerKey(String key, String signature, String canonical, String originUrl) {
+        HttpGet request = new HttpGet(originUrl + "/_matrix/key/v2/server");
+        log.info("Get keys from the server {}", request.getURI());
+        try (CloseableHttpResponse response = client.execute(request)) {
+            int statusCode = response.getStatusLine().getStatusCode();
+            log.info("Answer code: {}", statusCode);
+            if (statusCode == 200) {
+                verifyKey(key, signature, canonical, response);
+            } else {
+                throw new RemoteHomeServerException("Unable to fetch server keys.");
+            }
+        } catch (IOException e) {
+            String message = "Unable to get server keys: " + originUrl;
+            log.error(message, e);
+            throw new IllegalArgumentException(message);
+        }
+    }
+
+    private void verifyKey(String key, String signature, String canonical, CloseableHttpResponse response) throws IOException {
+        final String content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
+        log.info("Answer body: {}", content);
+        final JsonObject responseObject = GsonUtil.parseObj(content);
+        final long validUntilTs = GsonUtil.getLong(responseObject, "valid_until_ts");
+
+        final Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(validUntilTs);
+        if (calendar.before(Calendar.getInstance())) {
+            final String msg = "Key is expired";
+            log.error(msg);
+            throw new RemoteHomeServerException(msg);
+        }
+
+        final JsonObject verifyKeys = GsonUtil.getObj(responseObject, "verify_keys");
+        final JsonObject keyObject = GsonUtil.getObj(verifyKeys, key);
+        final String publicKey = GsonUtil.getStringOrNull(keyObject, "key");
+
+        if (StringUtils.isBlank(publicKey)) {
+            throw new RemoteHomeServerException("Missing server key.");
+        }
+
+        EdDSANamedCurveSpec ed25519CurveSpec = EdDSANamedCurveTable.ED_25519_CURVE_SPEC;
+        EdDSAPublicKeySpec publicKeySpec = new EdDSAPublicKeySpec(Base64.getDecoder().decode(publicKey), ed25519CurveSpec);
+        EdDSAPublicKey dsaPublicKey = new EdDSAPublicKey(publicKeySpec);
+
+        final boolean verificationResult = signatureManager.verify(dsaPublicKey, signature, canonical.getBytes(StandardCharsets.UTF_8));
+        log.info("Verification result: {}", verificationResult);
+        if (!verificationResult) {
+            throw new RemoteHomeServerException("Unable to verify request.");
+        }
+
+        log.info("Request was authorized.");
+    }
+
+    private void checkSession(String sid, String secret, ThreePid tpid, _MatrixID mxid) {
         // We ensure the session was validated
         ThreePidSession session = getSessionIfValidated(sid, secret);
 
@@ -199,8 +347,6 @@ public class SessionManager {
             throw new NotAllowedException("Only Matrix IDs from domain " + mxCfg.getDomain() + " can be unbound");
         }
 
-        log.info("Session {}: Unbinding of {}:{} to Matrix ID {} is accepted",
-                session.getId(), session.getThreePid().getMedium(), session.getThreePid().getAddress(), mxid.getId());
+        log.info("Request was authorized.");
     }
-
 }
