@@ -115,7 +115,7 @@ public class EmailSmtpConnector implements EmailConnector {
             msg.setRecipients(Message.RecipientType.TO, recipient);
             msg.saveChanges();
 
-            log.info("Sending invite to {} via SMTP using {}:{}", recipient, cfg.getHost(), cfg.getPort());
+            log.info("Sending email to {} via SMTP using {}:{}", recipient, cfg.getHost(), cfg.getPort());
             SMTPTransport transport = (SMTPTransport) session.getTransport("smtp");
 
             if (cfg.getTls() < 3) {
@@ -134,12 +134,12 @@ public class EmailSmtpConnector implements EmailConnector {
 
             try {
                 transport.sendMessage(msg, InternetAddress.parse(recipient));
-                log.info("Invite to {} was sent", recipient);
+                log.info("Email to {} was sent", recipient);
             } finally {
                 transport.close();
             }
         } catch (UnsupportedEncodingException | MessagingException e) {
-            throw new RuntimeException("Unable to send e-mail invite to " + recipient, e);
+            throw new RuntimeException("Unable to send e-mail to " + recipient, e);
         }
     }
 

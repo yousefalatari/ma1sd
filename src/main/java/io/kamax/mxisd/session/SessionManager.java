@@ -212,6 +212,10 @@ public class SessionManager {
         String secret = GsonUtil.getStringOrNull(reqData, "client_secret");
         ThreePid tpid = GsonUtil.get().fromJson(GsonUtil.getObj(reqData, "threepid"), ThreePid.class);
 
+        if (tpid == null || StringUtils.isBlank(tpid.getAddress()) || StringUtils.isBlank(tpid.getMedium())) {
+            throw new BadRequestException("Missing required 3PID");
+        }
+
         if (StringUtils.isNotBlank(sid) && StringUtils.isNotBlank(secret)) {
             checkSession(sid, secret, tpid, mxid);
         } else if (StringUtils.isNotBlank(auth)) {
@@ -220,7 +224,8 @@ public class SessionManager {
             throw new NotAllowedException("Unable to validate request");
         }
 
-        // TODO make invalid all 3PID with specified medium and address.
+        log.info("Unbinding of {} {} to {} is accepted", tpid.getMedium(), tpid.getAddress(), mxid.getId());
+        notifMgr.sendForUnbind(tpid);
     }
 
     private void checkAuthorization(String auth, JsonObject reqData) {

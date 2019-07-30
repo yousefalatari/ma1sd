@@ -9,14 +9,9 @@ Content-Disposition: inline
 
 Hello there!
 
-You or a server on your behalf requested to unbind your email.
+You or a server on your behalf unbinded your email.
 
-If it was really you who made this request, you can click on the following link to
-complete the unbinding your email address:
-
-  %VALIDATION_LINK%
-
-If you didn't make this request, you can safely disregard this email.
+If you didn't make this request, please contact the system administrator.
 
 %DOMAIN_PRETTY% Admins
 
@@ -66,14 +61,9 @@ Content-Disposition: inline
                 <td id="inner">
                     <p>Hello there!</p>
 
-                    <p>You or a server on your behalf requested to unbind your email.</p>
+                    <p>You or a server on your behalf unbinded your email.</p>
 
-                    <p>If it was really you who made this request, you can click on the following link to
-                    complete the unbinding your email address:</p>
-
-                    <p><a href="%VALIDATION_LINK%">Complete email unbinding</a></p>
-
-                    <p>If you didn't make this request, you can safely disregard this email.</p>
+                    <p>If you didn't make this request, please contact the system administrator.</p>
 
                     <p>%DOMAIN_PRETTY% Admins</p>
                 </td>

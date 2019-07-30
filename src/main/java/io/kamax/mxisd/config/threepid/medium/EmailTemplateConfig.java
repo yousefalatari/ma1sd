@@ -31,7 +31,6 @@ public class EmailTemplateConfig extends GenericTemplateConfig {
         setInvite("classpath:/threepids/email/invite-template.eml");
         getGeneric().put("matrixId", "classpath:/threepids/email/mxid-template.eml");
         getSession().setValidation("classpath:/threepids/email/validate-template.eml");
-        getSession().getUnbind().setValidation("classpath:/threepids/email/unbind-template.eml");
         getSession().getUnbind().setNotification("classpath:/threepids/email/unbind-notification.eml");
     }
 
@@ -41,7 +40,6 @@ public class EmailTemplateConfig extends GenericTemplateConfig {
         log.info("Session:");
         log.info("  Validation: {}", getSession().getValidation());
         log.info("  Unbind:");
-        log.info("    Validation: {}", getSession().getUnbind().getValidation());
         log.info("    Notification: {}", getSession().getUnbind().getNotification());
 
         return this;
