@@ -28,8 +28,7 @@ import io.kamax.matrix.ThreePid;
 import io.kamax.matrix._MatrixID;
 import io.kamax.matrix.json.GsonUtil;
 import io.kamax.matrix.json.MatrixJson;
-import io.kamax.mxisd.config.MatrixConfig;
-import io.kamax.mxisd.config.SessionConfig;
+import io.kamax.mxisd.config.MxisdConfig;
 import io.kamax.mxisd.crypto.SignatureManager;
 import io.kamax.mxisd.exception.BadRequestException;
 import io.kamax.mxisd.exception.NotAllowedException;
@@ -67,8 +66,7 @@ public class SessionManager {
 
     private static final Logger log = LoggerFactory.getLogger(SessionManager.class);
 
-    private SessionConfig cfg;
-    private MatrixConfig mxCfg;
+    private MxisdConfig cfg;
     private IStorage storage;
     private NotificationManager notifMgr;
     private HomeserverFederationResolver resolver;
@@ -76,8 +74,7 @@ public class SessionManager {
     private SignatureManager signatureManager;
 
     public SessionManager(
-        SessionConfig cfg,
-        MatrixConfig mxCfg,
+        MxisdConfig cfg,
         IStorage storage,
         NotificationManager notifMgr,
         HomeserverFederationResolver resolver,
@@ -85,7 +82,6 @@ public class SessionManager {
         SignatureManager signatureManager
     ) {
         this.cfg = cfg;
-        this.mxCfg = mxCfg;
         this.storage = storage;
         this.notifMgr = notifMgr;
         this.resolver = resolver;
@@ -111,7 +107,7 @@ public class SessionManager {
     }
 
     public String create(String server, ThreePid tpid, String secret, int attempt, String nextLink) {
-        PolicyTemplate policy = cfg.getPolicy().getValidation();
+        PolicyTemplate policy = cfg.getSession().getPolicy().getValidation();
         if (!policy.isEnabled()) {
             throw new NotAllowedException("Validating 3PID is disabled");
         }
@@ -187,8 +183,9 @@ public class SessionManager {
         _MatrixID mxid = MatrixID.asAcceptable(mxidRaw);
 
         // Only accept binds if the domain matches our own
-        if (!StringUtils.equalsIgnoreCase(mxCfg.getDomain(), mxid.getDomain())) {
-            throw new NotAllowedException("Only Matrix IDs from domain " + mxCfg.getDomain() + " can be bound");
+        final String domain = cfg.getMatrix().getDomain();
+        if (!StringUtils.equalsIgnoreCase(domain, mxid.getDomain())) {
+            throw new NotAllowedException("Only Matrix IDs from domain " + domain + " can be bound");
         }
 
         log.info("Session {}: Binding of {}:{} to Matrix ID {} is accepted",
@@ -201,6 +198,11 @@ public class SessionManager {
     }
 
     public void unbind(String auth, JsonObject reqData) {
+        if (!cfg.getSession().getPolicy().getUnbind().getEnabled()) {
+            log.error("Unbind disabled.");
+            throw new NotAllowedException("Unbinding 3PID is disabled");
+        }
+
         _MatrixID mxid;
         try {
             mxid = MatrixID.asAcceptable(GsonUtil.getStringOrThrow(reqData, "mxid"));
@@ -233,8 +235,8 @@ public class SessionManager {
             throw new NotAllowedException("Wrong authorization header");
         }
 
-        if (StringUtils.isBlank(mxCfg.getTrustedIdServer())) {
-            throw new NotAllowedException("Unable to verify request, missing `matrix.trustedIdServer` variable");
+        if (StringUtils.isBlank(cfg.getServer().getPublicUrl())) {
+            throw new NotAllowedException("Unable to verify request, missing `server.publicUrl` property");
         }
 
         String[] params = auth.substring("X-Matrix ".length()).split(",");
@@ -271,7 +273,7 @@ public class SessionManager {
         jsonObject.addProperty("method", "POST");
         jsonObject.addProperty("uri", "/_matrix/identity/api/v1/3pid/unbind");
         jsonObject.addProperty("origin", origin);
-        jsonObject.addProperty("destination_is", mxCfg.getTrustedIdServer());
+        jsonObject.addProperty("destination_is", cfg.getServer().getPublicUrl());
         jsonObject.add("content", reqData);
 
         String canonical = MatrixJson.encodeCanonical(jsonObject);
@@ -348,8 +350,9 @@ public class SessionManager {
         }
 
         // We only allow unbind for the domain we manage, mirroring bind
-        if (!StringUtils.equalsIgnoreCase(mxCfg.getDomain(), mxid.getDomain())) {
-            throw new NotAllowedException("Only Matrix IDs from domain " + mxCfg.getDomain() + " can be unbound");
+        final CharSequence domain = cfg.getMatrix().getDomain();
+        if (!StringUtils.equalsIgnoreCase(domain, mxid.getDomain())) {
+            throw new NotAllowedException("Only Matrix IDs from domain " + domain + " can be unbound");
         }
 
         log.info("Request was authorized.");

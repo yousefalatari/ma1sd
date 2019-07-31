@@ -62,7 +62,6 @@ public class MatrixConfig {
     private transient final Logger log = LoggerFactory.getLogger(MatrixConfig.class);
 
     private String domain;
-    private String trustedIdServer;
     private Identity identity = new Identity();
 
     public String getDomain() {
@@ -71,14 +70,6 @@ public class MatrixConfig {
 
     public void setDomain(String domain) {
         this.domain = domain;
-    }
-
-    public String getTrustedIdServer() {
-        return trustedIdServer;
-    }
-
-    public void setTrustedIdServer(String trustedIdServer) {
-        this.trustedIdServer = trustedIdServer;
     }
 
     public Identity getIdentity() {

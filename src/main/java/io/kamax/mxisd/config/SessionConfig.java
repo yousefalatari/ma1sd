@@ -59,6 +59,7 @@ public class SessionConfig {
 
         public Policy() {
             validation.enabled = true;
+            unbind.enabled = true;
         }
 
         private PolicyTemplate validation = new PolicyTemplate();
