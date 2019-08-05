@@ -45,6 +45,14 @@ Create a list under the label `myOtherServers` containing two Identity servers: 
 - `server.port`: HTTP port to listen on (unencrypted)
 - `server.publicUrl`: Defaults to `https://{server.name}`
 
+## Unbind (MSC1915)
+- `session.policy.unbind.enabled`: Enable or disable unbind functionality (MSC1915). (Defaults to true).
+
+*Warning*: Unbind check incoming request by two ways:
+- session validation.
+- request signature via `X-Matrix` header and uses `server.publicUrl` property to construct the signing json;
+Commonly the `server.publicUrl` should be the same value as the `trusted_third_party_id_servers` property in the synapse config.
+
 ## Storage
 ### SQLite
 `storage.provider.sqlite.database`: Absolute location of the SQLite database
