@@ -218,8 +218,15 @@ public class SessionManager {
             throw new BadRequestException("Missing required 3PID");
         }
 
+        // We only allow unbind for the domain we manage, mirroring bind
+        final CharSequence domain = cfg.getMatrix().getDomain();
+        if (!StringUtils.equalsIgnoreCase(domain, mxid.getDomain())) {
+            throw new NotAllowedException("Only Matrix IDs from domain " + domain + " can be unbound");
+        }
+
+        log.info("Request was authorized.");
         if (StringUtils.isNotBlank(sid) && StringUtils.isNotBlank(secret)) {
-            checkSession(sid, secret, tpid, mxid);
+            checkSession(sid, secret, tpid);
         } else if (StringUtils.isNotBlank(auth)) {
             checkAuthorization(auth, reqData);
         } else {
@@ -267,6 +274,10 @@ public class SessionManager {
         if (StringUtils.isBlank(origin) || StringUtils.isBlank(key) || StringUtils.isBlank(sig)) {
             log.error("Missing required parameters");
             throw new BadRequestException("Missing required header parameters");
+        }
+
+        if (!cfg.getMatrix().getDomain().equalsIgnoreCase(origin)) {
+            throw new NotAllowedException("Only Matrix IDs from domain " + origin + " can be unbound");
         }
 
         JsonObject jsonObject = new JsonObject();
@@ -340,7 +351,7 @@ public class SessionManager {
         log.info("Request was authorized.");
     }
 
-    private void checkSession(String sid, String secret, ThreePid tpid, _MatrixID mxid) {
+    private void checkSession(String sid, String secret, ThreePid tpid) {
         // We ensure the session was validated
         ThreePidSession session = getSessionIfValidated(sid, secret);
 
@@ -348,13 +359,5 @@ public class SessionManager {
         if (!session.getThreePid().equals(tpid)) {
             throw new BadRequestException("3PID to unbind does not match the one from the validated session");
         }
-
-        // We only allow unbind for the domain we manage, mirroring bind
-        final CharSequence domain = cfg.getMatrix().getDomain();
-        if (!StringUtils.equalsIgnoreCase(domain, mxid.getDomain())) {
-            throw new NotAllowedException("Only Matrix IDs from domain " + domain + " can be unbound");
-        }
-
-        log.info("Request was authorized.");
     }
 }
