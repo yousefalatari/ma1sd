@@ -15,7 +15,8 @@ ma1sd - Federated Matrix Identity Server
 
 ---
 
-* This project is a fork of the https://github.com/kamax-matrix/mxisd which has been archived and no longer supported. *
+* This project is a fork (not successor) of the https://github.com/kamax-matrix/mxisd, which has been archived and no longer maintained as a standalone product.
+Also, ma1sd is supported by the volunteer not developers of the original project.
 
 ---
 
