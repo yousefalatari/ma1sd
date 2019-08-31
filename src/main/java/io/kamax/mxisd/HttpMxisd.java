@@ -50,7 +50,6 @@ import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
 
 import java.util.Objects;
-import java.util.function.Supplier;
 
 public class HttpMxisd {
 
@@ -79,86 +78,102 @@ public class HttpMxisd {
         HttpHandler asTxnHandler = SaneHandler.around(new AsTransactionHandler(m.getAs()));
         HttpHandler asNotFoundHandler = SaneHandler.around(new AsNotFoundHandler(m.getAs()));
 
-        HttpHandler storeInvHandler = SaneHandler.around(new StoreInviteHandler(m.getConfig().getServer(), m.getInvite(), m.getKeyManager()));
+        HttpHandler storeInvHandler = SaneHandler
+            .around(new StoreInviteHandler(m.getConfig().getServer(), m.getInvite(), m.getKeyManager()));
 
-        httpSrv = Undertow.builder().addHttpListener(m.getConfig().getServer().getPort(), "0.0.0.0").setHandler(Handlers.routing()
+        final RoutingHandler handler = Handlers.routing()
+            .add("OPTIONS", "/**", SaneHandler.around(new OptionsHandler()))
 
-                .add("OPTIONS", "/**", SaneHandler.around(new OptionsHandler()))
+            // Status endpoints
+            .get(StatusHandler.Path, SaneHandler.around(new StatusHandler()))
+            .get(VersionHandler.Path, SaneHandler.around(new VersionHandler()))
 
-                // Status endpoints
-                .get(StatusHandler.Path, SaneHandler.around(new StatusHandler()))
-                .get(VersionHandler.Path, SaneHandler.around(new VersionHandler()))
+            // Authentication endpoints
+            .get(LoginHandler.Path, SaneHandler.around(new LoginGetHandler(m.getAuth(), m.getHttpClient())))
+            .post(LoginHandler.Path, SaneHandler.around(new LoginPostHandler(m.getAuth())))
+            .post(RestAuthHandler.Path, SaneHandler.around(new RestAuthHandler(m.getAuth())))
 
-                // Authentication endpoints
-                .get(LoginHandler.Path, SaneHandler.around(new LoginGetHandler(m.getAuth(), m.getHttpClient())))
-                .post(LoginHandler.Path, SaneHandler.around(new LoginPostHandler(m.getAuth())))
-                .post(RestAuthHandler.Path, SaneHandler.around(new RestAuthHandler(m.getAuth())))
+            // Directory endpoints
+            .post(UserDirectorySearchHandler.Path, SaneHandler.around(new UserDirectorySearchHandler(m.getDirectory())))
 
-                // Directory endpoints
-                .post(UserDirectorySearchHandler.Path, SaneHandler.around(new UserDirectorySearchHandler(m.getDirectory())))
+            // Profile endpoints
+            .get(ProfileHandler.Path, SaneHandler.around(new ProfileHandler(m.getProfile())))
+            .get(InternalProfileHandler.Path, SaneHandler.around(new InternalProfileHandler(m.getProfile())))
 
-                // Key endpoints
-                .get(KeyGetHandler.Path, SaneHandler.around(new KeyGetHandler(m.getKeyManager()))) // to v2
-                .get(RegularKeyIsValidHandler.Path, SaneHandler.around(new RegularKeyIsValidHandler(m.getKeyManager()))) // to v2
-                .get(EphemeralKeyIsValidHandler.Path, SaneHandler.around(new EphemeralKeyIsValidHandler(m.getKeyManager()))) // to v2
+            // Registration endpoints
+            .post(Register3pidRequestTokenHandler.Path,
+                SaneHandler.around(new Register3pidRequestTokenHandler(m.getReg(), m.getClientDns(), m.getHttpClient())))
 
-                // Identity endpoints
-                .get(HelloHandler.Path, helloHandler) // to v2
-                .get(HelloHandler.Path + "/", helloHandler) // Be lax with possibly trailing slash // to v2
-                .get(SingleLookupHandler.Path, SaneHandler.around(new SingleLookupHandler(m.getConfig(), m.getIdentity(), m.getSign()))) // to v2
-                .post(BulkLookupHandler.Path, SaneHandler.around(new BulkLookupHandler(m.getIdentity()))) // to v2
-                .post(StoreInviteHandler.Path, storeInvHandler) // to v2
-                .post(SessionStartHandler.Path, SaneHandler.around(new SessionStartHandler(m.getSession()))) // to v2
-                .get(SessionValidateHandler.Path, SaneHandler.around(new SessionValidationGetHandler(m.getSession(), m.getConfig()))) // to v2
-                .post(SessionValidateHandler.Path, SaneHandler.around(new SessionValidationPostHandler(m.getSession()))) // to v2
-                .get(SessionTpidGetValidatedHandler.Path, SaneHandler.around(new SessionTpidGetValidatedHandler(m.getSession()))) // to v2
-                .post(SessionTpidBindHandler.Path, SaneHandler.around(new SessionTpidBindHandler(m.getSession(), m.getInvite(), m.getSign()))) // to v2
-                .post(SessionTpidUnbindHandler.Path, SaneHandler.around(new SessionTpidUnbindHandler(m.getSession()))) // to v2
-                .post(SignEd25519Handler.Path, SaneHandler.around(new SignEd25519Handler(m.getConfig(), m.getInvite(), m.getSign())))
+            // Invite endpoints
+            .post(RoomInviteHandler.Path, SaneHandler.around(new RoomInviteHandler(m.getHttpClient(), m.getClientDns(), m.getInvite())))
 
-                // Profile endpoints
-                .get(ProfileHandler.Path, SaneHandler.around(new ProfileHandler(m.getProfile())))
-                .get(InternalProfileHandler.Path, SaneHandler.around(new InternalProfileHandler(m.getProfile())))
+            // Application Service endpoints
+            .get(AsUserHandler.Path, asUserHandler)
+            .get("/_matrix/app/v1/rooms/**", asNotFoundHandler)
+            .put(AsTransactionHandler.Path, asTxnHandler)
 
-                // Registration endpoints
-                .post(Register3pidRequestTokenHandler.Path, SaneHandler.around(new Register3pidRequestTokenHandler(m.getReg(), m.getClientDns(), m.getHttpClient())))
+            .get("/users/{" + AsUserHandler.ID + "}", asUserHandler) // Legacy endpoint
+            .get("/rooms/**", asNotFoundHandler) // Legacy endpoint
+            .put("/transactions/{" + AsTransactionHandler.ID + "}", asTxnHandler) // Legacy endpoint
 
-                // Invite endpoints
-                .post(RoomInviteHandler.Path, SaneHandler.around(new RoomInviteHandler(m.getHttpClient(), m.getClientDns(), m.getInvite())))
-
-                // Application Service endpoints
-                .get(AsUserHandler.Path, asUserHandler)
-                .get("/_matrix/app/v1/rooms/**", asNotFoundHandler)
-                .put(AsTransactionHandler.Path, asTxnHandler)
-
-                .get("/users/{" + AsUserHandler.ID + "}", asUserHandler) // Legacy endpoint
-                .get("/rooms/**", asNotFoundHandler) // Legacy endpoint
-                .put("/transactions/{" + AsTransactionHandler.ID + "}", asTxnHandler) // Legacy endpoint
-
-                // Banned endpoints
-                .get(InternalInfoHandler.Path, SaneHandler.around(new InternalInfoHandler()))
-
-        ).build();
+            // Banned endpoints
+            .get(InternalInfoHandler.Path, SaneHandler.around(new InternalInfoHandler()));
+        keyEndpoints(handler);
+        identityEndpoints(handler);
+        httpSrv = Undertow.builder().addHttpListener(m.getConfig().getServer().getPort(), "0.0.0.0").setHandler(handler).build();
 
         httpSrv.start();
     }
 
     public void stop() {
         // Because it might have never been initialized if an exception is thrown early
-        if (Objects.nonNull(httpSrv)) httpSrv.stop();
+        if (Objects.nonNull(httpSrv)) {
+            httpSrv.stop();
+        }
 
         m.stop();
     }
 
-    private RoutingHandler attachHandler(RoutingHandler routingHandler, HttpString method, ApiHandler handler, Supplier<HttpHandler> handlerSupplier) {
+    private void keyEndpoints(RoutingHandler routingHandler) {
+        addEndpoints(routingHandler, Methods.GET,
+            new KeyGetHandler(m.getKeyManager()),
+            new RegularKeyIsValidHandler(m.getKeyManager()),
+            new EphemeralKeyIsValidHandler(m.getKeyManager())
+        );
+    }
+
+    private void identityEndpoints(RoutingHandler routingHandler) {
+        addEndpoints(routingHandler, Methods.GET,
+            new HelloHandler(),
+            new SingleLookupHandler(m.getConfig(), m.getIdentity(), m.getSign()),
+            new SessionValidationGetHandler(m.getSession(), m.getConfig()),
+            new SessionTpidGetValidatedHandler(m.getSession())
+        );
+        addEndpoints(routingHandler, Methods.POST,
+            new BulkLookupHandler(m.getIdentity()),
+            new StoreInviteHandler(m.getConfig().getServer(), m.getInvite(), m.getKeyManager()),
+            new SessionStartHandler(m.getSession()),
+            new SessionValidationPostHandler(m.getSession()),
+            new SessionTpidBindHandler(m.getSession(), m.getInvite(), m.getSign()),
+            new SessionTpidUnbindHandler(m.getSession()),
+            new SignEd25519Handler(m.getConfig(), m.getInvite(), m.getSign())
+        );
+    }
+
+    private void addEndpoints(RoutingHandler routingHandler, HttpString method, ApiHandler... handlers) {
+        for (ApiHandler handler : handlers) {
+            attachHandler(routingHandler, method, handler, sane(handler));
+        }
+    }
+
+    private void attachHandler(RoutingHandler routingHandler, HttpString method, ApiHandler apiHandler, HttpHandler httpHandler) {
         final MatrixConfig matrixConfig = m.getConfig().getMatrix();
         if (matrixConfig.isV1()) {
-            return routingHandler.add(method, handler.getPath(IdentityServiceAPI.V1), handlerSupplier.get());
+            routingHandler.add(method, apiHandler.getPath(IdentityServiceAPI.V1), httpHandler);
         }
         if (matrixConfig.isV2()) {
-            return routingHandler.add(method, handler.getPath(IdentityServiceAPI.V2), handlerSupplier.get());
+            routingHandler.add(method, apiHandler.getPath(IdentityServiceAPI.V2), httpHandler);
         }
-        return routingHandler;
     }
 
     private HttpHandler sane(HttpHandler httpHandler) {
