@@ -27,6 +27,7 @@ import io.kamax.mxisd.config.ServerConfig;
 import io.kamax.mxisd.crypto.SignatureManager;
 import io.kamax.mxisd.http.IsAPIv1;
 import io.kamax.mxisd.http.io.identity.SingeLookupReplyJson;
+import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.kamax.mxisd.lookup.SingleLookupReply;
 import io.kamax.mxisd.lookup.SingleLookupRequest;
 import io.kamax.mxisd.lookup.strategy.LookupStrategy;
@@ -36,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
-public class SingleLookupHandler extends LookupHandler {
+public class SingleLookupHandler extends LookupHandler implements ApiHandler {
 
     public static final String Path = IsAPIv1.Base + "/lookup";
 
@@ -77,4 +78,8 @@ public class SingleLookupHandler extends LookupHandler {
         }
     }
 
+    @Override
+    public String getHandlerPath() {
+        return "/lookup";
+    }
 }

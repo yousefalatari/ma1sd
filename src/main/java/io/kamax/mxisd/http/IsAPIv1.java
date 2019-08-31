@@ -25,8 +25,6 @@ public class IsAPIv1 {
     public static final String Base = "/_matrix/identity/api/v1";
 
     public static String getValidate(String medium, String sid, String secret, String token) {
-        // FIXME use some kind of URLBuilder
-        return Base + "/validate/" + medium + "/submitToken?sid=" + sid + "&client_secret=" + secret + "&token=" + token;
+        return String.format("%s/validate/%s/submitToken?sid=%s&client_secret=%s&token=%s", Base, medium, sid, secret, token);
     }
-
 }

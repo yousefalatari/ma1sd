@@ -1,6 +1,6 @@
 /*
  * mxisd - Matrix Identity Server Daemon
- * Copyright (C) 2018 Kamax Sarl
+ * Copyright (C) 2017 Kamax Sarl
  *
  * https://www.kamax.io/
  *
@@ -18,24 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.mxisd.http.undertow.handler.identity.v1;
+package io.kamax.mxisd.http;
 
-import io.kamax.mxisd.http.IsAPIv1;
-import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
-import io.kamax.mxisd.http.undertow.handler.ApiHandler;
-import io.undertow.server.HttpServerExchange;
+public class IsAPIv2 {
 
-public class HelloHandler extends BasicHttpHandler implements ApiHandler {
+    public static final String Base = "/_matrix/identity/v2";
 
-    public static final String Path = IsAPIv1.Base;
-
-    @Override
-    public void handleRequest(HttpServerExchange exchange) {
-        respondJson(exchange, "{}");
+    public static String getValidate(String medium, String sid, String secret, String token) {
+        return String.format("%s/validate/%s/submitToken?sid=%s&client_secret=%s&token=%s", Base, medium, sid, secret, token);
     }
 
-    @Override
-    public String getHandlerPath() {
-        return "";
-    }
 }

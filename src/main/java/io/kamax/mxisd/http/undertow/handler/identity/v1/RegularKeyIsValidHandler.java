@@ -23,11 +23,12 @@ package io.kamax.mxisd.http.undertow.handler.identity.v1;
 import io.kamax.mxisd.crypto.KeyManager;
 import io.kamax.mxisd.crypto.KeyType;
 import io.kamax.mxisd.http.IsAPIv1;
+import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RegularKeyIsValidHandler extends KeyIsValidHandler {
+public class RegularKeyIsValidHandler extends KeyIsValidHandler implements ApiHandler {
 
     public static final String Path = IsAPIv1.Base + "/pubkey/isvalid";
 
@@ -48,4 +49,8 @@ public class RegularKeyIsValidHandler extends KeyIsValidHandler {
         respondJson(exchange, mgr.isValid(KeyType.Regular, pubKey) ? validKey : invalidKey);
     }
 
+    @Override
+    public String getHandlerPath() {
+        return "/pubkey/isvalid";
+    }
 }

@@ -28,6 +28,7 @@ import io.kamax.mxisd.http.IsAPIv1;
 import io.kamax.mxisd.http.io.identity.BindRequest;
 import io.kamax.mxisd.http.io.identity.SingeLookupReplyJson;
 import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
+import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.kamax.mxisd.invitation.InvitationManager;
 import io.kamax.mxisd.lookup.SingleLookupReply;
 import io.kamax.mxisd.session.SessionManager;
@@ -42,7 +43,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Deque;
 import java.util.Map;
 
-public class SessionTpidBindHandler extends BasicHttpHandler {
+public class SessionTpidBindHandler extends BasicHttpHandler implements ApiHandler {
 
     public static final String Path = IsAPIv1.Base + "/3pid/bind";
 
@@ -97,4 +98,8 @@ public class SessionTpidBindHandler extends BasicHttpHandler {
         }
     }
 
+    @Override
+    public String getHandlerPath() {
+        return "/3pid/bind";
+    }
 }

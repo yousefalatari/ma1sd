@@ -26,12 +26,13 @@ import io.kamax.mxisd.crypto.KeyManager;
 import io.kamax.mxisd.crypto.KeyType;
 import io.kamax.mxisd.http.IsAPIv1;
 import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
+import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.undertow.server.HttpServerExchange;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class KeyGetHandler extends BasicHttpHandler {
+public class KeyGetHandler extends BasicHttpHandler implements ApiHandler {
 
     public static final String Key = "key";
     public static final String Path = IsAPIv1.Base + "/pubkey/{" + Key + "}";
@@ -61,4 +62,8 @@ public class KeyGetHandler extends BasicHttpHandler {
         respond(exchange, obj);
     }
 
+    @Override
+    public String getHandlerPath() {
+        return "/pubkey/{" + Key + "}";
+    }
 }

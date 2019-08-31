@@ -28,13 +28,14 @@ import io.kamax.mxisd.http.io.identity.RequestTokenResponse;
 import io.kamax.mxisd.http.io.identity.SessionEmailTokenRequestJson;
 import io.kamax.mxisd.http.io.identity.SessionPhoneTokenRequestJson;
 import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
+import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.kamax.mxisd.session.SessionManager;
 import io.undertow.server.HttpServerExchange;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SessionStartHandler extends BasicHttpHandler {
+public class SessionStartHandler extends BasicHttpHandler implements ApiHandler {
 
     public static final String Medium = "medium";
     public static final String Path = IsAPIv1.Base + "/validate/{" + Medium + "}/requestToken";
@@ -84,4 +85,8 @@ public class SessionStartHandler extends BasicHttpHandler {
         }
     }
 
+    @Override
+    public String getHandlerPath() {
+        return "/validate/{" + Medium + "}/requestToken";
+    }
 }

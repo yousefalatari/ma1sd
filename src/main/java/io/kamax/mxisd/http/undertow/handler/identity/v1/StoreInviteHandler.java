@@ -32,6 +32,7 @@ import io.kamax.mxisd.http.IsAPIv1;
 import io.kamax.mxisd.http.io.identity.StoreInviteRequest;
 import io.kamax.mxisd.http.io.identity.ThreePidInviteReplyIO;
 import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
+import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.kamax.mxisd.invitation.IThreePidInvite;
 import io.kamax.mxisd.invitation.IThreePidInviteReply;
 import io.kamax.mxisd.invitation.InvitationManager;
@@ -45,7 +46,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Deque;
 import java.util.Map;
 
-public class StoreInviteHandler extends BasicHttpHandler {
+public class StoreInviteHandler extends BasicHttpHandler implements ApiHandler {
 
     public static final String Path = IsAPIv1.Base + "/store-invite";
 
@@ -100,4 +101,8 @@ public class StoreInviteHandler extends BasicHttpHandler {
         respondJson(exchange, new ThreePidInviteReplyIO(reply, keyMgr.getPublicKeyBase64(keyMgr.getServerSigningKey().getId()), cfg.getPublicUrl()));
     }
 
+    @Override
+    public String getHandlerPath() {
+        return "/store-invite";
+    }
 }

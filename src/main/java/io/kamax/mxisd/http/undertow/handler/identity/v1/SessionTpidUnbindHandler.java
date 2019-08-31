@@ -23,12 +23,13 @@ package io.kamax.mxisd.http.undertow.handler.identity.v1;
 import com.google.gson.JsonObject;
 import io.kamax.mxisd.http.IsAPIv1;
 import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
+import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.kamax.mxisd.session.SessionManager;
 import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SessionTpidUnbindHandler extends BasicHttpHandler {
+public class SessionTpidUnbindHandler extends BasicHttpHandler implements ApiHandler {
 
     public static final String Path = IsAPIv1.Base + "/3pid/unbind";
 
@@ -47,5 +48,10 @@ public class SessionTpidUnbindHandler extends BasicHttpHandler {
         JsonObject body = parseJsonObject(exchange);
         sessionMgr.unbind(auth, body);
         writeBodyAsUtf8(exchange, "{}");
+    }
+
+    @Override
+    public String getHandlerPath() {
+        return "/3pid/unbind";
     }
 }

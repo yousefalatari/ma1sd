@@ -22,13 +22,14 @@ package io.kamax.mxisd.http.undertow.handler.identity.v1;
 
 import io.kamax.mxisd.http.IsAPIv1;
 import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
+import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.kamax.mxisd.session.SessionManager;
 import io.kamax.mxisd.session.ValidationResult;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class SessionValidateHandler extends BasicHttpHandler {
+public abstract class SessionValidateHandler extends BasicHttpHandler implements ApiHandler {
 
     public static final String Path = IsAPIv1.Base + "/validate/{medium}/submitToken";
 
@@ -52,4 +53,8 @@ public abstract class SessionValidateHandler extends BasicHttpHandler {
         return mgr.validate(sid, secret, token);
     }
 
+    @Override
+    public String getHandlerPath() {
+        return "/validate/{medium}/submitToken";
+    }
 }

@@ -20,7 +20,9 @@
 
 package io.kamax.mxisd;
 
+import io.kamax.mxisd.config.MatrixConfig;
 import io.kamax.mxisd.config.MxisdConfig;
+import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.kamax.mxisd.http.undertow.handler.InternalInfoHandler;
 import io.kamax.mxisd.http.undertow.handler.OptionsHandler;
 import io.kamax.mxisd.http.undertow.handler.SaneHandler;
@@ -39,11 +41,16 @@ import io.kamax.mxisd.http.undertow.handler.profile.v1.ProfileHandler;
 import io.kamax.mxisd.http.undertow.handler.register.v1.Register3pidRequestTokenHandler;
 import io.kamax.mxisd.http.undertow.handler.status.StatusHandler;
 import io.kamax.mxisd.http.undertow.handler.status.VersionHandler;
+import io.kamax.mxisd.matrix.IdentityServiceAPI;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
+import io.undertow.server.RoutingHandler;
+import io.undertow.util.HttpString;
+import io.undertow.util.Methods;
 
 import java.util.Objects;
+import java.util.function.Supplier;
 
 public class HttpMxisd {
 
@@ -91,22 +98,22 @@ public class HttpMxisd {
                 .post(UserDirectorySearchHandler.Path, SaneHandler.around(new UserDirectorySearchHandler(m.getDirectory())))
 
                 // Key endpoints
-                .get(KeyGetHandler.Path, SaneHandler.around(new KeyGetHandler(m.getKeyManager())))
-                .get(RegularKeyIsValidHandler.Path, SaneHandler.around(new RegularKeyIsValidHandler(m.getKeyManager())))
-                .get(EphemeralKeyIsValidHandler.Path, SaneHandler.around(new EphemeralKeyIsValidHandler(m.getKeyManager())))
+                .get(KeyGetHandler.Path, SaneHandler.around(new KeyGetHandler(m.getKeyManager()))) // to v2
+                .get(RegularKeyIsValidHandler.Path, SaneHandler.around(new RegularKeyIsValidHandler(m.getKeyManager()))) // to v2
+                .get(EphemeralKeyIsValidHandler.Path, SaneHandler.around(new EphemeralKeyIsValidHandler(m.getKeyManager()))) // to v2
 
                 // Identity endpoints
-                .get(HelloHandler.Path, helloHandler)
-                .get(HelloHandler.Path + "/", helloHandler) // Be lax with possibly trailing slash
-                .get(SingleLookupHandler.Path, SaneHandler.around(new SingleLookupHandler(m.getConfig(), m.getIdentity(), m.getSign())))
-                .post(BulkLookupHandler.Path, SaneHandler.around(new BulkLookupHandler(m.getIdentity())))
-                .post(StoreInviteHandler.Path, storeInvHandler)
-                .post(SessionStartHandler.Path, SaneHandler.around(new SessionStartHandler(m.getSession())))
-                .get(SessionValidateHandler.Path, SaneHandler.around(new SessionValidationGetHandler(m.getSession(), m.getConfig())))
-                .post(SessionValidateHandler.Path, SaneHandler.around(new SessionValidationPostHandler(m.getSession())))
-                .get(SessionTpidGetValidatedHandler.Path, SaneHandler.around(new SessionTpidGetValidatedHandler(m.getSession())))
-                .post(SessionTpidBindHandler.Path, SaneHandler.around(new SessionTpidBindHandler(m.getSession(), m.getInvite(), m.getSign())))
-                .post(SessionTpidUnbindHandler.Path, SaneHandler.around(new SessionTpidUnbindHandler(m.getSession())))
+                .get(HelloHandler.Path, helloHandler) // to v2
+                .get(HelloHandler.Path + "/", helloHandler) // Be lax with possibly trailing slash // to v2
+                .get(SingleLookupHandler.Path, SaneHandler.around(new SingleLookupHandler(m.getConfig(), m.getIdentity(), m.getSign()))) // to v2
+                .post(BulkLookupHandler.Path, SaneHandler.around(new BulkLookupHandler(m.getIdentity()))) // to v2
+                .post(StoreInviteHandler.Path, storeInvHandler) // to v2
+                .post(SessionStartHandler.Path, SaneHandler.around(new SessionStartHandler(m.getSession()))) // to v2
+                .get(SessionValidateHandler.Path, SaneHandler.around(new SessionValidationGetHandler(m.getSession(), m.getConfig()))) // to v2
+                .post(SessionValidateHandler.Path, SaneHandler.around(new SessionValidationPostHandler(m.getSession()))) // to v2
+                .get(SessionTpidGetValidatedHandler.Path, SaneHandler.around(new SessionTpidGetValidatedHandler(m.getSession()))) // to v2
+                .post(SessionTpidBindHandler.Path, SaneHandler.around(new SessionTpidBindHandler(m.getSession(), m.getInvite(), m.getSign()))) // to v2
+                .post(SessionTpidUnbindHandler.Path, SaneHandler.around(new SessionTpidUnbindHandler(m.getSession()))) // to v2
                 .post(SignEd25519Handler.Path, SaneHandler.around(new SignEd25519Handler(m.getConfig(), m.getInvite(), m.getSign())))
 
                 // Profile endpoints
@@ -143,4 +150,18 @@ public class HttpMxisd {
         m.stop();
     }
 
+    private RoutingHandler attachHandler(RoutingHandler routingHandler, HttpString method, ApiHandler handler, Supplier<HttpHandler> handlerSupplier) {
+        final MatrixConfig matrixConfig = m.getConfig().getMatrix();
+        if (matrixConfig.isV1()) {
+            return routingHandler.add(method, handler.getPath(IdentityServiceAPI.V1), handlerSupplier.get());
+        }
+        if (matrixConfig.isV2()) {
+            return routingHandler.add(method, handler.getPath(IdentityServiceAPI.V2), handlerSupplier.get());
+        }
+        return routingHandler;
+    }
+
+    private HttpHandler sane(HttpHandler httpHandler) {
+        return SaneHandler.around(httpHandler);
+    }
 }
