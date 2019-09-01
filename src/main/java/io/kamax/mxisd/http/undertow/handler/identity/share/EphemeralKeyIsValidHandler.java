@@ -22,15 +22,12 @@ package io.kamax.mxisd.http.undertow.handler.identity.share;
 
 import io.kamax.mxisd.crypto.KeyManager;
 import io.kamax.mxisd.crypto.KeyType;
-import io.kamax.mxisd.http.IsAPIv1;
 import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class EphemeralKeyIsValidHandler extends KeyIsValidHandler implements ApiHandler {
-
-    public static final String Path = IsAPIv1.Base + "/pubkey/ephemeral/isvalid";
 
     private static final Logger log = LoggerFactory.getLogger(EphemeralKeyIsValidHandler.class);
 

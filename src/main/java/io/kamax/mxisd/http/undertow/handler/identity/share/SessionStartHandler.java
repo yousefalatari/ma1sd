@@ -23,7 +23,6 @@ package io.kamax.mxisd.http.undertow.handler.identity.share;
 import com.google.gson.JsonObject;
 import io.kamax.matrix.ThreePid;
 import io.kamax.matrix.ThreePidMedium;
-import io.kamax.mxisd.http.IsAPIv1;
 import io.kamax.mxisd.http.io.identity.RequestTokenResponse;
 import io.kamax.mxisd.http.io.identity.SessionEmailTokenRequestJson;
 import io.kamax.mxisd.http.io.identity.SessionPhoneTokenRequestJson;
@@ -38,7 +37,6 @@ import org.slf4j.LoggerFactory;
 public class SessionStartHandler extends BasicHttpHandler implements ApiHandler {
 
     public static final String Medium = "medium";
-    public static final String Path = IsAPIv1.Base + "/validate/{" + Medium + "}/requestToken";
 
     private transient final Logger log = LoggerFactory.getLogger(SessionStartHandler.class);
 

@@ -27,7 +27,6 @@ import io.kamax.matrix.json.GsonUtil;
 import io.kamax.matrix.json.MatrixJson;
 import io.kamax.mxisd.config.MxisdConfig;
 import io.kamax.mxisd.crypto.SignatureManager;
-import io.kamax.mxisd.http.IsAPIv1;
 import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
 import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.kamax.mxisd.invitation.IThreePidInviteReply;
@@ -37,8 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SignEd25519Handler extends BasicHttpHandler implements ApiHandler {
-
-    public static final String Path = IsAPIv1.Base + "/sign-ed25519";
 
     private static final Logger log = LoggerFactory.getLogger(SignEd25519Handler.class);
 

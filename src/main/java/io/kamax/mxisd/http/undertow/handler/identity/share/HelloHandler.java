@@ -20,14 +20,11 @@
 
 package io.kamax.mxisd.http.undertow.handler.identity.share;
 
-import io.kamax.mxisd.http.IsAPIv1;
 import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
 import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.undertow.server.HttpServerExchange;
 
 public class HelloHandler extends BasicHttpHandler implements ApiHandler {
-
-    public static final String Path = IsAPIv1.Base;
 
     @Override
     public void handleRequest(HttpServerExchange exchange) {

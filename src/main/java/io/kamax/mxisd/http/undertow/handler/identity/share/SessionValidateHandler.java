@@ -20,7 +20,6 @@
 
 package io.kamax.mxisd.http.undertow.handler.identity.share;
 
-import io.kamax.mxisd.http.IsAPIv1;
 import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
 import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.kamax.mxisd.session.SessionManager;
@@ -30,8 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class SessionValidateHandler extends BasicHttpHandler implements ApiHandler {
-
-    public static final String Path = IsAPIv1.Base + "/validate/{medium}/submitToken";
 
     private transient final Logger log = LoggerFactory.getLogger(SessionValidateHandler.class);
 

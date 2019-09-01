@@ -28,7 +28,6 @@ import io.kamax.matrix.json.GsonUtil;
 import io.kamax.mxisd.config.ServerConfig;
 import io.kamax.mxisd.crypto.KeyManager;
 import io.kamax.mxisd.exception.BadRequestException;
-import io.kamax.mxisd.http.IsAPIv1;
 import io.kamax.mxisd.http.io.identity.StoreInviteRequest;
 import io.kamax.mxisd.http.io.identity.ThreePidInviteReplyIO;
 import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
@@ -47,8 +46,6 @@ import java.util.Deque;
 import java.util.Map;
 
 public class StoreInviteHandler extends BasicHttpHandler implements ApiHandler {
-
-    public static final String Path = IsAPIv1.Base + "/store-invite";
 
     private ServerConfig cfg;
     private InvitationManager invMgr;

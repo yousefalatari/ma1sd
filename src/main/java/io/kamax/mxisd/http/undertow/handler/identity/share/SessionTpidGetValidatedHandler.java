@@ -22,7 +22,6 @@ package io.kamax.mxisd.http.undertow.handler.identity.share;
 
 import com.google.gson.JsonObject;
 import io.kamax.mxisd.exception.SessionNotValidatedException;
-import io.kamax.mxisd.http.IsAPIv1;
 import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
 import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.kamax.mxisd.lookup.ThreePidValidation;
@@ -32,8 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SessionTpidGetValidatedHandler extends BasicHttpHandler implements ApiHandler {
-
-    public static final String Path = IsAPIv1.Base + "/3pid/getValidated3pid";
 
     private static final Logger log = LoggerFactory.getLogger(SessionTpidGetValidatedHandler.class);
 

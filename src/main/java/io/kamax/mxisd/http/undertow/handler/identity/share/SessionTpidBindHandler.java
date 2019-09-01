@@ -24,7 +24,6 @@ import com.google.gson.JsonObject;
 import io.kamax.matrix.json.GsonUtil;
 import io.kamax.mxisd.crypto.SignatureManager;
 import io.kamax.mxisd.exception.BadRequestException;
-import io.kamax.mxisd.http.IsAPIv1;
 import io.kamax.mxisd.http.io.identity.BindRequest;
 import io.kamax.mxisd.http.io.identity.SingeLookupReplyJson;
 import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
@@ -44,8 +43,6 @@ import java.util.Deque;
 import java.util.Map;
 
 public class SessionTpidBindHandler extends BasicHttpHandler implements ApiHandler {
-
-    public static final String Path = IsAPIv1.Base + "/3pid/bind";
 
     private static final Logger log = LoggerFactory.getLogger(SessionTpidBindHandler.class);
 
