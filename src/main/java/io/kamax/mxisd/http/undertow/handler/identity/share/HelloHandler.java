@@ -18,39 +18,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.mxisd.http.undertow.handler.identity.v1;
+package io.kamax.mxisd.http.undertow.handler.identity.share;
 
-import io.kamax.mxisd.crypto.KeyManager;
-import io.kamax.mxisd.crypto.KeyType;
 import io.kamax.mxisd.http.IsAPIv1;
+import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
 import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.undertow.server.HttpServerExchange;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class RegularKeyIsValidHandler extends KeyIsValidHandler implements ApiHandler {
+public class HelloHandler extends BasicHttpHandler implements ApiHandler {
 
-    public static final String Path = IsAPIv1.Base + "/pubkey/isvalid";
-
-    private transient final Logger log = LoggerFactory.getLogger(RegularKeyIsValidHandler.class);
-
-    private KeyManager mgr;
-
-    public RegularKeyIsValidHandler(KeyManager mgr) {
-        this.mgr = mgr;
-    }
+    public static final String Path = IsAPIv1.Base;
 
     @Override
     public void handleRequest(HttpServerExchange exchange) {
-        // FIXME process + correctly in query parameter handling
-        String pubKey = getQueryParameter(exchange, "public_key").replace(" ", "+");
-        log.info("Validating public key {}", pubKey);
-
-        respondJson(exchange, mgr.isValid(KeyType.Regular, pubKey) ? validKey : invalidKey);
+        respondJson(exchange, "{}");
     }
 
     @Override
     public String getHandlerPath() {
-        return "/pubkey/isvalid";
+        return "";
     }
 }

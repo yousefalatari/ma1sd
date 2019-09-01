@@ -28,6 +28,7 @@ import io.kamax.mxisd.crypto.SignatureManager;
 import io.kamax.mxisd.http.IsAPIv1;
 import io.kamax.mxisd.http.io.identity.SingeLookupReplyJson;
 import io.kamax.mxisd.http.undertow.handler.ApiHandler;
+import io.kamax.mxisd.http.undertow.handler.identity.share.LookupHandler;
 import io.kamax.mxisd.lookup.SingleLookupReply;
 import io.kamax.mxisd.lookup.SingleLookupRequest;
 import io.kamax.mxisd.lookup.strategy.LookupStrategy;

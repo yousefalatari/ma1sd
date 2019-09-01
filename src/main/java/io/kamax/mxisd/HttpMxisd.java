@@ -34,6 +34,18 @@ import io.kamax.mxisd.http.undertow.handler.auth.v1.LoginGetHandler;
 import io.kamax.mxisd.http.undertow.handler.auth.v1.LoginHandler;
 import io.kamax.mxisd.http.undertow.handler.auth.v1.LoginPostHandler;
 import io.kamax.mxisd.http.undertow.handler.directory.v1.UserDirectorySearchHandler;
+import io.kamax.mxisd.http.undertow.handler.identity.share.EphemeralKeyIsValidHandler;
+import io.kamax.mxisd.http.undertow.handler.identity.share.HelloHandler;
+import io.kamax.mxisd.http.undertow.handler.identity.share.KeyGetHandler;
+import io.kamax.mxisd.http.undertow.handler.identity.share.RegularKeyIsValidHandler;
+import io.kamax.mxisd.http.undertow.handler.identity.share.SessionStartHandler;
+import io.kamax.mxisd.http.undertow.handler.identity.share.SessionTpidBindHandler;
+import io.kamax.mxisd.http.undertow.handler.identity.share.SessionTpidGetValidatedHandler;
+import io.kamax.mxisd.http.undertow.handler.identity.share.SessionTpidUnbindHandler;
+import io.kamax.mxisd.http.undertow.handler.identity.share.SessionValidationGetHandler;
+import io.kamax.mxisd.http.undertow.handler.identity.share.SessionValidationPostHandler;
+import io.kamax.mxisd.http.undertow.handler.identity.share.SignEd25519Handler;
+import io.kamax.mxisd.http.undertow.handler.identity.share.StoreInviteHandler;
 import io.kamax.mxisd.http.undertow.handler.identity.v1.*;
 import io.kamax.mxisd.http.undertow.handler.invite.v1.RoomInviteHandler;
 import io.kamax.mxisd.http.undertow.handler.profile.v1.InternalProfileHandler;
@@ -143,14 +155,14 @@ public class HttpMxisd {
     }
 
     private void identityEndpoints(RoutingHandler routingHandler) {
+        routingHandler.get(SingleLookupHandler.Path, sane(new SingleLookupHandler(m.getConfig(), m.getIdentity(), m.getSign())));
+        routingHandler.post(BulkLookupHandler.Path, sane(new BulkLookupHandler(m.getIdentity())));
         addEndpoints(routingHandler, Methods.GET,
             new HelloHandler(),
-            new SingleLookupHandler(m.getConfig(), m.getIdentity(), m.getSign()),
             new SessionValidationGetHandler(m.getSession(), m.getConfig()),
             new SessionTpidGetValidatedHandler(m.getSession())
         );
         addEndpoints(routingHandler, Methods.POST,
-            new BulkLookupHandler(m.getIdentity()),
             new StoreInviteHandler(m.getConfig().getServer(), m.getInvite(), m.getKeyManager()),
             new SessionStartHandler(m.getSession()),
             new SessionValidationPostHandler(m.getSession()),
