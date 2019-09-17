@@ -57,6 +57,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Calendar;
@@ -237,12 +239,26 @@ public class SessionManager {
         notifMgr.sendForUnbind(tpid);
     }
 
+    private String getDomain(String publicUrl) {
+        URL url;
+        try {
+            url = new URL(publicUrl);
+        } catch (MalformedURLException e) {
+            log.error("Malformed public url, use as is");
+            return publicUrl;
+        }
+        int port = url.getPort();
+        return url.getHost() + (port != -1 ? ":" + url.getPort() : "");
+    }
+
     private void checkAuthorization(String auth, JsonObject reqData) {
         if (!auth.startsWith("X-Matrix ")) {
             throw new NotAllowedException("Wrong authorization header");
         }
 
-        if (StringUtils.isBlank(cfg.getServer().getPublicUrl())) {
+        String domain = getDomain(cfg.getServer().getPublicUrl());
+
+        if (StringUtils.isBlank(domain)) {
             throw new NotAllowedException("Unable to verify request, missing `server.publicUrl` property");
         }
 
@@ -284,7 +300,7 @@ public class SessionManager {
         jsonObject.addProperty("method", "POST");
         jsonObject.addProperty("uri", "/_matrix/identity/api/v1/3pid/unbind");
         jsonObject.addProperty("origin", origin);
-        jsonObject.addProperty("destination_is", cfg.getServer().getPublicUrl());
+        jsonObject.addProperty("destination_is", domain);
         jsonObject.add("content", reqData);
 
         String canonical = MatrixJson.encodeCanonical(jsonObject);
