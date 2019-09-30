@@ -24,6 +24,7 @@ import io.kamax.matrix.ThreePid;
 import io.kamax.mxisd.invitation.IThreePidInviteReply;
 import io.kamax.mxisd.storage.dao.IThreePidSessionDao;
 import io.kamax.mxisd.storage.ormlite.dao.ASTransactionDao;
+import io.kamax.mxisd.storage.ormlite.dao.AccountDao;
 import io.kamax.mxisd.storage.ormlite.dao.ThreePidInviteIO;
 
 import java.time.Instant;
@@ -52,4 +53,9 @@ public interface IStorage {
 
     Optional<ASTransactionDao> getTransactionResult(String localpart, String txnId);
 
+    void insertToken(AccountDao accountDao);
+
+    Optional<String> findUserId(String accessToken);
+
+    void deleteToken(String accessToken);
 }

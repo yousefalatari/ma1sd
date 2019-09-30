@@ -34,6 +34,7 @@ import io.kamax.mxisd.invitation.IThreePidInviteReply;
 import io.kamax.mxisd.storage.IStorage;
 import io.kamax.mxisd.storage.dao.IThreePidSessionDao;
 import io.kamax.mxisd.storage.ormlite.dao.ASTransactionDao;
+import io.kamax.mxisd.storage.ormlite.dao.AccountDao;
 import io.kamax.mxisd.storage.ormlite.dao.HistoricalThreePidInviteIO;
 import io.kamax.mxisd.storage.ormlite.dao.ThreePidInviteIO;
 import io.kamax.mxisd.storage.ormlite.dao.ThreePidSessionDao;
@@ -42,7 +43,11 @@ import org.apache.commons.lang.StringUtils;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public class OrmLiteSqlStorage implements IStorage {
 
@@ -64,6 +69,7 @@ public class OrmLiteSqlStorage implements IStorage {
     private Dao<HistoricalThreePidInviteIO, String> expInvDao;
     private Dao<ThreePidSessionDao, String> sessionDao;
     private Dao<ASTransactionDao, String> asTxnDao;
+    private Dao<AccountDao, String> accountDao;
 
     public OrmLiteSqlStorage(MxisdConfig cfg) {
         this(cfg.getStorage().getBackend(), cfg.getStorage().getProvider().getSqlite().getDatabase());
@@ -84,6 +90,7 @@ public class OrmLiteSqlStorage implements IStorage {
             expInvDao = createDaoAndTable(connPool, HistoricalThreePidInviteIO.class);
             sessionDao = createDaoAndTable(connPool, ThreePidSessionDao.class);
             asTxnDao = createDaoAndTable(connPool, ASTransactionDao.class);
+            accountDao = createDaoAndTable(connPool, AccountDao.class);
         });
     }
 
@@ -175,7 +182,7 @@ public class OrmLiteSqlStorage implements IStorage {
             List<ThreePidSessionDao> daoList = sessionDao.queryForMatchingArgs(new ThreePidSessionDao(tpid, secret));
             if (daoList.size() > 1) {
                 throw new InternalServerError("Lookup for 3PID Session " +
-                        tpid + " returned more than one result");
+                    tpid + " returned more than one result");
             }
 
             if (daoList.isEmpty()) {
@@ -226,7 +233,7 @@ public class OrmLiteSqlStorage implements IStorage {
 
             if (daoList.size() > 1) {
                 throw new InternalServerError("Lookup for Transaction " +
-                        txnId + " for localpart " + localpart + " returned more than one result");
+                    txnId + " for localpart " + localpart + " returned more than one result");
             }
 
             if (daoList.isEmpty()) {
@@ -237,4 +244,37 @@ public class OrmLiteSqlStorage implements IStorage {
         });
     }
 
+    @Override
+    public void insertToken(AccountDao account) {
+        withCatcher(() -> {
+            int created = accountDao.create(account);
+            if (created != 1) {
+                throw new RuntimeException("Unexpected row count after DB action: " + created);
+            }
+        });
+    }
+
+    @Override
+    public Optional<String> findUserId(String token) {
+        return withCatcher(() -> {
+            List<AccountDao> accounts = accountDao.queryForEq("token", token);
+            if (accounts.isEmpty()) {
+                return Optional.empty();
+            }
+            if (accounts.size() != 1) {
+                throw new RuntimeException("Unexpected rows for access token: " + accounts.size());
+            }
+            return Optional.of(accounts.get(0).getUserId());
+        });
+    }
+
+    @Override
+    public void deleteToken(String token) {
+        withCatcher(() -> {
+            int updated = accountDao.deleteById(token);
+            if (updated != 1) {
+                throw new RuntimeException("Unexpected row count after DB action: " + updated);
+            }
+        });
+    }
 }
