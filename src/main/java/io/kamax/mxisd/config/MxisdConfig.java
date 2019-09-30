@@ -92,6 +92,7 @@ public class MxisdConfig {
     private AppServiceConfig appsvc = new AppServiceConfig();
     private AuthenticationConfig auth = new AuthenticationConfig();
     private DirectoryConfig directory = new DirectoryConfig();
+    private AccountConfig accountConfig = new AccountConfig();
     private Dns dns = new Dns();
     private ExecConfig exec = new ExecConfig();
     private FirebaseConfig firebase = new FirebaseConfig();
@@ -129,6 +130,14 @@ public class MxisdConfig {
 
     public void setAuth(AuthenticationConfig auth) {
         this.auth = auth;
+    }
+
+    public AccountConfig getAccountConfig() {
+        return accountConfig;
+    }
+
+    public void setAccountConfig(AccountConfig accountConfig) {
+        this.accountConfig = accountConfig;
     }
 
     public DirectoryConfig getDirectory() {
@@ -330,6 +339,7 @@ public class MxisdConfig {
 
         getAppsvc().build();
         getAuth().build();
+        getAccountConfig().build();
         getDirectory().build();
         getExec().build();
         getFirebase().build();

@@ -1,7 +1,11 @@
 package io.kamax.mxisd.auth;
 
 import com.google.gson.JsonObject;
+import io.kamax.matrix.MatrixID;
 import io.kamax.matrix.json.GsonUtil;
+import io.kamax.mxisd.config.AccountConfig;
+import io.kamax.mxisd.config.MatrixConfig;
+import io.kamax.mxisd.exception.BadRequestException;
 import io.kamax.mxisd.exception.InvalidCredentialsException;
 import io.kamax.mxisd.exception.NotFoundException;
 import io.kamax.mxisd.matrix.HomeserverFederationResolver;
@@ -27,12 +31,16 @@ public class AccountManager {
     private final IStorage storage;
     private final HomeserverFederationResolver resolver;
     private final CloseableHttpClient httpClient;
+    private final AccountConfig accountConfig;
+    private final MatrixConfig matrixConfig;
 
     public AccountManager(IStorage storage, HomeserverFederationResolver resolver,
-                          CloseableHttpClient httpClient) {
+                          CloseableHttpClient httpClient, AccountConfig accountConfig, MatrixConfig matrixConfig) {
         this.storage = storage;
         this.resolver = resolver;
         this.httpClient = httpClient;
+        this.accountConfig = accountConfig;
+        this.matrixConfig = matrixConfig;
     }
 
     public String register(OpenIdToken openIdToken) {
@@ -40,6 +48,20 @@ public class AccountManager {
         Objects.requireNonNull(openIdToken.getTokenType(), "Missing required token type");
         Objects.requireNonNull(openIdToken.getMatrixServerName(), "Missing required matrix domain");
 
+        String userId = getUserId(openIdToken);
+
+        String token = UUID.randomUUID().toString();
+        AccountDao account = new AccountDao(openIdToken.getAccessToken(), openIdToken.getTokenType(),
+            openIdToken.getMatrixServerName(), openIdToken.getExpiredIn(),
+            Instant.now().getEpochSecond(), userId, token);
+        storage.insertToken(account);
+
+        LOGGER.info("User {} registered", userId);
+
+        return token;
+    }
+
+    private String getUserId(OpenIdToken openIdToken) {
         String homeserverURL = resolver.resolve(openIdToken.getMatrixServerName()).toString();
         HttpGet getUserInfo = new HttpGet(
             "https://" + homeserverURL + "/_matrix/federation/v1/openid/userinfo?access_token=" + openIdToken.getAccessToken());
@@ -58,12 +80,30 @@ public class AccountManager {
             throw new InvalidCredentialsException();
         }
 
-        String token = UUID.randomUUID().toString();
-        AccountDao account = new AccountDao(openIdToken.getAccessToken(), openIdToken.getTokenType(),
-            openIdToken.getMatrixServerName(), openIdToken.getExpiredIn(),
-            Instant.now().getEpochSecond(), userId, token);
-        storage.insertToken(account);
-        return token;
+        checkMXID(userId);
+        return userId;
+    }
+
+    private void checkMXID(String userId) {
+        MatrixID mxid;
+        try {
+            mxid = MatrixID.asValid(userId);
+        } catch (IllegalArgumentException e) {
+            LOGGER.error("Wrong MXID: " + userId, e);
+            throw new BadRequestException("Wrong MXID");
+        }
+
+        if (getAccountConfig().isAllowOnlyTrustDomains()) {
+            LOGGER.info("Allow registration only for trust domain.");
+            if (getMatrixConfig().getDomain().equals(mxid.getDomain())) {
+                LOGGER.info("Allow user {} to registration", userId);
+            } else {
+                LOGGER.error("Deny user {} to registration", userId);
+                throw new InvalidCredentialsException();
+            }
+        } else {
+            LOGGER.info("Allow registration from any server.");
+        }
     }
 
     public String getUserId(String token) {
@@ -74,5 +114,13 @@ public class AccountManager {
         String userId = storage.findUserId(token).orElseThrow(InvalidCredentialsException::new);
         LOGGER.info("Logout: {}", userId);
         storage.deleteToken(token);
+    }
+
+    public AccountConfig getAccountConfig() {
+        return accountConfig;
+    }
+
+    public MatrixConfig getMatrixConfig() {
+        return matrixConfig;
     }
 }

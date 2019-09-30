@@ -20,30 +20,33 @@
 
 package io.kamax.mxisd.http.undertow.handler.auth.v2;
 
-import io.kamax.matrix.json.GsonUtil;
 import io.kamax.mxisd.auth.AccountManager;
-import io.kamax.mxisd.auth.OpenIdToken;
 import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
 import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AccountRegisterHandler extends BasicHttpHandler {
+public class AccountLogoutHandler extends BasicHttpHandler {
 
-    public static final String Path = "/_matrix/identity/v2/account/register";
+    public static final String Path = "/_matrix/identity/v2/account";
 
-    private static final Logger log = LoggerFactory.getLogger(AccountRegisterHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(AccountLogoutHandler.class);
 
     private final AccountManager accountManager;
 
-    public AccountRegisterHandler(AccountManager accountManager) {
+    public AccountLogoutHandler(AccountManager accountManager) {
         this.accountManager = accountManager;
     }
 
     @Override
     public void handleRequest(HttpServerExchange exchange) {
-        OpenIdToken openIdToken = parseJsonTo(exchange, OpenIdToken.class);
-        String token = accountManager.register(openIdToken);
-        respond(exchange, GsonUtil.makeObj("token", token));
+        String token = getQueryParameter(exchange, "access_token");
+        if (token == null) {
+            token = getAccessToken(exchange);
+        }
+
+        accountManager.logout(token);
+
+        respondJson(exchange, "{}");
     }
 }

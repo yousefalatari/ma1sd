@@ -33,6 +33,9 @@ import io.kamax.mxisd.http.undertow.handler.auth.RestAuthHandler;
 import io.kamax.mxisd.http.undertow.handler.auth.v1.LoginGetHandler;
 import io.kamax.mxisd.http.undertow.handler.auth.v1.LoginHandler;
 import io.kamax.mxisd.http.undertow.handler.auth.v1.LoginPostHandler;
+import io.kamax.mxisd.http.undertow.handler.auth.v2.AccountGetUserInfoHandler;
+import io.kamax.mxisd.http.undertow.handler.auth.v2.AccountLogoutHandler;
+import io.kamax.mxisd.http.undertow.handler.auth.v2.AccountRegisterHandler;
 import io.kamax.mxisd.http.undertow.handler.directory.v1.UserDirectorySearchHandler;
 import io.kamax.mxisd.http.undertow.handler.identity.share.EphemeralKeyIsValidHandler;
 import io.kamax.mxisd.http.undertow.handler.identity.share.HelloHandler;
@@ -104,6 +107,11 @@ public class HttpMxisd {
             .get(LoginHandler.Path, SaneHandler.around(new LoginGetHandler(m.getAuth(), m.getHttpClient())))
             .post(LoginHandler.Path, SaneHandler.around(new LoginPostHandler(m.getAuth())))
             .post(RestAuthHandler.Path, SaneHandler.around(new RestAuthHandler(m.getAuth())))
+
+            // Account endpoints
+            .post(AccountRegisterHandler.Path, SaneHandler.around(new AccountRegisterHandler(m.getAccMgr())))
+            .get(AccountGetUserInfoHandler.Path, SaneHandler.around(new AccountGetUserInfoHandler(m.getAccMgr())))
+            .post(AccountLogoutHandler.Path, SaneHandler.around(new AccountLogoutHandler(m.getAccMgr())))
 
             // Directory endpoints
             .post(UserDirectorySearchHandler.Path, SaneHandler.around(new UserDirectorySearchHandler(m.getDirectory())))
