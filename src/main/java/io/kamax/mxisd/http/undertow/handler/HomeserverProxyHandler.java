@@ -21,35 +21,11 @@
 package io.kamax.mxisd.http.undertow.handler;
 
 import io.kamax.mxisd.exception.AccessTokenNotFoundException;
-import io.kamax.mxisd.util.OptionalUtil;
 import io.undertow.server.HttpServerExchange;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.LinkedList;
-import java.util.Optional;
 
 public abstract class HomeserverProxyHandler extends BasicHttpHandler {
-
-    protected final static String headerName = "Authorization";
-    protected final static String headerValuePrefix = "Bearer ";
-    private final static String parameterName = "access_token";
-
-    Optional<String> findAccessTokenInHeaders(HttpServerExchange exchange) {
-        return Optional.ofNullable(exchange.getRequestHeaders().getFirst(headerName))
-                .filter(header -> StringUtils.startsWith(header, headerValuePrefix))
-                .map(header -> header.substring(headerValuePrefix.length()));
-    }
-
-    Optional<String> findAccessTokenInQuery(HttpServerExchange exchange) {
-        return Optional.ofNullable(exchange.getQueryParameters().getOrDefault(parameterName, new LinkedList<>()).peekFirst());
-    }
-
-    public Optional<String> findAccessToken(HttpServerExchange exchange) {
-        return OptionalUtil.findFirst(() -> findAccessTokenInHeaders(exchange), () -> findAccessTokenInQuery(exchange));
-    }
 
     public String getAccessToken(HttpServerExchange exchange) {
         return findAccessToken(exchange).orElseThrow(AccessTokenNotFoundException::new);
     }
-
 }

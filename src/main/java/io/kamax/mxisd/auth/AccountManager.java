@@ -8,6 +8,7 @@ import io.kamax.mxisd.config.MatrixConfig;
 import io.kamax.mxisd.exception.BadRequestException;
 import io.kamax.mxisd.exception.InvalidCredentialsException;
 import io.kamax.mxisd.exception.NotFoundException;
+import io.kamax.mxisd.http.undertow.handler.auth.v1.LoginGetHandler;
 import io.kamax.mxisd.matrix.HomeserverFederationResolver;
 import io.kamax.mxisd.storage.IStorage;
 import io.kamax.mxisd.storage.ormlite.dao.AccountDao;
@@ -48,7 +49,9 @@ public class AccountManager {
         Objects.requireNonNull(openIdToken.getTokenType(), "Missing required token type");
         Objects.requireNonNull(openIdToken.getMatrixServerName(), "Missing required matrix domain");
 
+        LOGGER.info("Registration from the server: {}", openIdToken.getMatrixServerName());
         String userId = getUserId(openIdToken);
+        LOGGER.info("UserId: {}", userId);
 
         String token = UUID.randomUUID().toString();
         AccountDao account = new AccountDao(openIdToken.getAccessToken(), openIdToken.getTokenType(),
@@ -63,13 +66,16 @@ public class AccountManager {
 
     private String getUserId(OpenIdToken openIdToken) {
         String homeserverURL = resolver.resolve(openIdToken.getMatrixServerName()).toString();
+        LOGGER.info("Domain resolved: {} => {}", openIdToken.getMatrixServerName(), homeserverURL);
         HttpGet getUserInfo = new HttpGet(
             "https://" + homeserverURL + "/_matrix/federation/v1/openid/userinfo?access_token=" + openIdToken.getAccessToken());
         String userId;
         try (CloseableHttpResponse response = httpClient.execute(getUserInfo)) {
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode == HttpStatus.SC_OK) {
-                JsonObject body = GsonUtil.parseObj(EntityUtils.toString(response.getEntity()));
+                String content = EntityUtils.toString(response.getEntity());
+                LOGGER.trace("Response: {}", content);
+                JsonObject body = GsonUtil.parseObj(content);
                 userId = GsonUtil.getStringOrThrow(body, "sub");
             } else {
                 LOGGER.error("Wrong response status: {}", statusCode);
@@ -107,12 +113,29 @@ public class AccountManager {
     }
 
     public String getUserId(String token) {
-        return storage.findUserId(token).orElseThrow(NotFoundException::new);
+        return storage.findAccount(token).orElseThrow(NotFoundException::new).getUserId();
+    }
+
+    public AccountDao findAccount(String token) {
+        AccountDao accountDao = storage.findAccount(token).orElse(null);
+
+        if (LOGGER.isInfoEnabled()) {
+            if (accountDao != null) {
+                LOGGER.info("Found account for user: {}", accountDao.getUserId());
+            } else {
+                LOGGER.warn("Account not found.");
+            }
+        }
+        return accountDao;
     }
 
     public void logout(String token) {
-        String userId = storage.findUserId(token).orElseThrow(InvalidCredentialsException::new);
+        String userId = storage.findAccount(token).orElseThrow(InvalidCredentialsException::new).getUserId();
         LOGGER.info("Logout: {}", userId);
+        deleteAccount(token);
+    }
+
+    public void deleteAccount(String token) {
         storage.deleteToken(token);
     }
 

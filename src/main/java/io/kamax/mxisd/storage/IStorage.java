@@ -55,7 +55,7 @@ public interface IStorage {
 
     void insertToken(AccountDao accountDao);
 
-    Optional<String> findUserId(String accessToken);
+    Optional<AccountDao> findAccount(String token);
 
     void deleteToken(String accessToken);
 }

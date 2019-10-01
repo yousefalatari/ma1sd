@@ -23,6 +23,7 @@ package io.kamax.mxisd;
 import io.kamax.mxisd.config.MatrixConfig;
 import io.kamax.mxisd.config.MxisdConfig;
 import io.kamax.mxisd.http.undertow.handler.ApiHandler;
+import io.kamax.mxisd.http.undertow.handler.AuthorizationHandler;
 import io.kamax.mxisd.http.undertow.handler.InternalInfoHandler;
 import io.kamax.mxisd.http.undertow.handler.OptionsHandler;
 import io.kamax.mxisd.http.undertow.handler.SaneHandler;
@@ -87,14 +88,9 @@ public class HttpMxisd {
     public void start() {
         m.start();
 
-        HttpHandler helloHandler = SaneHandler.around(new HelloHandler());
-
         HttpHandler asUserHandler = SaneHandler.around(new AsUserHandler(m.getAs()));
         HttpHandler asTxnHandler = SaneHandler.around(new AsTransactionHandler(m.getAs()));
         HttpHandler asNotFoundHandler = SaneHandler.around(new AsNotFoundHandler(m.getAs()));
-
-        HttpHandler storeInvHandler = SaneHandler
-            .around(new StoreInviteHandler(m.getConfig().getServer(), m.getInvite(), m.getKeyManager()));
 
         final RoutingHandler handler = Handlers.routing()
             .add("OPTIONS", "/**", SaneHandler.around(new OptionsHandler()))
@@ -110,8 +106,10 @@ public class HttpMxisd {
 
             // Account endpoints
             .post(AccountRegisterHandler.Path, SaneHandler.around(new AccountRegisterHandler(m.getAccMgr())))
-            .get(AccountGetUserInfoHandler.Path, SaneHandler.around(new AccountGetUserInfoHandler(m.getAccMgr())))
-            .post(AccountLogoutHandler.Path, SaneHandler.around(new AccountLogoutHandler(m.getAccMgr())))
+            .get(AccountGetUserInfoHandler.Path,
+                SaneHandler.around(AuthorizationHandler.around(m.getAccMgr(), new AccountGetUserInfoHandler(m.getAccMgr()))))
+            .post(AccountLogoutHandler.Path,
+                SaneHandler.around(AuthorizationHandler.around(m.getAccMgr(), new AccountLogoutHandler(m.getAccMgr()))))
 
             // Directory endpoints
             .post(UserDirectorySearchHandler.Path, SaneHandler.around(new UserDirectorySearchHandler(m.getDirectory())))
@@ -155,7 +153,7 @@ public class HttpMxisd {
     }
 
     private void keyEndpoints(RoutingHandler routingHandler) {
-        addEndpoints(routingHandler, Methods.GET,
+        addEndpoints(routingHandler, Methods.GET, false,
             new KeyGetHandler(m.getKeyManager()),
             new RegularKeyIsValidHandler(m.getKeyManager()),
             new EphemeralKeyIsValidHandler(m.getKeyManager())
@@ -163,14 +161,17 @@ public class HttpMxisd {
     }
 
     private void identityEndpoints(RoutingHandler routingHandler) {
+        // Legacy v1
         routingHandler.get(SingleLookupHandler.Path, sane(new SingleLookupHandler(m.getConfig(), m.getIdentity(), m.getSign())));
         routingHandler.post(BulkLookupHandler.Path, sane(new BulkLookupHandler(m.getIdentity())));
-        addEndpoints(routingHandler, Methods.GET,
-            new HelloHandler(),
+
+        addEndpoints(routingHandler, Methods.GET, false, new HelloHandler());
+
+        addEndpoints(routingHandler, Methods.GET, true,
             new SessionValidationGetHandler(m.getSession(), m.getConfig()),
             new SessionTpidGetValidatedHandler(m.getSession())
         );
-        addEndpoints(routingHandler, Methods.POST,
+        addEndpoints(routingHandler, Methods.POST, true,
             new StoreInviteHandler(m.getConfig().getServer(), m.getInvite(), m.getKeyManager()),
             new SessionStartHandler(m.getSession()),
             new SessionValidationPostHandler(m.getSession()),
@@ -180,19 +181,20 @@ public class HttpMxisd {
         );
     }
 
-    private void addEndpoints(RoutingHandler routingHandler, HttpString method, ApiHandler... handlers) {
+    private void addEndpoints(RoutingHandler routingHandler, HttpString method, boolean useAuthorization, ApiHandler... handlers) {
         for (ApiHandler handler : handlers) {
-            attachHandler(routingHandler, method, handler, sane(handler));
+            attachHandler(routingHandler, method, handler, useAuthorization, sane(handler));
         }
     }
 
-    private void attachHandler(RoutingHandler routingHandler, HttpString method, ApiHandler apiHandler, HttpHandler httpHandler) {
-        final MatrixConfig matrixConfig = m.getConfig().getMatrix();
+    private void attachHandler(RoutingHandler routingHandler, HttpString method, ApiHandler apiHandler, boolean useAuthorization, HttpHandler httpHandler) {
+        MatrixConfig matrixConfig = m.getConfig().getMatrix();
         if (matrixConfig.isV1()) {
             routingHandler.add(method, apiHandler.getPath(IdentityServiceAPI.V1), httpHandler);
         }
         if (matrixConfig.isV2()) {
-            routingHandler.add(method, apiHandler.getPath(IdentityServiceAPI.V2), httpHandler);
+            HttpHandler wrappedHandler = useAuthorization ? AuthorizationHandler.around(m.getAccMgr(), httpHandler) : httpHandler;
+            routingHandler.add(method, apiHandler.getPath(IdentityServiceAPI.V2), wrappedHandler);
         }
     }
 

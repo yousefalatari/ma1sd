@@ -255,7 +255,7 @@ public class OrmLiteSqlStorage implements IStorage {
     }
 
     @Override
-    public Optional<String> findUserId(String token) {
+    public Optional<AccountDao> findAccount(String token) {
         return withCatcher(() -> {
             List<AccountDao> accounts = accountDao.queryForEq("token", token);
             if (accounts.isEmpty()) {
@@ -264,7 +264,7 @@ public class OrmLiteSqlStorage implements IStorage {
             if (accounts.size() != 1) {
                 throw new RuntimeException("Unexpected rows for access token: " + accounts.size());
             }
-            return Optional.of(accounts.get(0).getUserId());
+            return Optional.of(accounts.get(0));
         });
     }
 

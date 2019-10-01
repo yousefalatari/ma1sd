@@ -28,11 +28,13 @@ import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
+
 public class AccountRegisterHandler extends BasicHttpHandler {
 
     public static final String Path = "/_matrix/identity/v2/account/register";
 
-    private static final Logger log = LoggerFactory.getLogger(AccountRegisterHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccountRegisterHandler.class);
 
     private final AccountManager accountManager;
 
@@ -43,6 +45,12 @@ public class AccountRegisterHandler extends BasicHttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exchange) {
         OpenIdToken openIdToken = parseJsonTo(exchange, OpenIdToken.class);
+
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Registration from domain: {}, expired at {}", openIdToken.getMatrixServerName(),
+                new Date(openIdToken.getExpiredIn()));
+        }
+
         String token = accountManager.register(openIdToken);
         respond(exchange, GsonUtil.makeObj("token", token));
     }

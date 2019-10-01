@@ -21,6 +21,7 @@
 package io.kamax.mxisd.http.undertow.handler.auth.v2;
 
 import io.kamax.mxisd.auth.AccountManager;
+import io.kamax.mxisd.exception.InvalidCredentialsException;
 import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
 import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
@@ -28,9 +29,9 @@ import org.slf4j.LoggerFactory;
 
 public class AccountLogoutHandler extends BasicHttpHandler {
 
-    public static final String Path = "/_matrix/identity/v2/account";
+    public static final String Path = "/_matrix/identity/v2/account/logout";
 
-    private static final Logger log = LoggerFactory.getLogger(AccountLogoutHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccountLogoutHandler.class);
 
     private final AccountManager accountManager;
 
@@ -40,10 +41,8 @@ public class AccountLogoutHandler extends BasicHttpHandler {
 
     @Override
     public void handleRequest(HttpServerExchange exchange) {
-        String token = getQueryParameter(exchange, "access_token");
-        if (token == null) {
-            token = getAccessToken(exchange);
-        }
+        LOGGER.info("Logout.");
+        String token = findAccessToken(exchange).orElseThrow(InvalidCredentialsException::new);
 
         accountManager.logout(token);
 
