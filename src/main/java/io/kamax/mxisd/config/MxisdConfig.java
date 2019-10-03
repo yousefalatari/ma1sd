@@ -115,6 +115,7 @@ public class MxisdConfig {
     private ThreePidConfig threepid = new ThreePidConfig();
     private ViewConfig view = new ViewConfig();
     private WordpressConfig wordpress = new WordpressConfig();
+    private PolicyConfig policy = new PolicyConfig();
 
     public AppServiceConfig getAppsvc() {
         return appsvc;
@@ -324,6 +325,14 @@ public class MxisdConfig {
         this.wordpress = wordpress;
     }
 
+    public PolicyConfig getPolicy() {
+        return policy;
+    }
+
+    public void setPolicy(PolicyConfig policy) {
+        this.policy = policy;
+    }
+
     public MxisdConfig inMemory() {
         getKey().setPath(":memory:");
         getStorage().getProvider().getSqlite().setDatabase(":memory:");
@@ -362,6 +371,7 @@ public class MxisdConfig {
         getThreepid().build();
         getView().build();
         getWordpress().build();
+        getPolicy().build();
 
         return this;
     }
