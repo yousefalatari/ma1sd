@@ -5,6 +5,7 @@ import io.kamax.matrix.MatrixID;
 import io.kamax.matrix.json.GsonUtil;
 import io.kamax.mxisd.config.AccountConfig;
 import io.kamax.mxisd.config.MatrixConfig;
+import io.kamax.mxisd.config.PolicyConfig;
 import io.kamax.mxisd.exception.BadRequestException;
 import io.kamax.mxisd.exception.InvalidCredentialsException;
 import io.kamax.mxisd.exception.NotFoundException;
@@ -22,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -137,6 +139,14 @@ public class AccountManager {
 
     public void deleteAccount(String token) {
         storage.deleteToken(token);
+    }
+
+    public void acceptTerm(String token, String url) {
+        storage.acceptTerm(token, url);
+    }
+
+    public boolean isTermAccepted(String token, List<PolicyConfig.PolicyObject> policies) {
+        return policies.isEmpty() || storage.isTermAccepted(token, policies);
     }
 
     public AccountConfig getAccountConfig() {

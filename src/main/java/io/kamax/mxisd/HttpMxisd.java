@@ -22,8 +22,10 @@ package io.kamax.mxisd;
 
 import io.kamax.mxisd.config.MatrixConfig;
 import io.kamax.mxisd.config.MxisdConfig;
+import io.kamax.mxisd.config.PolicyConfig;
 import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.kamax.mxisd.http.undertow.handler.AuthorizationHandler;
+import io.kamax.mxisd.http.undertow.handler.CheckTermsHandler;
 import io.kamax.mxisd.http.undertow.handler.InternalInfoHandler;
 import io.kamax.mxisd.http.undertow.handler.OptionsHandler;
 import io.kamax.mxisd.http.undertow.handler.SaneHandler;
@@ -65,7 +67,10 @@ import io.undertow.server.RoutingHandler;
 import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 public class HttpMxisd {
 
@@ -187,13 +192,26 @@ public class HttpMxisd {
         }
     }
 
-    private void attachHandler(RoutingHandler routingHandler, HttpString method, ApiHandler apiHandler, boolean useAuthorization, HttpHandler httpHandler) {
+    private void attachHandler(RoutingHandler routingHandler, HttpString method, ApiHandler apiHandler, boolean useAuthorization,
+                               HttpHandler httpHandler) {
         MatrixConfig matrixConfig = m.getConfig().getMatrix();
         if (matrixConfig.isV1()) {
             routingHandler.add(method, apiHandler.getPath(IdentityServiceAPI.V1), httpHandler);
         }
         if (matrixConfig.isV2()) {
-            HttpHandler wrappedHandler = useAuthorization ? AuthorizationHandler.around(m.getAccMgr(), httpHandler) : httpHandler;
+            PolicyConfig policyConfig = m.getConfig().getPolicy();
+            List<PolicyConfig.PolicyObject> policies = new ArrayList<>();
+            if (!policyConfig.getPolicies().isEmpty()) {
+                for (PolicyConfig.PolicyObject policy : policyConfig.getPolicies().values()) {
+                    for (Pattern pattern : policy.getPatterns()) {
+                        if (pattern.matcher(apiHandler.getHandlerPath()).matches()) {
+                            policies.add(policy);
+                        }
+                    }
+                }
+            }
+            HttpHandler handlerWithTerms = CheckTermsHandler.around(m.getAccMgr(), httpHandler, policies);
+            HttpHandler wrappedHandler = useAuthorization ? AuthorizationHandler.around(m.getAccMgr(), handlerWithTerms) : handlerWithTerms;
             routingHandler.add(method, apiHandler.getPath(IdentityServiceAPI.V2), wrappedHandler);
         }
     }

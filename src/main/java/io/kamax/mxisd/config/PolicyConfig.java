@@ -3,22 +3,25 @@ package io.kamax.mxisd.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class PolicyConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PolicyConfig.class);
 
-    public static class PolicyObject {
+    private Map<String, PolicyObject> policies = new HashMap<>();
+
+    private AcceptingPolicy acceptingPolicy = AcceptingPolicy.ANY;
+
+    public static class TermObject {
 
         private String name;
 
-        private String version;
-
-        private Map<String, String> urls;
-
-        private boolean required = true;
+        private String url;
 
         public String getName() {
             return name;
@@ -28,6 +31,25 @@ public class PolicyConfig {
             this.name = name;
         }
 
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+    }
+
+    public static class PolicyObject {
+
+        private String version;
+
+        private Map<String, TermObject> terms;
+
+        private List<String> regexp = new ArrayList<>();
+
+        private transient List<Pattern> patterns = new ArrayList<>();
+
         public String getVersion() {
             return version;
         }
@@ -36,24 +58,26 @@ public class PolicyConfig {
             this.version = version;
         }
 
-        public Map<String, String> getUrls() {
-            return urls;
+        public Map<String, TermObject> getTerms() {
+            return terms;
         }
 
-        public void setUrls(Map<String, String> urls) {
-            this.urls = urls;
+        public void setTerms(Map<String, TermObject> terms) {
+            this.terms = terms;
         }
 
-        public boolean isRequired() {
-            return required;
+        public List<String> getRegexp() {
+            return regexp;
         }
 
-        public void setRequired(boolean required) {
-            this.required = required;
+        public void setRegexp(List<String> regexp) {
+            this.regexp = regexp;
+        }
+
+        public List<Pattern> getPatterns() {
+            return patterns;
         }
     }
-
-    private Map<String, PolicyObject> policies = new HashMap<>();
 
     public Map<String, PolicyObject> getPolicies() {
         return policies;
@@ -63,21 +87,33 @@ public class PolicyConfig {
         this.policies = policies;
     }
 
+    public AcceptingPolicy getAcceptingPolicy() {
+        return acceptingPolicy;
+    }
+
+    public void setAcceptingPolicy(AcceptingPolicy acceptingPolicy) {
+        this.acceptingPolicy = acceptingPolicy;
+    }
+
     public void build() {
         LOGGER.info("--- Policy Config ---");
         if (getPolicies().isEmpty()) {
             LOGGER.info("Empty");
         } else {
-            for (Map.Entry<String, PolicyObject> policyObjectEntry : getPolicies().entrySet()) {
-                PolicyObject policyObject = policyObjectEntry.getValue();
+            for (Map.Entry<String, PolicyObject> policyObjectItem : getPolicies().entrySet()) {
+                PolicyObject policyObject = policyObjectItem.getValue();
                 StringBuilder sb = new StringBuilder();
-                sb.append("Policy \"").append(policyObjectEntry.getKey()).append("\"\n");
+                sb.append("Policy \"").append(policyObjectItem.getKey()).append("\"\n");
                 sb.append("  version: ").append(policyObject.getVersion()).append("\n");
-                sb.append("  required: ").append(policyObject.isRequired()).append("\n");
-                sb.append("  urls:\n");
-                for (Map.Entry<String, String> urlEntry : policyObject.getUrls().entrySet()) {
-                    sb.append("    lang: ").append(urlEntry.getKey()).append("\n");
-                    sb.append("    url: ").append(urlEntry.getValue());
+                for (String regexp : policyObjectItem.getValue().getRegexp()) {
+                    sb.append("    - ").append(regexp).append("\n");
+                    policyObjectItem.getValue().getPatterns().add(Pattern.compile(regexp));
+                }
+                sb.append("  terms:\n");
+                for (Map.Entry<String, TermObject> termItem : policyObject.getTerms().entrySet()) {
+                    sb.append("    - lang: ").append(termItem.getKey()).append("\n");
+                    sb.append("      name: ").append(termItem.getValue().getName()).append("\n");
+                    sb.append("       url: ").append(termItem.getValue().getUrl()).append("\n");
                 }
                 LOGGER.info(sb.toString());
             }

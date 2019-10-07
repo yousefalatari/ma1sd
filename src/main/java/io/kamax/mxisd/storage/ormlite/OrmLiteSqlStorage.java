@@ -28,14 +28,17 @@ import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import io.kamax.matrix.ThreePid;
 import io.kamax.mxisd.config.MxisdConfig;
+import io.kamax.mxisd.config.PolicyConfig;
 import io.kamax.mxisd.exception.ConfigurationException;
 import io.kamax.mxisd.exception.InternalServerError;
+import io.kamax.mxisd.exception.InvalidCredentialsException;
 import io.kamax.mxisd.invitation.IThreePidInviteReply;
 import io.kamax.mxisd.storage.IStorage;
 import io.kamax.mxisd.storage.dao.IThreePidSessionDao;
 import io.kamax.mxisd.storage.ormlite.dao.ASTransactionDao;
 import io.kamax.mxisd.storage.ormlite.dao.AccountDao;
 import io.kamax.mxisd.storage.ormlite.dao.HistoricalThreePidInviteIO;
+import io.kamax.mxisd.storage.ormlite.dao.AcceptedDao;
 import io.kamax.mxisd.storage.ormlite.dao.ThreePidInviteIO;
 import io.kamax.mxisd.storage.ormlite.dao.ThreePidSessionDao;
 import org.apache.commons.lang.StringUtils;
@@ -70,6 +73,7 @@ public class OrmLiteSqlStorage implements IStorage {
     private Dao<ThreePidSessionDao, String> sessionDao;
     private Dao<ASTransactionDao, String> asTxnDao;
     private Dao<AccountDao, String> accountDao;
+    private Dao<AcceptedDao, String> acceptedDao;
 
     public OrmLiteSqlStorage(MxisdConfig cfg) {
         this(cfg.getStorage().getBackend(), cfg.getStorage().getProvider().getSqlite().getDatabase());
@@ -91,6 +95,7 @@ public class OrmLiteSqlStorage implements IStorage {
             sessionDao = createDaoAndTable(connPool, ThreePidSessionDao.class);
             asTxnDao = createDaoAndTable(connPool, ASTransactionDao.class);
             accountDao = createDaoAndTable(connPool, AccountDao.class);
+            acceptedDao = createDaoAndTable(connPool, AcceptedDao.class);
         });
     }
 
@@ -275,6 +280,35 @@ public class OrmLiteSqlStorage implements IStorage {
             if (updated != 1) {
                 throw new RuntimeException("Unexpected row count after DB action: " + updated);
             }
+        });
+    }
+
+    @Override
+    public void acceptTerm(String token, String url) {
+        withCatcher(() -> {
+            AccountDao account = findAccount(token).orElseThrow(InvalidCredentialsException::new);
+            int created = acceptedDao.create(new AcceptedDao(url, account.getUserId(), System.currentTimeMillis()));
+            if (created != 1) {
+                throw new RuntimeException("Unexpected row count after DB action: " + created);
+            }
+        });
+    }
+
+    @Override
+    public boolean isTermAccepted(String token, List<PolicyConfig.PolicyObject> policies) {
+        return withCatcher(() -> {
+            AccountDao account = findAccount(token).orElseThrow(InvalidCredentialsException::new);
+            List<AcceptedDao> acceptedTerms = acceptedDao.queryForEq("userId", account.getUserId());
+            for (AcceptedDao acceptedTerm : acceptedTerms) {
+                for (PolicyConfig.PolicyObject policy : policies) {
+                    for (PolicyConfig.TermObject termObject : policy.getTerms().values()) {
+                        if (termObject.getUrl().equalsIgnoreCase(acceptedTerm.getUrl())) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         });
     }
 }
