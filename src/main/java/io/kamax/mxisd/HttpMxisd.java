@@ -59,6 +59,8 @@ import io.kamax.mxisd.http.undertow.handler.profile.v1.ProfileHandler;
 import io.kamax.mxisd.http.undertow.handler.register.v1.Register3pidRequestTokenHandler;
 import io.kamax.mxisd.http.undertow.handler.status.StatusHandler;
 import io.kamax.mxisd.http.undertow.handler.status.VersionHandler;
+import io.kamax.mxisd.http.undertow.handler.term.v2.AcceptTermsHandler;
+import io.kamax.mxisd.http.undertow.handler.term.v2.GetTermsHandler;
 import io.kamax.mxisd.matrix.IdentityServiceAPI;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
@@ -66,6 +68,7 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.RoutingHandler;
 import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -143,6 +146,7 @@ public class HttpMxisd {
             .get(InternalInfoHandler.Path, SaneHandler.around(new InternalInfoHandler()));
         keyEndpoints(handler);
         identityEndpoints(handler);
+        termsEndpoints(handler);
         httpSrv = Undertow.builder().addHttpListener(m.getConfig().getServer().getPort(), "0.0.0.0").setHandler(handler).build();
 
         httpSrv.start();
@@ -186,6 +190,12 @@ public class HttpMxisd {
         );
     }
 
+    private void termsEndpoints(RoutingHandler routingHandler) {
+        routingHandler.get(GetTermsHandler.PATH, new GetTermsHandler(m.getConfig().getPolicy()));
+        routingHandler
+            .post(AcceptTermsHandler.PATH, AuthorizationHandler.around(m.getAccMgr(), sane(new AcceptTermsHandler(m.getAccMgr()))));
+    }
+
     private void addEndpoints(RoutingHandler routingHandler, HttpString method, boolean useAuthorization, ApiHandler... handlers) {
         for (ApiHandler handler : handlers) {
             attachHandler(routingHandler, method, handler, useAuthorization, sane(handler));
@@ -199,21 +209,26 @@ public class HttpMxisd {
             routingHandler.add(method, apiHandler.getPath(IdentityServiceAPI.V1), httpHandler);
         }
         if (matrixConfig.isV2()) {
-            PolicyConfig policyConfig = m.getConfig().getPolicy();
-            List<PolicyConfig.PolicyObject> policies = new ArrayList<>();
-            if (!policyConfig.getPolicies().isEmpty()) {
-                for (PolicyConfig.PolicyObject policy : policyConfig.getPolicies().values()) {
-                    for (Pattern pattern : policy.getPatterns()) {
-                        if (pattern.matcher(apiHandler.getHandlerPath()).matches()) {
-                            policies.add(policy);
-                        }
-                    }
-                }
-            }
-            HttpHandler handlerWithTerms = CheckTermsHandler.around(m.getAccMgr(), httpHandler, policies);
+            HttpHandler handlerWithTerms = CheckTermsHandler.around(m.getAccMgr(), httpHandler, getPolicyObjects(apiHandler));
             HttpHandler wrappedHandler = useAuthorization ? AuthorizationHandler.around(m.getAccMgr(), handlerWithTerms) : handlerWithTerms;
             routingHandler.add(method, apiHandler.getPath(IdentityServiceAPI.V2), wrappedHandler);
         }
+    }
+
+    @NotNull
+    private List<PolicyConfig.PolicyObject> getPolicyObjects(ApiHandler apiHandler) {
+        PolicyConfig policyConfig = m.getConfig().getPolicy();
+        List<PolicyConfig.PolicyObject> policies = new ArrayList<>();
+        if (!policyConfig.getPolicies().isEmpty()) {
+            for (PolicyConfig.PolicyObject policy : policyConfig.getPolicies().values()) {
+                for (Pattern pattern : policy.getPatterns()) {
+                    if (pattern.matcher(apiHandler.getHandlerPath()).matches()) {
+                        policies.add(policy);
+                    }
+                }
+            }
+        }
+        return policies;
     }
 
     private HttpHandler sane(HttpHandler httpHandler) {

@@ -138,6 +138,7 @@ public class AccountManager {
     }
 
     public void deleteAccount(String token) {
+        storage.deleteAccepts(token);
         storage.deleteToken(token);
     }
 

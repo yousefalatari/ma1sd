@@ -63,5 +63,7 @@ public interface IStorage {
 
     void acceptTerm(String token, String url);
 
+    void deleteAccepts(String token);
+
     boolean isTermAccepted(String token, List<PolicyConfig.PolicyObject> policies);
 }

@@ -295,6 +295,14 @@ public class OrmLiteSqlStorage implements IStorage {
     }
 
     @Override
+    public void deleteAccepts(String token) {
+        withCatcher(() -> {
+            AccountDao account = findAccount(token).orElseThrow(InvalidCredentialsException::new);
+            acceptedDao.delete(acceptedDao.queryForEq("userId", account.getUserId()));
+        });
+    }
+
+    @Override
     public boolean isTermAccepted(String token, List<PolicyConfig.PolicyObject> policies) {
         return withCatcher(() -> {
             AccountDao account = findAccount(token).orElseThrow(InvalidCredentialsException::new);
