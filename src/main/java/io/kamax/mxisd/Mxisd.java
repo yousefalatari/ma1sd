@@ -35,6 +35,7 @@ import io.kamax.mxisd.directory.DirectoryManager;
 import io.kamax.mxisd.directory.DirectoryProviders;
 import io.kamax.mxisd.dns.ClientDnsOverwrite;
 import io.kamax.mxisd.dns.FederationDnsOverwrite;
+import io.kamax.mxisd.hash.HashManager;
 import io.kamax.mxisd.invitation.InvitationManager;
 import io.kamax.mxisd.lookup.ThreePidProviders;
 import io.kamax.mxisd.lookup.fetcher.IRemoteIdentityServerFetcher;
@@ -87,6 +88,7 @@ public class Mxisd {
     private NotificationManager notifMgr;
     private RegistrationManager regMgr;
     private AccountManager accMgr;
+    private HashManager hashManager;
 
     // HS-specific classes
     private Synapse synapse;
@@ -127,6 +129,9 @@ public class Mxisd {
         regMgr = new RegistrationManager(cfg.getRegister(), httpClient, clientDns, invMgr);
         asHander = new AppSvcManager(this);
         accMgr = new AccountManager(store, resolver, getHttpClient(), cfg.getAccountConfig(), cfg.getMatrix());
+
+        hashManager = new HashManager();
+        hashManager.init(cfg.getHashing(), ThreePidProviders.get());
     }
 
     public MxisdConfig getConfig() {
@@ -199,6 +204,10 @@ public class Mxisd {
 
     public AccountManager getAccMgr() {
         return accMgr;
+    }
+
+    public HashManager getHashManager() {
+        return hashManager;
     }
 
     public void start() {

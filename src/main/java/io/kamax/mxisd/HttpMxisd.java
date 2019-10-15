@@ -53,6 +53,7 @@ import io.kamax.mxisd.http.undertow.handler.identity.share.SessionValidationPost
 import io.kamax.mxisd.http.undertow.handler.identity.share.SignEd25519Handler;
 import io.kamax.mxisd.http.undertow.handler.identity.share.StoreInviteHandler;
 import io.kamax.mxisd.http.undertow.handler.identity.v1.*;
+import io.kamax.mxisd.http.undertow.handler.identity.v2.HashDetailsHandler;
 import io.kamax.mxisd.http.undertow.handler.invite.v1.RoomInviteHandler;
 import io.kamax.mxisd.http.undertow.handler.profile.v1.InternalProfileHandler;
 import io.kamax.mxisd.http.undertow.handler.profile.v1.ProfileHandler;
@@ -147,6 +148,7 @@ public class HttpMxisd {
         keyEndpoints(handler);
         identityEndpoints(handler);
         termsEndpoints(handler);
+        hashEndpoints(handler);
         httpSrv = Undertow.builder().addHttpListener(m.getConfig().getServer().getPort(), "0.0.0.0").setHandler(handler).build();
 
         httpSrv.start();
@@ -194,6 +196,10 @@ public class HttpMxisd {
         routingHandler.get(GetTermsHandler.PATH, new GetTermsHandler(m.getConfig().getPolicy()));
         routingHandler
             .post(AcceptTermsHandler.PATH, AuthorizationHandler.around(m.getAccMgr(), sane(new AcceptTermsHandler(m.getAccMgr()))));
+    }
+
+    private void hashEndpoints(RoutingHandler routingHandler) {
+        routingHandler.get(HashDetailsHandler.PATH, AuthorizationHandler.around(m.getAccMgr(), sane(new HashDetailsHandler(m.getHashManager()))));
     }
 
     private void addEndpoints(RoutingHandler routingHandler, HttpString method, boolean useAuthorization, ApiHandler... handlers) {

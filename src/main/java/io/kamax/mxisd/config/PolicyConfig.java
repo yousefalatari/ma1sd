@@ -15,8 +15,6 @@ public class PolicyConfig {
 
     private Map<String, PolicyObject> policies = new HashMap<>();
 
-    private AcceptingPolicy acceptingPolicy = AcceptingPolicy.ANY;
-
     public static class TermObject {
 
         private String name;
@@ -85,14 +83,6 @@ public class PolicyConfig {
 
     public void setPolicies(Map<String, PolicyObject> policies) {
         this.policies = policies;
-    }
-
-    public AcceptingPolicy getAcceptingPolicy() {
-        return acceptingPolicy;
-    }
-
-    public void setAcceptingPolicy(AcceptingPolicy acceptingPolicy) {
-        this.acceptingPolicy = acceptingPolicy;
     }
 
     public void build() {

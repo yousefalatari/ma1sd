@@ -24,6 +24,7 @@ import io.kamax.mxisd.lookup.SingleLookupReply;
 import io.kamax.mxisd.lookup.SingleLookupRequest;
 import io.kamax.mxisd.lookup.ThreePidMapping;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,4 +41,7 @@ public interface IThreePidProvider {
 
     List<ThreePidMapping> populate(List<ThreePidMapping> mappings);
 
+    default Iterable<ThreePidMapping> populateHashes() {
+        return Collections.emptyList();
+    }
 }

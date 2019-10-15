@@ -116,6 +116,7 @@ public class MxisdConfig {
     private ViewConfig view = new ViewConfig();
     private WordpressConfig wordpress = new WordpressConfig();
     private PolicyConfig policy = new PolicyConfig();
+    private HashingConfig hashing = new HashingConfig();
 
     public AppServiceConfig getAppsvc() {
         return appsvc;
@@ -333,6 +334,14 @@ public class MxisdConfig {
         this.policy = policy;
     }
 
+    public HashingConfig getHashing() {
+        return hashing;
+    }
+
+    public void setHashing(HashingConfig hashing) {
+        this.hashing = hashing;
+    }
+
     public MxisdConfig inMemory() {
         getKey().setPath(":memory:");
         getStorage().getProvider().getSqlite().setDatabase(":memory:");
@@ -372,6 +381,7 @@ public class MxisdConfig {
         getView().build();
         getWordpress().build();
         getPolicy().build();
+        getHashing().build();
 
         return this;
     }
