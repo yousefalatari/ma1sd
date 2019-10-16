@@ -1,4 +1,4 @@
-package io.kamax.mxisd.hash;
+package io.kamax.mxisd.hash.storage;
 
 import io.kamax.mxisd.lookup.ThreePidMapping;
 

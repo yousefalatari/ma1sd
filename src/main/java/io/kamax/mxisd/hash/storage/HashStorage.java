@@ -1,6 +1,5 @@
-package io.kamax.mxisd.hash;
+package io.kamax.mxisd.hash.storage;
 
-import io.kamax.matrix.ThreePid;
 import io.kamax.mxisd.lookup.ThreePidMapping;
 
 public interface HashStorage {

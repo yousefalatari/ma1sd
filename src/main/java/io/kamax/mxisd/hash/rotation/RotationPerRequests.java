@@ -1,4 +1,6 @@
-package io.kamax.mxisd.hash;
+package io.kamax.mxisd.hash.rotation;
+
+import io.kamax.mxisd.hash.HashEngine;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

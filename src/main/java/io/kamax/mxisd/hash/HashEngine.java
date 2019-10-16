@@ -2,6 +2,7 @@ package io.kamax.mxisd.hash;
 
 import io.kamax.matrix.codec.MxSha256;
 import io.kamax.mxisd.config.HashingConfig;
+import io.kamax.mxisd.hash.storage.HashStorage;
 import io.kamax.mxisd.lookup.ThreePidMapping;
 import io.kamax.mxisd.lookup.provider.IThreePidProvider;
 import org.apache.commons.lang3.RandomStringUtils;
