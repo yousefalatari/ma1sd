@@ -199,7 +199,10 @@ public class HttpMxisd {
     }
 
     private void hashEndpoints(RoutingHandler routingHandler) {
-        routingHandler.get(HashDetailsHandler.PATH, AuthorizationHandler.around(m.getAccMgr(), sane(new HashDetailsHandler(m.getHashManager()))));
+        routingHandler
+            .get(HashDetailsHandler.PATH, AuthorizationHandler.around(m.getAccMgr(), sane(new HashDetailsHandler(m.getHashManager()))));
+        routingHandler.post(HashLookupHandler.Path,
+            AuthorizationHandler.around(m.getAccMgr(), sane(new HashLookupHandler(m.getIdentity(), m.getHashManager()))));
     }
 
     private void addEndpoints(RoutingHandler routingHandler, HttpString method, boolean useAuthorization, ApiHandler... handlers) {

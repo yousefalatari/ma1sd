@@ -119,7 +119,10 @@ public class Mxisd {
         ServiceLoader.load(IdentityStoreSupplier.class).iterator().forEachRemaining(p -> p.accept(this));
         ServiceLoader.load(NotificationHandlerSupplier.class).iterator().forEachRemaining(p -> p.accept(this));
 
-        idStrategy = new RecursivePriorityLookupStrategy(cfg.getLookup(), ThreePidProviders.get(), bridgeFetcher);
+        hashManager = new HashManager();
+        hashManager.init(cfg.getHashing(), ThreePidProviders.get());
+
+        idStrategy = new RecursivePriorityLookupStrategy(cfg.getLookup(), ThreePidProviders.get(), bridgeFetcher, hashManager);
         pMgr = new ProfileManager(ProfileProviders.get(), clientDns, httpClient);
         notifMgr = new NotificationManager(cfg.getNotification(), NotificationHandlers.get());
         sessMgr = new SessionManager(cfg, store, notifMgr, resolver, httpClient, signMgr);
@@ -129,9 +132,6 @@ public class Mxisd {
         regMgr = new RegistrationManager(cfg.getRegister(), httpClient, clientDns, invMgr);
         asHander = new AppSvcManager(this);
         accMgr = new AccountManager(store, resolver, getHttpClient(), cfg.getAccountConfig(), cfg.getMatrix());
-
-        hashManager = new HashManager();
-        hashManager.init(cfg.getHashing(), ThreePidProviders.get());
     }
 
     public MxisdConfig getConfig() {

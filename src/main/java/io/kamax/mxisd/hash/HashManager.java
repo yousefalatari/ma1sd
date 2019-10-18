@@ -11,6 +11,7 @@ import io.kamax.mxisd.lookup.provider.IThreePidProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
