@@ -70,7 +70,7 @@ public class AccountManager {
         String homeserverURL = resolver.resolve(openIdToken.getMatrixServerName()).toString();
         LOGGER.info("Domain resolved: {} => {}", openIdToken.getMatrixServerName(), homeserverURL);
         HttpGet getUserInfo = new HttpGet(
-            "https://" + homeserverURL + "/_matrix/federation/v1/openid/userinfo?access_token=" + openIdToken.getAccessToken());
+            homeserverURL + "/_matrix/federation/v1/openid/userinfo?access_token=" + openIdToken.getAccessToken());
         String userId;
         try (CloseableHttpResponse response = httpClient.execute(getUserInfo)) {
             int statusCode = response.getStatusLine().getStatusCode();
@@ -84,7 +84,7 @@ public class AccountManager {
                 throw new InvalidCredentialsException();
             }
         } catch (IOException e) {
-            LOGGER.error("Unable to get user info.");
+            LOGGER.error("Unable to get user info.", e);
             throw new InvalidCredentialsException();
         }
 
