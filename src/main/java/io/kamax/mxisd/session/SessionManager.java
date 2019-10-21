@@ -284,7 +284,7 @@ public class SessionManager {
         jsonObject.addProperty("method", "POST");
         jsonObject.addProperty("uri", "/_matrix/identity/api/v1/3pid/unbind");
         jsonObject.addProperty("origin", origin);
-        jsonObject.addProperty("destination_is", cfg.getServer().getPublicUrl());
+        jsonObject.addProperty("destination_is", URI.create(cfg.getServer().getPublicUrl()).getHost());
         jsonObject.add("content", reqData);
 
         String canonical = MatrixJson.encodeCanonical(jsonObject);
