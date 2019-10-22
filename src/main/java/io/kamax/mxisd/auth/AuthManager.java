@@ -140,7 +140,7 @@ public class AuthManager {
                 }
 
                 try {
-                    MatrixID.asValid(mxId);
+                    MatrixID.asAcceptable(mxId);
                 } catch (IllegalArgumentException e) {
                     log.warn("The returned User ID {} is not a valid Matrix ID. Login might fail at the Homeserver level", mxId);
                 }
