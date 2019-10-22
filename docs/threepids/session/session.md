@@ -103,8 +103,7 @@ session:
     validation:
       enabled: true
     unbind:
-      notification:
-        enabled: true
+      notifications: true
 
 # DO NOT COPY/PASTE AS-IS IN YOUR CONFIGURATION
 # CONFIGURATION EXAMPLE
@@ -115,7 +114,7 @@ are allowed to do in terms of 3PID sessions. The policy has a global on/off swit
 
 ---
 
-`unbind` controls warning notifications for 3PID removal.  
+`unbind` controls warning notifications for 3PID removal. Setting `notifications` for `unbind` to false will prevent unbind emails from sending.
 
 ### Web views
 Once a user click on a validation link, it is taken to the Identity Server validation page where the token is submitted.  

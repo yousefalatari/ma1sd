@@ -47,6 +47,8 @@ public class SessionConfig {
         public static class PolicyUnbind {
 
             private boolean enabled = true;
+            
+            private boolean notifications = true;
 
             public boolean getEnabled() {
                 return enabled;
@@ -55,11 +57,20 @@ public class SessionConfig {
             public void setEnabled(boolean enabled) {
                 this.enabled = enabled;
             }
+            
+            public boolean shouldNotify() {
+                return notifications;
+            }
+            
+            public void setNotifications(boolean notifications) {
+                this.notifications = notifications;
+            }
         }
 
         public Policy() {
             validation.enabled = true;
             unbind.enabled = true;
+            unbind.notifications = true;
         }
 
         private PolicyTemplate validation = new PolicyTemplate();

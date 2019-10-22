@@ -235,7 +235,9 @@ public class SessionManager {
         }
 
         log.info("Unbinding of {} {} to {} is accepted", tpid.getMedium(), tpid.getAddress(), mxid.getId());
-        notifMgr.sendForUnbind(tpid);
+        if (cfg.getSession().getPolicy().getUnbind().shouldNotify()) {
+            notifMgr.sendForUnbind(tpid);
+        }
     }
 
     private void checkAuthorization(String auth, JsonObject reqData) {
