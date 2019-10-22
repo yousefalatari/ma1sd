@@ -104,6 +104,7 @@ session:
       enabled: true
     unbind:
       notifications: true
+      enabled: true
 
 # DO NOT COPY/PASTE AS-IS IN YOUR CONFIGURATION
 # CONFIGURATION EXAMPLE
