@@ -23,10 +23,12 @@ package io.kamax.mxisd.storage;
 import io.kamax.matrix.ThreePid;
 import io.kamax.mxisd.config.PolicyConfig;
 import io.kamax.mxisd.invitation.IThreePidInviteReply;
+import io.kamax.mxisd.lookup.ThreePidMapping;
 import io.kamax.mxisd.storage.dao.IThreePidSessionDao;
 import io.kamax.mxisd.storage.ormlite.dao.ASTransactionDao;
 import io.kamax.mxisd.storage.ormlite.dao.AccountDao;
 import io.kamax.mxisd.storage.ormlite.dao.ThreePidInviteIO;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -66,4 +68,10 @@ public interface IStorage {
     void deleteAccepts(String token);
 
     boolean isTermAccepted(String token, List<PolicyConfig.PolicyObject> policies);
+
+    void clearHashes();
+
+    void addHash(String mxid, String medium, String address, String hash);
+
+    Collection<Pair<String, ThreePidMapping>> findHashes(Iterable<String> hashes);
 }

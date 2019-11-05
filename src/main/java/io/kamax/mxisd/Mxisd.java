@@ -120,7 +120,7 @@ public class Mxisd {
         ServiceLoader.load(NotificationHandlerSupplier.class).iterator().forEachRemaining(p -> p.accept(this));
 
         hashManager = new HashManager();
-        hashManager.init(cfg.getHashing(), ThreePidProviders.get());
+        hashManager.init(cfg.getHashing(), ThreePidProviders.get(), store);
 
         idStrategy = new RecursivePriorityLookupStrategy(cfg.getLookup(), ThreePidProviders.get(), bridgeFetcher, hashManager);
         pMgr = new ProfileManager(ProfileProviders.get(), clientDns, httpClient);

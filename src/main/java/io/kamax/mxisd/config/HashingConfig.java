@@ -11,6 +11,7 @@ public class HashingConfig {
     private int pepperLength = 10;
     private RotationPolicyEnum rotationPolicy;
     private HashStorageEnum hashStorageType;
+    private long delay = 10;
 
     public void build() {
         if (isEnabled()) {
@@ -18,17 +19,22 @@ public class HashingConfig {
             LOGGER.info("   Pepper length: {}", getPepperLength());
             LOGGER.info("   Rotation policy: {}", getRotationPolicy());
             LOGGER.info("   Hash storage type: {}", getHashStorageType());
+            if (RotationPolicyEnum.PER_SECONDS == rotationPolicy) {
+                LOGGER.info("   Rotation delay: {}", delay);
+            }
         } else {
             LOGGER.info("Hash configuration disabled, used only `none` pepper.");
         }
     }
 
     public enum RotationPolicyEnum {
-        PER_REQUESTS
+        PER_REQUESTS,
+        PER_SECONDS
     }
 
     public enum HashStorageEnum {
-        IN_MEMORY
+        IN_MEMORY,
+        SQL
     }
 
     public boolean isEnabled() {
@@ -61,5 +67,13 @@ public class HashingConfig {
 
     public void setHashStorageType(HashStorageEnum hashStorageType) {
         this.hashStorageType = hashStorageType;
+    }
+
+    public long getDelay() {
+        return delay;
+    }
+
+    public void setDelay(long delay) {
+        this.delay = delay;
     }
 }
