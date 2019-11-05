@@ -3,6 +3,9 @@ package io.kamax.mxisd.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class HashingConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HashingConfig.class);
@@ -12,6 +15,7 @@ public class HashingConfig {
     private RotationPolicyEnum rotationPolicy;
     private HashStorageEnum hashStorageType;
     private long delay = 10;
+    private List<Algorithm> algorithms = new ArrayList<>();
 
     public void build() {
         if (isEnabled()) {
@@ -25,6 +29,11 @@ public class HashingConfig {
         } else {
             LOGGER.info("Hash configuration disabled, used only `none` pepper.");
         }
+    }
+
+    public enum Algorithm {
+        NONE,
+        SHA256
     }
 
     public enum RotationPolicyEnum {
@@ -75,5 +84,13 @@ public class HashingConfig {
 
     public void setDelay(long delay) {
         this.delay = delay;
+    }
+
+    public List<Algorithm> getAlgorithms() {
+        return algorithms;
+    }
+
+    public void setAlgorithms(List<Algorithm> algorithms) {
+        this.algorithms = algorithms;
     }
 }

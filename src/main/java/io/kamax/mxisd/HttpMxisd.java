@@ -54,6 +54,7 @@ import io.kamax.mxisd.http.undertow.handler.identity.share.SignEd25519Handler;
 import io.kamax.mxisd.http.undertow.handler.identity.share.StoreInviteHandler;
 import io.kamax.mxisd.http.undertow.handler.identity.v1.*;
 import io.kamax.mxisd.http.undertow.handler.identity.v2.HashDetailsHandler;
+import io.kamax.mxisd.http.undertow.handler.identity.v2.HashLookupHandler;
 import io.kamax.mxisd.http.undertow.handler.invite.v1.RoomInviteHandler;
 import io.kamax.mxisd.http.undertow.handler.profile.v1.InternalProfileHandler;
 import io.kamax.mxisd.http.undertow.handler.profile.v1.ProfileHandler;

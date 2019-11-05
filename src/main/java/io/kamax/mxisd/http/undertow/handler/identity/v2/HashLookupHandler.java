@@ -18,8 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.mxisd.http.undertow.handler.identity.v1;
+package io.kamax.mxisd.http.undertow.handler.identity.v2;
 
+import io.kamax.mxisd.config.HashingConfig;
 import io.kamax.mxisd.exception.InvalidParamException;
 import io.kamax.mxisd.exception.InvalidPepperException;
 import io.kamax.mxisd.hash.HashManager;
@@ -51,6 +52,7 @@ public class HashLookupHandler extends LookupHandler implements ApiHandler {
 
     public HashLookupHandler(LookupStrategy strategy, HashManager hashManager) {
         this.strategy = strategy;
+        this.hashManager = hashManager;
     }
 
     @Override
@@ -60,6 +62,10 @@ public class HashLookupHandler extends LookupHandler implements ApiHandler {
         setRequesterInfo(lookupRequest, exchange);
         log.info("Got bulk lookup request from {} with client {} - Is recursive? {}",
             lookupRequest.getRequester(), lookupRequest.getUserAgent(), lookupRequest.isRecursive());
+
+        if (!hashManager.getConfig().isEnabled()) {
+            throw new InvalidParamException();
+        }
 
         if (!hashManager.getHashEngine().getPepper().equals(input.getPepper())) {
             throw new InvalidPepperException();
@@ -78,6 +84,10 @@ public class HashLookupHandler extends LookupHandler implements ApiHandler {
     }
 
     private void noneAlgorithm(HttpServerExchange exchange, HashLookupRequest request, ClientHashLookupRequest input) throws Exception {
+        if (!hashManager.getConfig().getAlgorithms().contains(HashingConfig.Algorithm.NONE)) {
+            throw new InvalidParamException();
+        }
+
         BulkLookupRequest bulkLookupRequest = new BulkLookupRequest();
         List<ThreePidMapping> mappings = new ArrayList<>();
         for (String address : input.getAddresses()) {
@@ -100,6 +110,10 @@ public class HashLookupHandler extends LookupHandler implements ApiHandler {
     }
 
     private void sha256Algorithm(HttpServerExchange exchange, HashLookupRequest request, ClientHashLookupRequest input) {
+        if (!hashManager.getConfig().getAlgorithms().contains(HashingConfig.Algorithm.SHA256)) {
+            throw new InvalidParamException();
+        }
+
         ClientHashLookupAnswer answer = new ClientHashLookupAnswer();
         for (Pair<String, ThreePidMapping> pair : hashManager.getHashStorage().find(request.getHashes())) {
             answer.getMappings().put(pair.getKey(), pair.getValue().getMxid());
