@@ -78,7 +78,7 @@ buildscript {
 
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:5.1.0'
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.21.0'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.27.0'
     }
 }
 
@@ -94,12 +94,12 @@ dependencies {
     compile 'commons-io:commons-io:2.6'
 
     // Config management
-    compile 'org.yaml:snakeyaml:1.24'
+    compile 'org.yaml:snakeyaml:1.25'
 
     // Dependencies from old Matrix-java-sdk
     compile 'org.apache.commons:commons-lang3:3.9'
-    compile 'com.squareup.okhttp3:okhttp:4.0.1'
-    compile 'commons-codec:commons-codec:1.12'
+    compile 'com.squareup.okhttp3:okhttp:4.2.2'
+    compile 'commons-codec:commons-codec:1.13'
 
     // ORMLite
     compile 'com.j256.ormlite:ormlite-jdbc:5.1'
@@ -114,10 +114,10 @@ dependencies {
     compile 'dnsjava:dnsjava:2.1.9'
 
     // HTTP connections
-    compile 'org.apache.httpcomponents:httpclient:4.5.9'
+    compile 'org.apache.httpcomponents:httpclient:4.5.10'
 
     // Phone numbers validation
-    compile 'com.googlecode.libphonenumber:libphonenumber:8.10.15'
+    compile 'com.googlecode.libphonenumber:libphonenumber:8.10.22'
 
     // E-mail sending
     compile 'javax.mail:javax.mail-api:1.6.2'
@@ -133,13 +133,13 @@ dependencies {
     compile 'org.xerial:sqlite-jdbc:3.28.0'
 
     // PostgreSQL
-    compile 'org.postgresql:postgresql:42.2.6'
+    compile 'org.postgresql:postgresql:42.2.8'
 
     // MariaDB/MySQL
-    compile 'org.mariadb.jdbc:mariadb-java-client:2.4.2'
+    compile 'org.mariadb.jdbc:mariadb-java-client:2.5.1'
 
     // Twilio SDK for SMS
-    compile 'com.twilio.sdk:twilio:7.40.1'
+    compile 'com.twilio.sdk:twilio:7.45.0'
 
     // SendGrid SDK to send emails from GCE
     compile 'com.sendgrid:sendgrid-java:2.2.2'
@@ -148,15 +148,15 @@ dependencies {
     compile 'org.zeroturnaround:zt-exec:1.11'
 
     // HTTP server
-    compile 'io.undertow:undertow-core:2.0.22.Final'
+    compile 'io.undertow:undertow-core:2.0.27.Final'
 
     // Command parser for AS interface
     implementation 'commons-cli:commons-cli:1.4'
 
-    testCompile 'junit:junit:4.13-beta-3'
-    testCompile 'com.github.tomakehurst:wiremock:2.24.0'
-    testCompile 'com.unboundid:unboundid-ldapsdk:4.0.11'
-    testCompile 'com.icegreen:greenmail:1.5.10'
+    testCompile 'junit:junit:4.13-rc-1'
+    testCompile 'com.github.tomakehurst:wiremock:2.25.1'
+    testCompile 'com.unboundid:unboundid-ldapsdk:4.0.12'
+    testCompile 'com.icegreen:greenmail:1.5.11'
 }
 
 jar {
