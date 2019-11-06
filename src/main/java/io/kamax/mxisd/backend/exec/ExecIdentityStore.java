@@ -164,6 +164,26 @@ public class ExecIdentityStore extends ExecStore implements IThreePidProvider {
             return input.toString();
         });
 
+        addBulkSuccessMapper(p);
+
+        p.withFailureDefault(output -> Collections.emptyList());
+
+        return p.execute();
+    }
+
+    @Override
+    public Iterable<ThreePidMapping> populateHashes() {
+        Processor<List<ThreePidMapping>> p = new Processor<>();
+        p.withConfig(cfg.getLookup().getBulk());
+
+        addBulkSuccessMapper(p);
+
+        p.withFailureDefault(output -> Collections.emptyList());
+
+        return p.execute();
+    }
+
+    private void addBulkSuccessMapper(Processor<List<ThreePidMapping>> p) {
         p.addSuccessMapper(JsonType, output -> {
             if (StringUtils.isBlank(output)) {
                 return Collections.emptyList();
@@ -188,10 +208,5 @@ public class ExecIdentityStore extends ExecStore implements IThreePidProvider {
                 throw new InternalServerError("Invalid user type: " + item.getId().getType());
             }).collect(Collectors.toList());
         });
-
-        p.withFailureDefault(output -> Collections.emptyList());
-
-        return p.execute();
     }
-
 }
