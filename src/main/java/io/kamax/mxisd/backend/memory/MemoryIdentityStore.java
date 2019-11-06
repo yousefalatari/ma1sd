@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class MemoryIdentityStore implements AuthenticatorProvider, DirectoryProvider, IThreePidProvider, ProfileProvider {
 
@@ -171,4 +172,11 @@ public class MemoryIdentityStore implements AuthenticatorProvider, DirectoryProv
         }).orElseGet(BackendAuthResult::failure);
     }
 
+    @Override
+    public Iterable<ThreePidMapping> populateHashes() {
+        return cfg.getIdentities().stream()
+            .map(mic -> mic.getThreepids().stream().map(mtp -> new ThreePidMapping(mtp.getMedium(), mtp.getAddress(), mic.getUsername())))
+            .flatMap(s -> s).collect(
+            Collectors.toList());
+    }
 }

@@ -36,6 +36,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -104,4 +105,27 @@ public abstract class SqlThreePidProvider implements IThreePidProvider {
         return new ArrayList<>();
     }
 
+    @Override
+    public Iterable<ThreePidMapping> populateHashes() {
+        if (StringUtils.isBlank(cfg.getLookup().getQuery())) {
+            log.warn("Lookup query not configured, skip.");
+            return Collections.emptyList();
+        }
+
+        List<ThreePidMapping> result = new ArrayList<>();
+        try (Connection connection = pool.get()) {
+            PreparedStatement statement = connection.prepareStatement(cfg.getLookup().getQuery());
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    String mxid = resultSet.getString("mxid");
+                    String medium = resultSet.getString("medium");
+                    String address = resultSet.getString("address");
+                    result.add(new ThreePidMapping(medium, address, mxid));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
 }
