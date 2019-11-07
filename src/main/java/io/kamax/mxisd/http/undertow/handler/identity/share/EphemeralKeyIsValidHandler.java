@@ -1,6 +1,6 @@
 /*
  * mxisd - Matrix Identity Server Daemon
- * Copyright (C) 2019 Kamax Sarl
+ * Copyright (C) 2018 Kamax Sarl
  *
  * https://www.kamax.io/
  *
@@ -18,34 +18,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.mxisd.http.undertow.handler.identity.v1;
+package io.kamax.mxisd.http.undertow.handler.identity.share;
 
-import com.google.gson.JsonObject;
-import io.kamax.mxisd.http.IsAPIv1;
-import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
-import io.kamax.mxisd.session.SessionManager;
+import io.kamax.mxisd.crypto.KeyManager;
+import io.kamax.mxisd.crypto.KeyType;
+import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SessionTpidUnbindHandler extends BasicHttpHandler {
+public class EphemeralKeyIsValidHandler extends KeyIsValidHandler implements ApiHandler {
 
-    public static final String Path = IsAPIv1.Base + "/3pid/unbind";
+    private static final Logger log = LoggerFactory.getLogger(EphemeralKeyIsValidHandler.class);
 
-    private static final Logger log = LoggerFactory.getLogger(SessionTpidUnbindHandler.class);
+    private KeyManager mgr;
 
-    private final SessionManager sessionMgr;
-
-    public SessionTpidUnbindHandler(SessionManager sessionMgr) {
-        this.sessionMgr = sessionMgr;
+    public EphemeralKeyIsValidHandler(KeyManager mgr) {
+        this.mgr = mgr;
     }
 
     @Override
     public void handleRequest(HttpServerExchange exchange) {
-        String auth = exchange.getRequestHeaders().getFirst("Authorization");
+        // FIXME process + correctly in query parameter handling
+        String pubKey = getQueryParameter(exchange, "public_key").replace(" ", "+");
+        log.info("Validating ephemeral public key {}", pubKey);
 
-        JsonObject body = parseJsonObject(exchange);
-        sessionMgr.unbind(auth, body);
-        writeBodyAsUtf8(exchange, "{}");
+        respondJson(exchange, mgr.isValid(KeyType.Ephemeral, pubKey) ? validKey : invalidKey);
+    }
+
+    @Override
+    public String getHandlerPath() {
+        return "/pubkey/ephemeral/isvalid";
     }
 }

@@ -18,23 +18,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.mxisd.http.undertow.handler.identity.v1;
+package io.kamax.mxisd.http.undertow.handler.identity.share;
 
 import com.google.gson.JsonObject;
 import io.kamax.mxisd.crypto.GenericKeyIdentifier;
 import io.kamax.mxisd.crypto.KeyManager;
 import io.kamax.mxisd.crypto.KeyType;
-import io.kamax.mxisd.http.IsAPIv1;
 import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
+import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.undertow.server.HttpServerExchange;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class KeyGetHandler extends BasicHttpHandler {
+public class KeyGetHandler extends BasicHttpHandler implements ApiHandler {
 
     public static final String Key = "key";
-    public static final String Path = IsAPIv1.Base + "/pubkey/{" + Key + "}";
 
     private transient final Logger log = LoggerFactory.getLogger(KeyGetHandler.class);
 
@@ -61,4 +60,8 @@ public class KeyGetHandler extends BasicHttpHandler {
         respond(exchange, obj);
     }
 
+    @Override
+    public String getHandlerPath() {
+        return "/pubkey/{" + Key + "}";
+    }
 }

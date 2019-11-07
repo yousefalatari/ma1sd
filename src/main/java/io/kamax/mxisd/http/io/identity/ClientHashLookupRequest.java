@@ -1,6 +1,6 @@
 /*
  * mxisd - Matrix Identity Server Daemon
- * Copyright (C) 2018 Kamax Sarl
+ * Copyright (C) 2017 Kamax Sarl
  *
  * https://www.kamax.io/
  *
@@ -18,19 +18,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.mxisd.http.undertow.handler.identity.v1;
+package io.kamax.mxisd.http.io.identity;
 
-import io.kamax.mxisd.http.IsAPIv1;
-import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
-import io.undertow.server.HttpServerExchange;
+import java.util.ArrayList;
+import java.util.List;
 
-public class HelloHandler extends BasicHttpHandler {
+public class ClientHashLookupRequest {
 
-    public static final String Path = IsAPIv1.Base;
+    private String algorithm;
+    private String pepper;
+    private List<String> addresses = new ArrayList<>();
 
-    @Override
-    public void handleRequest(HttpServerExchange exchange) {
-        respondJson(exchange, "{}");
+    public String getAlgorithm() {
+        return algorithm;
     }
 
+    public void setAlgorithm(String algorithm) {
+        this.algorithm = algorithm;
+    }
+
+    public String getPepper() {
+        return pepper;
+    }
+
+    public void setPepper(String pepper) {
+        this.pepper = pepper;
+    }
+
+    public List<String> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<String> addresses) {
+        this.addresses = addresses;
+    }
 }

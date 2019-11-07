@@ -23,6 +23,8 @@ package io.kamax.mxisd.http.undertow.handler.identity.v1;
 import io.kamax.mxisd.http.IsAPIv1;
 import io.kamax.mxisd.http.io.identity.ClientBulkLookupAnswer;
 import io.kamax.mxisd.http.io.identity.ClientBulkLookupRequest;
+import io.kamax.mxisd.http.undertow.handler.ApiHandler;
+import io.kamax.mxisd.http.undertow.handler.identity.share.LookupHandler;
 import io.kamax.mxisd.lookup.BulkLookupRequest;
 import io.kamax.mxisd.lookup.ThreePidMapping;
 import io.kamax.mxisd.lookup.strategy.LookupStrategy;
@@ -33,7 +35,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BulkLookupHandler extends LookupHandler {
+public class BulkLookupHandler extends LookupHandler implements ApiHandler {
 
     public static final String Path = IsAPIv1.Base + "/bulk_lookup";
 
@@ -69,4 +71,8 @@ public class BulkLookupHandler extends LookupHandler {
         respondJson(exchange, answer);
     }
 
+    @Override
+    public String getHandlerPath() {
+        return "/bulk_lookup";
+    }
 }

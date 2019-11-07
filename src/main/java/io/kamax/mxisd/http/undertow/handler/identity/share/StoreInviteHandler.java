@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.mxisd.http.undertow.handler.identity.v1;
+package io.kamax.mxisd.http.undertow.handler.identity.share;
 
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -28,10 +28,10 @@ import io.kamax.matrix.json.GsonUtil;
 import io.kamax.mxisd.config.ServerConfig;
 import io.kamax.mxisd.crypto.KeyManager;
 import io.kamax.mxisd.exception.BadRequestException;
-import io.kamax.mxisd.http.IsAPIv1;
 import io.kamax.mxisd.http.io.identity.StoreInviteRequest;
 import io.kamax.mxisd.http.io.identity.ThreePidInviteReplyIO;
 import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
+import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.kamax.mxisd.invitation.IThreePidInvite;
 import io.kamax.mxisd.invitation.IThreePidInviteReply;
 import io.kamax.mxisd.invitation.InvitationManager;
@@ -45,9 +45,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Deque;
 import java.util.Map;
 
-public class StoreInviteHandler extends BasicHttpHandler {
-
-    public static final String Path = IsAPIv1.Base + "/store-invite";
+public class StoreInviteHandler extends BasicHttpHandler implements ApiHandler {
 
     private ServerConfig cfg;
     private InvitationManager invMgr;
@@ -100,4 +98,8 @@ public class StoreInviteHandler extends BasicHttpHandler {
         respondJson(exchange, new ThreePidInviteReplyIO(reply, keyMgr.getPublicKeyBase64(keyMgr.getServerSigningKey().getId()), cfg.getPublicUrl()));
     }
 
+    @Override
+    public String getHandlerPath() {
+        return "/store-invite";
+    }
 }

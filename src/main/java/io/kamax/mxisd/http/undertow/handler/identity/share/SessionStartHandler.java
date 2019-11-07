@@ -18,26 +18,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.mxisd.http.undertow.handler.identity.v1;
+package io.kamax.mxisd.http.undertow.handler.identity.share;
 
 import com.google.gson.JsonObject;
 import io.kamax.matrix.ThreePid;
 import io.kamax.matrix.ThreePidMedium;
-import io.kamax.mxisd.http.IsAPIv1;
 import io.kamax.mxisd.http.io.identity.RequestTokenResponse;
 import io.kamax.mxisd.http.io.identity.SessionEmailTokenRequestJson;
 import io.kamax.mxisd.http.io.identity.SessionPhoneTokenRequestJson;
 import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
+import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.kamax.mxisd.session.SessionManager;
 import io.undertow.server.HttpServerExchange;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SessionStartHandler extends BasicHttpHandler {
+public class SessionStartHandler extends BasicHttpHandler implements ApiHandler {
 
     public static final String Medium = "medium";
-    public static final String Path = IsAPIv1.Base + "/validate/{" + Medium + "}/requestToken";
 
     private transient final Logger log = LoggerFactory.getLogger(SessionStartHandler.class);
 
@@ -84,4 +83,8 @@ public class SessionStartHandler extends BasicHttpHandler {
         }
     }
 
+    @Override
+    public String getHandlerPath() {
+        return "/validate/{" + Medium + "}/requestToken";
+    }
 }

@@ -21,6 +21,7 @@
 package io.kamax.mxisd.lookup.strategy;
 
 import io.kamax.mxisd.lookup.BulkLookupRequest;
+import io.kamax.mxisd.lookup.HashLookupRequest;
 import io.kamax.mxisd.lookup.SingleLookupReply;
 import io.kamax.mxisd.lookup.SingleLookupRequest;
 import io.kamax.mxisd.lookup.ThreePidMapping;
@@ -46,4 +47,5 @@ public interface LookupStrategy {
 
     CompletableFuture<List<ThreePidMapping>> find(BulkLookupRequest requests);
 
+    CompletableFuture<List<ThreePidMapping>> find(HashLookupRequest request);
 }

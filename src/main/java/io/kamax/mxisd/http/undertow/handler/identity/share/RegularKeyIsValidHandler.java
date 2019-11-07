@@ -18,18 +18,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.mxisd.http.undertow.handler.identity.v1;
+package io.kamax.mxisd.http.undertow.handler.identity.share;
 
 import io.kamax.mxisd.crypto.KeyManager;
 import io.kamax.mxisd.crypto.KeyType;
-import io.kamax.mxisd.http.IsAPIv1;
+import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RegularKeyIsValidHandler extends KeyIsValidHandler {
-
-    public static final String Path = IsAPIv1.Base + "/pubkey/isvalid";
+public class RegularKeyIsValidHandler extends KeyIsValidHandler implements ApiHandler {
 
     private transient final Logger log = LoggerFactory.getLogger(RegularKeyIsValidHandler.class);
 
@@ -48,4 +46,8 @@ public class RegularKeyIsValidHandler extends KeyIsValidHandler {
         respondJson(exchange, mgr.isValid(KeyType.Regular, pubKey) ? validKey : invalidKey);
     }
 
+    @Override
+    public String getHandlerPath() {
+        return "/pubkey/isvalid";
+    }
 }

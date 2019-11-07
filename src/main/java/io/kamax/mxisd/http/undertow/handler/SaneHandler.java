@@ -87,6 +87,10 @@ public class SaneHandler extends BasicHttpHandler {
                 respond(exchange, HttpStatus.SC_NOT_FOUND, "M_NOT_FOUND", e.getMessage());
             } catch (NotImplementedException e) {
                 respond(exchange, HttpStatus.SC_NOT_IMPLEMENTED, "M_NOT_IMPLEMENTED", e.getMessage());
+            } catch (InvalidPepperException e) {
+                respond(exchange, HttpStatus.SC_BAD_REQUEST, "M_INVALID_PEPPER", e.getMessage());
+            } catch (InvalidParamException e) {
+                respond(exchange, HttpStatus.SC_BAD_REQUEST, "M_INVALID_PARAM", e.getMessage());
             } catch (FeatureNotAvailable e) {
                 if (StringUtils.isNotBlank(e.getInternalReason())) {
                     log.error("Feature not available: {}", e.getInternalReason());

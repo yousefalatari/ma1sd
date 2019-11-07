@@ -79,5 +79,4 @@ public class ServerConfig {
         log.info("Port: {}", getPort());
         log.info("Public URL: {}", getPublicUrl());
     }
-
 }

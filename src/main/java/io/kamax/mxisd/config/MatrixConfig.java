@@ -63,6 +63,8 @@ public class MatrixConfig {
 
     private String domain;
     private Identity identity = new Identity();
+    private boolean v1 = true;
+    private boolean v2 = true;
 
     public String getDomain() {
         return domain;
@@ -80,6 +82,22 @@ public class MatrixConfig {
         this.identity = identity;
     }
 
+    public boolean isV1() {
+        return v1;
+    }
+
+    public void setV1(boolean v1) {
+        this.v1 = v1;
+    }
+
+    public boolean isV2() {
+        return v2;
+    }
+
+    public void setV2(boolean v2) {
+        this.v2 = v2;
+    }
+
     public void build() {
         log.info("--- Matrix config ---");
 
@@ -90,6 +108,11 @@ public class MatrixConfig {
         log.info("Domain: {}", getDomain());
         log.info("Identity:");
         log.info("\tServers: {}", GsonUtil.get().toJson(identity.getServers()));
+        log.info("API v1: {}", v1);
+        log.info("API v2: {}", v2);
+        if (v1) {
+            log.warn("API v1 is deprecated via MSC2140: https://github.com/matrix-org/matrix-doc/pull/2140 and will be deleted in future releases.");
+            log.warn("Please upgrade your homeserver and enable only API v2.");
+        }
     }
-
 }

@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.mxisd.http.undertow.handler.identity.v1;
+package io.kamax.mxisd.http.undertow.handler.identity.share;
 
 import com.google.gson.JsonObject;
 import io.kamax.matrix.MatrixID;
@@ -27,17 +27,15 @@ import io.kamax.matrix.json.GsonUtil;
 import io.kamax.matrix.json.MatrixJson;
 import io.kamax.mxisd.config.MxisdConfig;
 import io.kamax.mxisd.crypto.SignatureManager;
-import io.kamax.mxisd.http.IsAPIv1;
 import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
+import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.kamax.mxisd.invitation.IThreePidInviteReply;
 import io.kamax.mxisd.invitation.InvitationManager;
 import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SignEd25519Handler extends BasicHttpHandler {
-
-    public static final String Path = IsAPIv1.Base + "/sign-ed25519";
+public class SignEd25519Handler extends BasicHttpHandler implements ApiHandler {
 
     private static final Logger log = LoggerFactory.getLogger(SignEd25519Handler.class);
 
@@ -72,4 +70,8 @@ public class SignEd25519Handler extends BasicHttpHandler {
         respondJson(exchange, res);
     }
 
+    @Override
+    public String getHandlerPath() {
+        return "/sign-ed25519";
+    }
 }

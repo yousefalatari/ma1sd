@@ -25,10 +25,13 @@ import io.kamax.matrix.json.GsonUtil;
 import io.kamax.matrix.json.MatrixJson;
 import io.kamax.mxisd.config.MxisdConfig;
 import io.kamax.mxisd.exception.ConfigurationException;
+import io.kamax.mxisd.hash.HashManager;
+import io.kamax.mxisd.hash.storage.HashStorage;
 import io.kamax.mxisd.lookup.*;
 import io.kamax.mxisd.lookup.fetcher.IBridgeFetcher;
 import io.kamax.mxisd.lookup.provider.IThreePidProvider;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,10 +53,14 @@ public class RecursivePriorityLookupStrategy implements LookupStrategy {
 
     private List<CIDRUtils> allowedCidr = new ArrayList<>();
 
-    public RecursivePriorityLookupStrategy(MxisdConfig.Lookup cfg, List<? extends IThreePidProvider> providers, IBridgeFetcher bridge) {
+    private HashManager hashManager;
+
+    public RecursivePriorityLookupStrategy(MxisdConfig.Lookup cfg, List<? extends IThreePidProvider> providers, IBridgeFetcher bridge,
+                                           HashManager hashManager) {
         this.cfg = cfg;
         this.bridge = bridge;
         this.providers = new ArrayList<>(providers);
+        this.hashManager = hashManager;
 
         try {
             log.info("Found {} providers", providers.size());
@@ -65,6 +72,8 @@ public class RecursivePriorityLookupStrategy implements LookupStrategy {
                 log.info("{} is allowed for recursion", cidr);
                 allowedCidr.add(new CIDRUtils(cidr));
             }
+
+            log.info("Hash lookups enabled: {}", hashManager.getConfig().isEnabled());
         } catch (UnknownHostException e) {
             throw new ConfigurationException("lookup.recursive.allowedCidrs", "Allowed CIDRs");
         }
@@ -154,20 +163,20 @@ public class RecursivePriorityLookupStrategy implements LookupStrategy {
             Optional<SingleLookupReply> lookupDataOpt = provider.find(request);
             if (lookupDataOpt.isPresent()) {
                 log.info("Found 3PID mapping: {medium: '{}', address: '{}', mxid: '{}'}",
-                        request.getType(), request.getThreePid(), lookupDataOpt.get().getMxid().getId());
+                    request.getType(), request.getThreePid(), lookupDataOpt.get().getMxid().getId());
                 return lookupDataOpt;
             }
         }
 
         if (
-                cfg.getRecursive().getBridge() != null &&
-                        cfg.getRecursive().getBridge().getEnabled() &&
-                        (!cfg.getRecursive().getBridge().getRecursiveOnly() || isAllowedForRecursive(request.getRequester()))
+            cfg.getRecursive().getBridge() != null &&
+                cfg.getRecursive().getBridge().getEnabled() &&
+                (!cfg.getRecursive().getBridge().getRecursiveOnly() || isAllowedForRecursive(request.getRequester()))
         ) {
             log.info("Using bridge failover for lookup");
             Optional<SingleLookupReply> lookupDataOpt = bridge.find(request);
             log.info("Found 3PID mapping: {medium: '{}', address: '{}', mxid: '{}'}",
-                    request.getThreePid(), request.getId(), lookupDataOpt.get().getMxid().getId());
+                request.getThreePid(), request.getId(), lookupDataOpt.get().getMxid().getId());
             return lookupDataOpt;
         }
 
@@ -230,4 +239,12 @@ public class RecursivePriorityLookupStrategy implements LookupStrategy {
         return bulkLookupInProgress.remove(payloadId);
     }
 
+    @Override
+    public CompletableFuture<List<ThreePidMapping>> find(HashLookupRequest request) {
+        HashStorage hashStorage = hashManager.getHashStorage();
+        CompletableFuture<List<ThreePidMapping>> result = new CompletableFuture<>();
+        result.complete(hashStorage.find(request.getHashes()).stream().map(Pair::getValue).collect(Collectors.toList()));
+        hashManager.getRotationStrategy().newRequest();
+        return result;
+    }
 }

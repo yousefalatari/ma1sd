@@ -92,6 +92,7 @@ public class MxisdConfig {
     private AppServiceConfig appsvc = new AppServiceConfig();
     private AuthenticationConfig auth = new AuthenticationConfig();
     private DirectoryConfig directory = new DirectoryConfig();
+    private AccountConfig accountConfig = new AccountConfig();
     private Dns dns = new Dns();
     private ExecConfig exec = new ExecConfig();
     private FirebaseConfig firebase = new FirebaseConfig();
@@ -114,6 +115,8 @@ public class MxisdConfig {
     private ThreePidConfig threepid = new ThreePidConfig();
     private ViewConfig view = new ViewConfig();
     private WordpressConfig wordpress = new WordpressConfig();
+    private PolicyConfig policy = new PolicyConfig();
+    private HashingConfig hashing = new HashingConfig();
 
     public AppServiceConfig getAppsvc() {
         return appsvc;
@@ -129,6 +132,14 @@ public class MxisdConfig {
 
     public void setAuth(AuthenticationConfig auth) {
         this.auth = auth;
+    }
+
+    public AccountConfig getAccountConfig() {
+        return accountConfig;
+    }
+
+    public void setAccountConfig(AccountConfig accountConfig) {
+        this.accountConfig = accountConfig;
     }
 
     public DirectoryConfig getDirectory() {
@@ -315,6 +326,22 @@ public class MxisdConfig {
         this.wordpress = wordpress;
     }
 
+    public PolicyConfig getPolicy() {
+        return policy;
+    }
+
+    public void setPolicy(PolicyConfig policy) {
+        this.policy = policy;
+    }
+
+    public HashingConfig getHashing() {
+        return hashing;
+    }
+
+    public void setHashing(HashingConfig hashing) {
+        this.hashing = hashing;
+    }
+
     public MxisdConfig inMemory() {
         getKey().setPath(":memory:");
         getStorage().getProvider().getSqlite().setDatabase(":memory:");
@@ -330,6 +357,7 @@ public class MxisdConfig {
 
         getAppsvc().build();
         getAuth().build();
+        getAccountConfig().build();
         getDirectory().build();
         getExec().build();
         getFirebase().build();
@@ -352,6 +380,8 @@ public class MxisdConfig {
         getThreepid().build();
         getView().build();
         getWordpress().build();
+        getPolicy().build();
+        getHashing().build();
 
         return this;
     }

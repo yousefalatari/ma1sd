@@ -21,6 +21,7 @@
 package io.kamax.mxisd;
 
 import io.kamax.mxisd.as.AppSvcManager;
+import io.kamax.mxisd.auth.AccountManager;
 import io.kamax.mxisd.auth.AuthManager;
 import io.kamax.mxisd.auth.AuthProviders;
 import io.kamax.mxisd.backend.IdentityStoreSupplier;
@@ -34,6 +35,7 @@ import io.kamax.mxisd.directory.DirectoryManager;
 import io.kamax.mxisd.directory.DirectoryProviders;
 import io.kamax.mxisd.dns.ClientDnsOverwrite;
 import io.kamax.mxisd.dns.FederationDnsOverwrite;
+import io.kamax.mxisd.hash.HashManager;
 import io.kamax.mxisd.invitation.InvitationManager;
 import io.kamax.mxisd.lookup.ThreePidProviders;
 import io.kamax.mxisd.lookup.fetcher.IRemoteIdentityServerFetcher;
@@ -85,6 +87,8 @@ public class Mxisd {
     private SessionManager sessMgr;
     private NotificationManager notifMgr;
     private RegistrationManager regMgr;
+    private AccountManager accMgr;
+    private HashManager hashManager;
 
     // HS-specific classes
     private Synapse synapse;
@@ -115,7 +119,10 @@ public class Mxisd {
         ServiceLoader.load(IdentityStoreSupplier.class).iterator().forEachRemaining(p -> p.accept(this));
         ServiceLoader.load(NotificationHandlerSupplier.class).iterator().forEachRemaining(p -> p.accept(this));
 
-        idStrategy = new RecursivePriorityLookupStrategy(cfg.getLookup(), ThreePidProviders.get(), bridgeFetcher);
+        hashManager = new HashManager();
+        hashManager.init(cfg.getHashing(), ThreePidProviders.get(), store);
+
+        idStrategy = new RecursivePriorityLookupStrategy(cfg.getLookup(), ThreePidProviders.get(), bridgeFetcher, hashManager);
         pMgr = new ProfileManager(ProfileProviders.get(), clientDns, httpClient);
         notifMgr = new NotificationManager(cfg.getNotification(), NotificationHandlers.get());
         sessMgr = new SessionManager(cfg, store, notifMgr, resolver, httpClient, signMgr);
@@ -124,6 +131,7 @@ public class Mxisd {
         dirMgr = new DirectoryManager(cfg.getDirectory(), clientDns, httpClient, DirectoryProviders.get());
         regMgr = new RegistrationManager(cfg.getRegister(), httpClient, clientDns, invMgr);
         asHander = new AppSvcManager(this);
+        accMgr = new AccountManager(store, resolver, getHttpClient(), cfg.getAccountConfig(), cfg.getMatrix());
     }
 
     public MxisdConfig getConfig() {
@@ -192,6 +200,14 @@ public class Mxisd {
 
     public Synapse getSynapse() {
         return synapse;
+    }
+
+    public AccountManager getAccMgr() {
+        return accMgr;
+    }
+
+    public HashManager getHashManager() {
+        return hashManager;
     }
 
     public void start() {

@@ -24,25 +24,38 @@ import com.j256.ormlite.dao.CloseableWrappedIterable;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import io.kamax.matrix.ThreePid;
 import io.kamax.mxisd.config.MxisdConfig;
+import io.kamax.mxisd.config.PolicyConfig;
 import io.kamax.mxisd.exception.ConfigurationException;
 import io.kamax.mxisd.exception.InternalServerError;
+import io.kamax.mxisd.exception.InvalidCredentialsException;
 import io.kamax.mxisd.invitation.IThreePidInviteReply;
+import io.kamax.mxisd.lookup.ThreePidMapping;
 import io.kamax.mxisd.storage.IStorage;
 import io.kamax.mxisd.storage.dao.IThreePidSessionDao;
 import io.kamax.mxisd.storage.ormlite.dao.ASTransactionDao;
+import io.kamax.mxisd.storage.ormlite.dao.AccountDao;
+import io.kamax.mxisd.storage.ormlite.dao.HashDao;
 import io.kamax.mxisd.storage.ormlite.dao.HistoricalThreePidInviteIO;
+import io.kamax.mxisd.storage.ormlite.dao.AcceptedDao;
 import io.kamax.mxisd.storage.ormlite.dao.ThreePidInviteIO;
 import io.kamax.mxisd.storage.ormlite.dao.ThreePidSessionDao;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class OrmLiteSqlStorage implements IStorage {
 
@@ -64,6 +77,9 @@ public class OrmLiteSqlStorage implements IStorage {
     private Dao<HistoricalThreePidInviteIO, String> expInvDao;
     private Dao<ThreePidSessionDao, String> sessionDao;
     private Dao<ASTransactionDao, String> asTxnDao;
+    private Dao<AccountDao, String> accountDao;
+    private Dao<AcceptedDao, String> acceptedDao;
+    private Dao<HashDao, String> hashDao;
 
     public OrmLiteSqlStorage(MxisdConfig cfg) {
         this(cfg.getStorage().getBackend(), cfg.getStorage().getProvider().getSqlite().getDatabase());
@@ -84,6 +100,9 @@ public class OrmLiteSqlStorage implements IStorage {
             expInvDao = createDaoAndTable(connPool, HistoricalThreePidInviteIO.class);
             sessionDao = createDaoAndTable(connPool, ThreePidSessionDao.class);
             asTxnDao = createDaoAndTable(connPool, ASTransactionDao.class);
+            accountDao = createDaoAndTable(connPool, AccountDao.class);
+            acceptedDao = createDaoAndTable(connPool, AcceptedDao.class);
+            hashDao = createDaoAndTable(connPool, HashDao.class);
         });
     }
 
@@ -175,7 +194,7 @@ public class OrmLiteSqlStorage implements IStorage {
             List<ThreePidSessionDao> daoList = sessionDao.queryForMatchingArgs(new ThreePidSessionDao(tpid, secret));
             if (daoList.size() > 1) {
                 throw new InternalServerError("Lookup for 3PID Session " +
-                        tpid + " returned more than one result");
+                    tpid + " returned more than one result");
             }
 
             if (daoList.isEmpty()) {
@@ -226,7 +245,7 @@ public class OrmLiteSqlStorage implements IStorage {
 
             if (daoList.size() > 1) {
                 throw new InternalServerError("Lookup for Transaction " +
-                        txnId + " for localpart " + localpart + " returned more than one result");
+                    txnId + " for localpart " + localpart + " returned more than one result");
             }
 
             if (daoList.isEmpty()) {
@@ -237,4 +256,103 @@ public class OrmLiteSqlStorage implements IStorage {
         });
     }
 
+    @Override
+    public void insertToken(AccountDao account) {
+        withCatcher(() -> {
+            int created = accountDao.create(account);
+            if (created != 1) {
+                throw new RuntimeException("Unexpected row count after DB action: " + created);
+            }
+        });
+    }
+
+    @Override
+    public Optional<AccountDao> findAccount(String token) {
+        return withCatcher(() -> {
+            List<AccountDao> accounts = accountDao.queryForEq("token", token);
+            if (accounts.isEmpty()) {
+                return Optional.empty();
+            }
+            if (accounts.size() != 1) {
+                throw new RuntimeException("Unexpected rows for access token: " + accounts.size());
+            }
+            return Optional.of(accounts.get(0));
+        });
+    }
+
+    @Override
+    public void deleteToken(String token) {
+        withCatcher(() -> {
+            int updated = accountDao.deleteById(token);
+            if (updated != 1) {
+                throw new RuntimeException("Unexpected row count after DB action: " + updated);
+            }
+        });
+    }
+
+    @Override
+    public void acceptTerm(String token, String url) {
+        withCatcher(() -> {
+            AccountDao account = findAccount(token).orElseThrow(InvalidCredentialsException::new);
+            int created = acceptedDao.create(new AcceptedDao(url, account.getUserId(), System.currentTimeMillis()));
+            if (created != 1) {
+                throw new RuntimeException("Unexpected row count after DB action: " + created);
+            }
+        });
+    }
+
+    @Override
+    public void deleteAccepts(String token) {
+        withCatcher(() -> {
+            AccountDao account = findAccount(token).orElseThrow(InvalidCredentialsException::new);
+            acceptedDao.delete(acceptedDao.queryForEq("userId", account.getUserId()));
+        });
+    }
+
+    @Override
+    public boolean isTermAccepted(String token, List<PolicyConfig.PolicyObject> policies) {
+        return withCatcher(() -> {
+            AccountDao account = findAccount(token).orElseThrow(InvalidCredentialsException::new);
+            List<AcceptedDao> acceptedTerms = acceptedDao.queryForEq("userId", account.getUserId());
+            for (AcceptedDao acceptedTerm : acceptedTerms) {
+                for (PolicyConfig.PolicyObject policy : policies) {
+                    for (PolicyConfig.TermObject termObject : policy.getTerms().values()) {
+                        if (termObject.getUrl().equalsIgnoreCase(acceptedTerm.getUrl())) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        });
+    }
+
+    @Override
+    public void clearHashes() {
+        withCatcher(() -> {
+            List<HashDao> allHashes = hashDao.queryForAll();
+            int deleted = hashDao.delete(allHashes);
+            if (deleted != allHashes.size()) {
+                throw new RuntimeException("Not all hashes deleted: " + deleted);
+            }
+        });
+    }
+
+    @Override
+    public void addHash(String mxid, String medium, String address, String hash) {
+        withCatcher(() -> {
+            hashDao.create(new HashDao(mxid, medium, address, hash));
+        });
+    }
+
+    @Override
+    public Collection<Pair<String, ThreePidMapping>> findHashes(Iterable<String> hashes) {
+        return withCatcher(() -> {
+            QueryBuilder<HashDao, String> builder = hashDao.queryBuilder();
+            builder.where().in("hash", hashes);
+            return hashDao.query(builder.prepare()).stream()
+                .map(dao -> Pair.of(dao.getHash(), new ThreePidMapping(dao.getMedium(), dao.getAddress(), dao.getMxid()))).collect(
+                    Collectors.toList());
+        });
+    }
 }

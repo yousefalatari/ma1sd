@@ -28,6 +28,7 @@ import io.kamax.mxisd.exception.AccessTokenNotFoundException;
 import io.kamax.mxisd.exception.HttpMatrixException;
 import io.kamax.mxisd.exception.InternalServerError;
 import io.kamax.mxisd.proxy.Response;
+import io.kamax.mxisd.util.OptionalUtil;
 import io.kamax.mxisd.util.RestClientUtils;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -54,6 +55,24 @@ import java.util.*;
 public abstract class BasicHttpHandler implements HttpHandler {
 
     private static final Logger log = LoggerFactory.getLogger(BasicHttpHandler.class);
+
+    protected final static String headerName = "Authorization";
+    protected final static String headerValuePrefix = "Bearer ";
+    private final static String parameterName = "access_token";
+
+    Optional<String> findAccessTokenInHeaders(HttpServerExchange exchange) {
+        return Optional.ofNullable(exchange.getRequestHeaders().getFirst(headerName))
+            .filter(header -> StringUtils.startsWith(header, headerValuePrefix))
+            .map(header -> header.substring(headerValuePrefix.length()));
+    }
+
+    Optional<String> findAccessTokenInQuery(HttpServerExchange exchange) {
+        return Optional.ofNullable(exchange.getQueryParameters().getOrDefault(parameterName, new LinkedList<>()).peekFirst());
+    }
+
+    public Optional<String> findAccessToken(HttpServerExchange exchange) {
+        return OptionalUtil.findFirst(() -> findAccessTokenInHeaders(exchange), () -> findAccessTokenInQuery(exchange));
+    }
 
     protected String getAccessToken(HttpServerExchange exchange) {
         return Optional.ofNullable(exchange.getRequestHeaders().getFirst("Authorization"))

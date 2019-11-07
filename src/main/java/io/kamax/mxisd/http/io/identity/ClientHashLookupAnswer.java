@@ -1,6 +1,6 @@
 /*
  * mxisd - Matrix Identity Server Daemon
- * Copyright (C) 2018 Kamax Sarl
+ * Copyright (C) 2017 Kamax Sarl
  *
  * https://www.kamax.io/
  *
@@ -18,15 +18,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.kamax.mxisd.http.undertow.handler.identity.v1;
+package io.kamax.mxisd.http.io.identity;
 
-import io.kamax.matrix.json.GsonUtil;
-import io.kamax.mxisd.http.io.identity.KeyValidityJson;
-import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
+import java.util.HashMap;
+import java.util.Map;
 
-public abstract class KeyIsValidHandler extends BasicHttpHandler {
+public class ClientHashLookupAnswer {
 
-    protected final String validKey = GsonUtil.get().toJson(new KeyValidityJson(true));
-    protected final String invalidKey = GsonUtil.get().toJson(new KeyValidityJson(false));
+    private Map<String, String> mappings = new HashMap<>();
 
+    public Map<String, String> getMappings() {
+        return mappings;
+    }
 }

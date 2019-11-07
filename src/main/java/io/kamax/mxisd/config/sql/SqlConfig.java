@@ -124,6 +124,18 @@ public abstract class SqlConfig {
 
     }
 
+    public static class Lookup {
+        private String query;
+
+        public String getQuery() {
+            return query;
+        }
+
+        public void setQuery(String query) {
+            this.query = query;
+        }
+    }
+
     public static class Identity {
 
         private Boolean enabled;
@@ -264,6 +276,7 @@ public abstract class SqlConfig {
     private Directory directory = new Directory();
     private Identity identity = new Identity();
     private Profile profile = new Profile();
+    private Lookup lookup = new Lookup();
 
     public boolean isEnabled() {
         return enabled;
@@ -321,6 +334,14 @@ public abstract class SqlConfig {
         this.profile = profile;
     }
 
+    public Lookup getLookup() {
+        return lookup;
+    }
+
+    public void setLookup(Lookup lookup) {
+        this.lookup = lookup;
+    }
+
     protected abstract String getProviderName();
 
     public void build() {
@@ -354,6 +375,7 @@ public abstract class SqlConfig {
             log.info("Identity type: {}", getIdentity().getType());
             log.info("3PID mapping query: {}", getIdentity().getQuery());
             log.info("Identity medium queries: {}", GsonUtil.build().toJson(getIdentity().getMedium()));
+            log.info("Lookup query: {}", getLookup().getQuery());
             log.info("Profile:");
             log.info("  Enabled: {}", getProfile().isEnabled());
             if (getProfile().isEnabled()) {
