@@ -131,7 +131,7 @@ public class Mxisd {
         dirMgr = new DirectoryManager(cfg.getDirectory(), clientDns, httpClient, DirectoryProviders.get());
         regMgr = new RegistrationManager(cfg.getRegister(), httpClient, clientDns, invMgr);
         asHander = new AppSvcManager(this);
-        accMgr = new AccountManager(store, resolver, getHttpClient(), cfg.getAccountConfig(), cfg.getMatrix());
+        accMgr = new AccountManager(store, resolver, cfg.getAccountConfig(), cfg.getMatrix());
     }
 
     public MxisdConfig getConfig() {
