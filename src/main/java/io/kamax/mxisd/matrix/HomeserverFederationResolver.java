@@ -178,26 +178,26 @@ public class HomeserverFederationResolver {
         }
     }
 
-    public URL resolve(String domain) {
+    public HomeserverTarget resolve(String domain) {
         Optional<URL> s1 = resolveOverwrite(domain);
         if (s1.isPresent()) {
             URL dest = s1.get();
             log.info("Resolution of {} via DNS overwrite to {}", domain, dest);
-            return dest;
+            return new HomeserverTarget(dest.getHost(), dest);
         }
 
         Optional<URL> s2 = resolveLiteral(domain);
         if (s2.isPresent()) {
             URL dest = s2.get();
             log.info("Resolution of {} as IP literal or IP/hostname with explicit port to {}", domain, dest);
-            return dest;
+            return new HomeserverTarget(dest.getHost(), dest);
         }
 
         Optional<URL> s3 = resolveWellKnown(domain);
         if (s3.isPresent()) {
             URL dest = s3.get();
             log.info("Resolution of {} via well-known to {}", domain, dest);
-            return dest;
+            return new HomeserverTarget(dest.getHost(), dest);
         }
         // The domain needs to be resolved
 
@@ -205,12 +205,30 @@ public class HomeserverFederationResolver {
         if (s4.isPresent()) {
             URL dest = s4.get();
             log.info("Resolution of {} via DNS SRV record to {}", domain, dest);
-            return dest;
+            return new HomeserverTarget(domain, dest);
         }
 
         URL dest = build(domain + ":" + getDefaultPort());
         log.info("Resolution of {} to {}", domain, dest);
-        return dest;
+        return new HomeserverTarget(dest.getHost(), dest);
     }
 
+    public static class HomeserverTarget {
+
+        private final String domain;
+        private final URL url;
+
+        HomeserverTarget(String domain, URL url) {
+            this.domain = domain;
+            this.url = url;
+        }
+
+        public String getDomain() {
+            return domain;
+        }
+
+        public URL getUrl() {
+            return url;
+        }
+    }
 }

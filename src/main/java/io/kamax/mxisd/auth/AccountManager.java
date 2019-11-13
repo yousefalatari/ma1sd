@@ -16,7 +16,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,13 +73,14 @@ public class AccountManager {
 
     private String getUserId(OpenIdToken openIdToken) {
         String matrixServerName = openIdToken.getMatrixServerName();
-        String homeserverURL = resolver.resolve(matrixServerName).toString();
+        HomeserverFederationResolver.HomeserverTarget homeserverTarget = resolver.resolve(matrixServerName);
+        String homeserverURL = homeserverTarget.getUrl().toString();
         LOGGER.info("Domain resolved: {} => {}", matrixServerName, homeserverURL);
         HttpGet getUserInfo = new HttpGet(
             homeserverURL + "/_matrix/federation/v1/openid/userinfo?access_token=" + openIdToken.getAccessToken());
         String userId;
-        try (CloseableHttpClient httpClient = HttpClientBuilder.create()
-            .setSSLHostnameVerifier(new MatrixHostnameVerifier(matrixServerName)).build()) {
+        try (CloseableHttpClient httpClient = HttpClients.custom()
+            .setSSLHostnameVerifier(new MatrixHostnameVerifier(homeserverTarget.getDomain())).build()) {
             try (CloseableHttpResponse response = httpClient.execute(getUserInfo)) {
                 int statusCode = response.getStatusLine().getStatusCode();
                 if (statusCode == HttpStatus.SC_OK) {

@@ -39,6 +39,7 @@ import io.kamax.mxisd.lookup.SingleLookupReply;
 import io.kamax.mxisd.lookup.SingleLookupRequest;
 import io.kamax.mxisd.lookup.ThreePidValidation;
 import io.kamax.mxisd.matrix.HomeserverFederationResolver;
+import io.kamax.mxisd.matrix.HomeserverVerifier;
 import io.kamax.mxisd.notification.NotificationManager;
 import io.kamax.mxisd.storage.IStorage;
 import io.kamax.mxisd.storage.dao.IThreePidSessionDao;
@@ -53,6 +54,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +75,6 @@ public class SessionManager {
     private IStorage storage;
     private NotificationManager notifMgr;
     private HomeserverFederationResolver resolver;
-    private CloseableHttpClient client;
     private SignatureManager signatureManager;
 
     public SessionManager(
@@ -81,14 +82,12 @@ public class SessionManager {
         IStorage storage,
         NotificationManager notifMgr,
         HomeserverFederationResolver resolver,
-        CloseableHttpClient client,
         SignatureManager signatureManager
     ) {
         this.cfg = cfg;
         this.storage = storage;
         this.notifMgr = notifMgr;
         this.resolver = resolver;
-        this.client = client;
         this.signatureManager = signatureManager;
     }
 
@@ -308,25 +307,34 @@ public class SessionManager {
 
         String canonical = MatrixJson.encodeCanonical(jsonObject);
 
-        String originUrl = resolver.resolve(origin).toString();
+        HomeserverFederationResolver.HomeserverTarget homeserverTarget = resolver.resolve(origin);
 
-        validateServerKey(key, sig, canonical, originUrl);
+        validateServerKey(key, sig, canonical, homeserverTarget);
     }
 
     private String removeQuotes(String origin) {
         return origin.startsWith("\"") && origin.endsWith("\"") ? origin.substring(1, origin.length() - 1) : origin;
     }
 
-    private void validateServerKey(String key, String signature, String canonical, String originUrl) {
+    private void validateServerKey(String key, String signature, String canonical,
+                                   HomeserverFederationResolver.HomeserverTarget homeserverTarget) {
+        String originUrl = homeserverTarget.getUrl().toString();
         HttpGet request = new HttpGet(originUrl + "/_matrix/key/v2/server");
         log.info("Get keys from the server {}", request.getURI());
-        try (CloseableHttpResponse response = client.execute(request)) {
-            int statusCode = response.getStatusLine().getStatusCode();
-            log.info("Answer code: {}", statusCode);
-            if (statusCode == 200) {
-                verifyKey(key, signature, canonical, response);
-            } else {
-                throw new RemoteHomeServerException("Unable to fetch server keys.");
+        try (CloseableHttpClient httpClient = HttpClients.custom()
+            .setSSLHostnameVerifier(new HomeserverVerifier(homeserverTarget.getDomain())).build()) {
+            try (CloseableHttpResponse response = httpClient.execute(request)) {
+                int statusCode = response.getStatusLine().getStatusCode();
+                log.info("Answer code: {}", statusCode);
+                if (statusCode == 200) {
+                    verifyKey(key, signature, canonical, response);
+                } else {
+                    throw new RemoteHomeServerException("Unable to fetch server keys.");
+                }
+            } catch (IOException e) {
+                String message = "Unable to get server keys: " + originUrl;
+                log.error(message, e);
+                throw new IllegalArgumentException(message);
             }
         } catch (IOException e) {
             String message = "Unable to get server keys: " + originUrl;

@@ -51,13 +51,13 @@ public class HomeserverFederationResolverTest {
 
     @Test
     public void hostnameWithoutPort() {
-        URL url = resolver.resolve("example.org");
+        URL url = resolver.resolve("example.org").getUrl();
         assertEquals("https://example.org:8448", url.toString());
     }
 
     @Test
     public void hostnameWithPort() {
-        URL url = resolver.resolve("example.org:443");
+        URL url = resolver.resolve("example.org:443").getUrl();
         assertEquals("https://example.org:443", url.toString());
     }
 

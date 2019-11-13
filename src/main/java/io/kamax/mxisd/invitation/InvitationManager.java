@@ -29,7 +29,11 @@ import io.kamax.matrix.json.GsonUtil;
 import io.kamax.mxisd.config.InvitationConfig;
 import io.kamax.mxisd.config.MxisdConfig;
 import io.kamax.mxisd.config.ServerConfig;
-import io.kamax.mxisd.crypto.*;
+import io.kamax.mxisd.crypto.GenericKeyIdentifier;
+import io.kamax.mxisd.crypto.KeyIdentifier;
+import io.kamax.mxisd.crypto.KeyManager;
+import io.kamax.mxisd.crypto.KeyType;
+import io.kamax.mxisd.crypto.SignatureManager;
 import io.kamax.mxisd.exception.BadRequestException;
 import io.kamax.mxisd.exception.ConfigurationException;
 import io.kamax.mxisd.exception.MappingAlreadyExistsException;
@@ -38,6 +42,7 @@ import io.kamax.mxisd.lookup.SingleLookupReply;
 import io.kamax.mxisd.lookup.ThreePidMapping;
 import io.kamax.mxisd.lookup.strategy.LookupStrategy;
 import io.kamax.mxisd.matrix.HomeserverFederationResolver;
+import io.kamax.mxisd.matrix.HomeserverVerifier;
 import io.kamax.mxisd.notification.NotificationManager;
 import io.kamax.mxisd.profile.ProfileManager;
 import io.kamax.mxisd.storage.IStorage;
@@ -48,23 +53,26 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContextBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.DateTimeException;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
@@ -86,7 +94,6 @@ public class InvitationManager {
     private NotificationManager notifMgr;
     private ProfileManager profileMgr;
 
-    private CloseableHttpClient client;
     private Timer refreshTimer;
 
     private Map<String, IThreePidInviteReply> invitations = new ConcurrentHashMap<>();
@@ -128,17 +135,6 @@ public class InvitationManager {
             invitations.put(reply.getId(), reply);
         });
         log.info("Loaded saved invites");
-
-        // FIXME export such madness into matrix-java-sdk with a nice wrapper to talk to a homeserver
-        try {
-            SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial(new TrustSelfSignedStrategy()).build();
-            HostnameVerifier hostnameVerifier = new NoopHostnameVerifier();
-            SSLConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(sslContext, hostnameVerifier);
-            client = HttpClients.custom().setSSLSocketFactory(sslSocketFactory).build();
-        } catch (Exception e) {
-            // FIXME do better...
-            throw new RuntimeException(e);
-        }
 
         log.info("Setting up invitation mapping refresh timer");
         refreshTimer = new Timer();
@@ -423,11 +419,11 @@ public class InvitationManager {
         String address = reply.getInvite().getAddress();
         String domain = reply.getInvite().getSender().getDomain();
         log.info("Discovering HS for domain {}", domain);
-        String hsUrlOpt = resolver.resolve(domain).toString();
+        HomeserverFederationResolver.HomeserverTarget hsUrlOpt = resolver.resolve(domain);
 
         // TODO this is needed as this will block if called during authentication cycle due to synapse implementation
         new Thread(() -> { // FIXME need to make this retry-able and within a general background working pool
-            HttpPost req = new HttpPost(hsUrlOpt + "/_matrix/federation/v1/3pid/onbind");
+            HttpPost req = new HttpPost(hsUrlOpt.getUrl().toString() + "/_matrix/federation/v1/3pid/onbind");
             // Expected body: https://matrix.to/#/!HUeDbmFUsWAhxHHvFG:matrix.org/$150469846739DCLWc:matrix.trancendances.fr
             JsonObject obj = new JsonObject();
             obj.addProperty("mxid", mxid);
@@ -459,36 +455,41 @@ public class InvitationManager {
             Instant resolvedAt = Instant.now();
             boolean couldPublish = false;
             boolean shouldArchive = true;
-            try {
-                log.info("Posting onBind event to {}", req.getURI());
-                CloseableHttpResponse response = client.execute(req);
-                int statusCode = response.getStatusLine().getStatusCode();
-                log.info("Answer code: {}", statusCode);
-                if (statusCode >= 300 && statusCode != 403) {
-                    log.info("Answer body: {}", IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8));
-                    log.warn("HS returned an error.");
+            try (CloseableHttpClient httpClient = HttpClients.custom().setSSLHostnameVerifier(new HomeserverVerifier(hsUrlOpt.getDomain()))
+                .build()) {
+                try {
+                    log.info("Posting onBind event to {}", req.getURI());
+                    CloseableHttpResponse response = httpClient.execute(req);
+                    int statusCode = response.getStatusLine().getStatusCode();
+                    log.info("Answer code: {}", statusCode);
+                    if (statusCode >= 300 && statusCode != 403) {
+                        log.info("Answer body: {}", IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8));
+                        log.warn("HS returned an error.");
 
-                    shouldArchive = statusCode != 502;
+                        shouldArchive = statusCode != 502;
+                        if (shouldArchive) {
+                            log.info("Invite can be found in historical storage for manual re-processing");
+                        }
+                    } else {
+                        couldPublish = true;
+                        if (statusCode == 403) {
+                            log.info("Invite is obsolete or no longer under our control");
+                        }
+                    }
+                    response.close();
+                } catch (IOException e) {
+                    log.warn("Unable to tell HS {} about invite being mapped", domain, e);
+                } finally {
                     if (shouldArchive) {
-                        log.info("Invite can be found in historical storage for manual re-processing");
-                    }
-                } else {
-                    couldPublish = true;
-                    if (statusCode == 403) {
-                        log.info("Invite is obsolete or no longer under our control");
+                        synchronized (this) {
+                            storage.insertHistoricalInvite(reply, mxid, resolvedAt, couldPublish);
+                            removeInvite(reply);
+                            log.info("Moved invite {} to historical table", reply.getId());
+                        }
                     }
                 }
-                response.close();
             } catch (IOException e) {
-                log.warn("Unable to tell HS {} about invite being mapped", domain, e);
-            } finally {
-                if (shouldArchive) {
-                    synchronized (this) {
-                        storage.insertHistoricalInvite(reply, mxid, resolvedAt, couldPublish);
-                        removeInvite(reply);
-                        log.info("Moved invite {} to historical table", reply.getId());
-                    }
-                }
+                log.error("Unable to create client to the " + hsUrlOpt.getUrl().toString(), e);
             }
         }).start();
     }
