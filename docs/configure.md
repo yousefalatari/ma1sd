@@ -48,6 +48,9 @@ Create a list under the label `myOtherServers` containing two Identity servers: 
 ## Unbind (MSC1915)
 - `session.policy.unbind.enabled`: Enable or disable unbind functionality (MSC1915). (Defaults to true).
 
+## Hash lookups, Term and others (MSC2140, MSC2134)
+See the [dedicated document](MSC2140_MSC2134.md) for configuration.
+
 *Warning*: Unbind check incoming request by two ways:
 - session validation.
 - request signature via `X-Matrix` header and uses `server.publicUrl` property to construct the signing json;

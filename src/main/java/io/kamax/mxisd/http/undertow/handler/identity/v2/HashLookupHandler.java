@@ -84,7 +84,7 @@ public class HashLookupHandler extends LookupHandler implements ApiHandler {
     }
 
     private void noneAlgorithm(HttpServerExchange exchange, HashLookupRequest request, ClientHashLookupRequest input) throws Exception {
-        if (!hashManager.getConfig().getAlgorithms().contains(HashingConfig.Algorithm.NONE)) {
+        if (!hashManager.getConfig().getAlgorithms().contains(HashingConfig.Algorithm.none)) {
             throw new InvalidParamException();
         }
 
@@ -110,7 +110,7 @@ public class HashLookupHandler extends LookupHandler implements ApiHandler {
     }
 
     private void sha256Algorithm(HttpServerExchange exchange, HashLookupRequest request, ClientHashLookupRequest input) {
-        if (!hashManager.getConfig().getAlgorithms().contains(HashingConfig.Algorithm.SHA256)) {
+        if (!hashManager.getConfig().getAlgorithms().contains(HashingConfig.Algorithm.sha256)) {
             throw new InvalidParamException();
         }
 

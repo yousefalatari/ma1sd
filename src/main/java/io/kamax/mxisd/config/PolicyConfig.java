@@ -100,10 +100,12 @@ public class PolicyConfig {
                     policyObjectItem.getValue().getPatterns().add(Pattern.compile(regexp));
                 }
                 sb.append("  terms:\n");
-                for (Map.Entry<String, TermObject> termItem : policyObject.getTerms().entrySet()) {
-                    sb.append("    - lang: ").append(termItem.getKey()).append("\n");
-                    sb.append("      name: ").append(termItem.getValue().getName()).append("\n");
-                    sb.append("       url: ").append(termItem.getValue().getUrl()).append("\n");
+                if (policyObject.getTerms() != null) {
+                    for (Map.Entry<String, TermObject> termItem : policyObject.getTerms().entrySet()) {
+                        sb.append("    - lang: ").append(termItem.getKey()).append("\n");
+                        sb.append("      name: ").append(termItem.getValue().getName()).append("\n");
+                        sb.append("       url: ").append(termItem.getValue().getUrl()).append("\n");
+                    }
                 }
                 LOGGER.info(sb.toString());
             }

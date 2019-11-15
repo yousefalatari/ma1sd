@@ -125,7 +125,7 @@ public abstract class SqlConfig {
     }
 
     public static class Lookup {
-        private String query;
+        private String query = "SELECT user_id AS mxid, medium, address from user_threepids";
 
         public String getQuery() {
             return query;

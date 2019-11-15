@@ -40,10 +40,10 @@ public class HashManager {
     private void initStorage() {
         if (config.isEnabled()) {
             switch (config.getHashStorageType()) {
-                case IN_MEMORY:
+                case in_memory:
                     this.hashStorage = new InMemoryHashStorage();
                     break;
-                case SQL:
+                case sql:
                     this.hashStorage = new SqlHashStorage(storage);
                     break;
                 default:
@@ -57,10 +57,10 @@ public class HashManager {
     private void initRotationStrategy() {
         if (config.isEnabled()) {
             switch (config.getRotationPolicy()) {
-                case PER_REQUESTS:
+                case per_requests:
                     this.rotationStrategy = new RotationPerRequests();
                     break;
-                case PER_SECONDS:
+                case per_seconds:
                     this.rotationStrategy = new TimeBasedRotation(config.getDelay());
                     break;
                 default:

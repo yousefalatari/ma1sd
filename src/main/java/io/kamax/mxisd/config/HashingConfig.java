@@ -23,27 +23,28 @@ public class HashingConfig {
             LOGGER.info("   Pepper length: {}", getPepperLength());
             LOGGER.info("   Rotation policy: {}", getRotationPolicy());
             LOGGER.info("   Hash storage type: {}", getHashStorageType());
-            if (RotationPolicyEnum.PER_SECONDS == rotationPolicy) {
+            if (RotationPolicyEnum.per_seconds == rotationPolicy) {
                 LOGGER.info("   Rotation delay: {}", delay);
             }
+            LOGGER.info("   Algorithms: {}", algorithms);
         } else {
             LOGGER.info("Hash configuration disabled, used only `none` pepper.");
         }
     }
 
     public enum Algorithm {
-        NONE,
-        SHA256
+        none,
+        sha256
     }
 
     public enum RotationPolicyEnum {
-        PER_REQUESTS,
-        PER_SECONDS
+        per_requests,
+        per_seconds
     }
 
     public enum HashStorageEnum {
-        IN_MEMORY,
-        SQL
+        in_memory,
+        sql
     }
 
     public boolean isEnabled() {
