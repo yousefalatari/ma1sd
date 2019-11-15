@@ -58,7 +58,8 @@ public class AuthorizationHandler extends BasicHttpHandler {
             log.error("Account not found from request from: {}", exchange.getHostAndPort());
             throw new InvalidCredentialsException();
         }
-        if (account.getExpiresIn() < System.currentTimeMillis()) {
+        long expiredAt = (account.getCreatedAt() + account.getExpiresIn()) * 1000; // expired in milliseconds
+        if (expiredAt < System.currentTimeMillis()) {
             log.error("Account for '{}' from: {}", account.getUserId(), exchange.getHostAndPort());
             accountManager.deleteAccount(token);
             throw new InvalidCredentialsException();
