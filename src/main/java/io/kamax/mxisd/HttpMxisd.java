@@ -219,7 +219,10 @@ public class HttpMxisd {
             routingHandler.add(method, apiHandler.getPath(IdentityServiceAPI.V1), httpHandler);
         }
         if (matrixConfig.isV2()) {
-            HttpHandler handlerWithTerms = CheckTermsHandler.around(m.getAccMgr(), httpHandler, getPolicyObjects(apiHandler));
+            List<PolicyConfig.PolicyObject> policyObjects = getPolicyObjects(apiHandler);
+            HttpHandler handlerWithTerms = policyObjects.isEmpty()
+                ? httpHandler
+                : CheckTermsHandler.around(m.getAccMgr(), httpHandler, policyObjects);
             HttpHandler wrappedHandler = useAuthorization ? AuthorizationHandler.around(m.getAccMgr(), handlerWithTerms) : handlerWithTerms;
             routingHandler.add(method, apiHandler.getPath(IdentityServiceAPI.V2), wrappedHandler);
         }

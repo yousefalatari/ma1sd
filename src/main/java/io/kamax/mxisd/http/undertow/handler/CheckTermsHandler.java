@@ -54,6 +54,11 @@ public class CheckTermsHandler extends BasicHttpHandler {
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
+        if (policies == null || policies.isEmpty()) {
+            child.handleRequest(exchange);
+            return;
+        }
+
         String token = findAccessToken(exchange).orElse(null);
         if (token == null) {
             log.error("Unauthorized request from: {}", exchange.getHostAndPort());
