@@ -56,6 +56,6 @@ public class HashEngine {
     }
 
     protected String newPepper() {
-        return RandomStringUtils.random(config.getPepperLength());
+        return RandomStringUtils.random(config.getPepperLength(), true, true);
     }
 }

@@ -12,6 +12,7 @@ public class RotationPerRequests implements HashRotationStrategy {
     @Override
     public void register(HashEngine hashEngine) {
         this.hashEngine = hashEngine;
+        trigger();
     }
 
     @Override

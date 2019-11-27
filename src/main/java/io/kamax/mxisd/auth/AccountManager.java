@@ -62,7 +62,7 @@ public class AccountManager {
 
         String token = UUID.randomUUID().toString();
         AccountDao account = new AccountDao(openIdToken.getAccessToken(), openIdToken.getTokenType(),
-            openIdToken.getMatrixServerName(), openIdToken.getExpiredIn(),
+            openIdToken.getMatrixServerName(), openIdToken.getExpiresIn(),
             Instant.now().getEpochSecond(), userId, token);
         storage.insertToken(account);
 

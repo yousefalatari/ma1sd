@@ -11,7 +11,7 @@ public class HashingConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(HashingConfig.class);
 
     private boolean enabled = false;
-    private int pepperLength = 10;
+    private int pepperLength = 20;
     private RotationPolicyEnum rotationPolicy;
     private HashStorageEnum hashStorageType;
     private long delay = 10;

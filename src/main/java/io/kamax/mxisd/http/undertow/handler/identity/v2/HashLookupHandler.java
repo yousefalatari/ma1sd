@@ -67,7 +67,7 @@ public class HashLookupHandler extends LookupHandler implements ApiHandler {
             throw new InvalidParamException();
         }
 
-        if (!hashManager.getHashEngine().getPepper().equals(input.getPepper())) {
+        if ("sha256".equals(input.getAlgorithm()) && !hashManager.getHashEngine().getPepper().equals(input.getPepper())) {
             throw new InvalidPepperException();
         }
 
@@ -93,8 +93,8 @@ public class HashLookupHandler extends LookupHandler implements ApiHandler {
         for (String address : input.getAddresses()) {
             String[] parts = address.split(" ");
             ThreePidMapping mapping = new ThreePidMapping();
-            mapping.setMedium(parts[0]);
-            mapping.setValue(parts[1]);
+            mapping.setMedium(parts[1]);
+            mapping.setValue(parts[0]);
             mappings.add(mapping);
         }
         bulkLookupRequest.setMappings(mappings);

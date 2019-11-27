@@ -1,14 +1,20 @@
 package io.kamax.mxisd.auth;
 
+import com.google.gson.annotations.SerializedName;
+
 public class OpenIdToken {
 
+    @SerializedName("access_token")
     private String accessToken;
 
+    @SerializedName("token_type")
     private String tokenType;
 
+    @SerializedName("matrix_server_name")
     private String matrixServerName;
 
-    private long expiredIn;
+    @SerializedName("expires_in")
+    private long expiresIn;
 
     public String getAccessToken() {
         return accessToken;
@@ -34,11 +40,11 @@ public class OpenIdToken {
         this.matrixServerName = matrixServerName;
     }
 
-    public long getExpiredIn() {
-        return expiredIn;
+    public long getExpiresIn() {
+        return expiresIn;
     }
 
-    public void setExpiredIn(long expiredIn) {
-        this.expiredIn = expiredIn;
+    public void setExpiresIn(long expiresIn) {
+        this.expiresIn = expiresIn;
     }
 }
