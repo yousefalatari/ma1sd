@@ -23,7 +23,6 @@ package io.kamax.mxisd.http.undertow.handler;
 import io.kamax.mxisd.auth.AccountManager;
 import io.kamax.mxisd.config.PolicyConfig;
 import io.kamax.mxisd.exception.InvalidCredentialsException;
-import io.kamax.mxisd.storage.ormlite.dao.AccountDao;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;

@@ -52,7 +52,8 @@ import io.kamax.mxisd.http.undertow.handler.identity.share.SessionValidationGetH
 import io.kamax.mxisd.http.undertow.handler.identity.share.SessionValidationPostHandler;
 import io.kamax.mxisd.http.undertow.handler.identity.share.SignEd25519Handler;
 import io.kamax.mxisd.http.undertow.handler.identity.share.StoreInviteHandler;
-import io.kamax.mxisd.http.undertow.handler.identity.v1.*;
+import io.kamax.mxisd.http.undertow.handler.identity.v1.BulkLookupHandler;
+import io.kamax.mxisd.http.undertow.handler.identity.v1.SingleLookupHandler;
 import io.kamax.mxisd.http.undertow.handler.identity.v2.HashDetailsHandler;
 import io.kamax.mxisd.http.undertow.handler.identity.v2.HashLookupHandler;
 import io.kamax.mxisd.http.undertow.handler.invite.v1.RoomInviteHandler;
@@ -220,10 +221,14 @@ public class HttpMxisd {
         }
         if (matrixConfig.isV2()) {
             List<PolicyConfig.PolicyObject> policyObjects = getPolicyObjects(apiHandler);
-            HttpHandler handlerWithTerms = policyObjects.isEmpty()
-                ? httpHandler
-                : CheckTermsHandler.around(m.getAccMgr(), httpHandler, policyObjects);
-            HttpHandler wrappedHandler = useAuthorization ? AuthorizationHandler.around(m.getAccMgr(), handlerWithTerms) : handlerWithTerms;
+            boolean wrapWithTerms = !policyObjects.isEmpty();
+            HttpHandler wrappedHandler;
+            if (useAuthorization) {
+                wrappedHandler = wrapWithTerms ? CheckTermsHandler.around(m.getAccMgr(), httpHandler, policyObjects) : httpHandler;
+                wrappedHandler = AuthorizationHandler.around(m.getAccMgr(), wrappedHandler);
+            } else {
+                wrappedHandler = httpHandler;
+            }
             routingHandler.add(method, apiHandler.getPath(IdentityServiceAPI.V2), wrappedHandler);
         }
     }
