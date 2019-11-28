@@ -60,6 +60,7 @@ public class HashLookupHandler extends LookupHandler implements ApiHandler {
         ClientHashLookupRequest input = parseJsonTo(exchange, ClientHashLookupRequest.class);
         HashLookupRequest lookupRequest = new HashLookupRequest();
         setRequesterInfo(lookupRequest, exchange);
+        lookupRequest.setHashes(input.getAddresses());
         log.info("Got bulk lookup request from {} with client {} - Is recursive? {}",
             lookupRequest.getRequester(), lookupRequest.getUserAgent(), lookupRequest.isRecursive());
 
@@ -67,7 +68,7 @@ public class HashLookupHandler extends LookupHandler implements ApiHandler {
             throw new InvalidParamException();
         }
 
-        if ("sha256".equals(input.getAlgorithm()) && !hashManager.getHashEngine().getPepper().equals(input.getPepper())) {
+        if (!hashManager.getHashEngine().getPepper().equals(input.getPepper())) {
             throw new InvalidPepperException();
         }
 
@@ -115,10 +116,14 @@ public class HashLookupHandler extends LookupHandler implements ApiHandler {
         }
 
         ClientHashLookupAnswer answer = new ClientHashLookupAnswer();
-        for (Pair<String, ThreePidMapping> pair : hashManager.getHashStorage().find(request.getHashes())) {
-            answer.getMappings().put(pair.getKey(), pair.getValue().getMxid());
+        if (request.getHashes() != null && !request.getHashes().isEmpty()) {
+            for (Pair<String, ThreePidMapping> pair : hashManager.getHashStorage().find(request.getHashes())) {
+                answer.getMappings().put(pair.getKey(), pair.getValue().getMxid());
+            }
+            log.info("Finished bulk lookup request from {}", request.getRequester());
+        } else {
+            log.warn("Empty request");
         }
-        log.info("Finished bulk lookup request from {}", request.getRequester());
 
         respondJson(exchange, answer);
     }

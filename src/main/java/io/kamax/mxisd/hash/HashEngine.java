@@ -1,10 +1,10 @@
 package io.kamax.mxisd.hash;
 
-import io.kamax.matrix.codec.MxSha256;
 import io.kamax.mxisd.config.HashingConfig;
 import io.kamax.mxisd.hash.storage.HashStorage;
 import io.kamax.mxisd.lookup.ThreePidMapping;
 import io.kamax.mxisd.lookup.provider.IThreePidProvider;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,6 @@ public class HashEngine {
 
     private final List<? extends IThreePidProvider> providers;
     private final HashStorage hashStorage;
-    private final MxSha256 sha256 = new MxSha256();
     private final HashingConfig config;
     private String pepper;
 
@@ -52,7 +51,7 @@ public class HashEngine {
     }
 
     protected String hash(ThreePidMapping pidMapping) {
-        return sha256.hash(pidMapping.getMedium() + " " + pidMapping.getValue() + " " + getPepper());
+        return DigestUtils.sha256Hex(pidMapping.getValue() + " " + pidMapping.getMedium() + " " + getPepper());
     }
 
     protected String newPepper() {
