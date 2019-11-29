@@ -2,7 +2,6 @@ package io.kamax.mxisd.http.undertow.handler.term.v2;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import io.kamax.matrix.json.GsonUtil;
 import io.kamax.mxisd.auth.AccountManager;
 import io.kamax.mxisd.exception.InvalidCredentialsException;
 import io.kamax.mxisd.http.undertow.handler.BasicHttpHandler;
@@ -28,7 +27,7 @@ public class AcceptTermsHandler extends BasicHttpHandler {
         String token = getAccessToken(exchange);
 
         JsonObject request = parseJsonObject(exchange);
-        JsonObject accepts = GsonUtil.getObj(request, "user_accepts");
+        JsonElement accepts = request.get("user_accepts");
         AccountDao account = accountManager.findAccount(token);
 
         if (account == null) {

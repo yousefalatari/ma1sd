@@ -115,13 +115,6 @@ public class HttpMxisd {
             .post(LoginHandler.Path, SaneHandler.around(new LoginPostHandler(m.getAuth())))
             .post(RestAuthHandler.Path, SaneHandler.around(new RestAuthHandler(m.getAuth())))
 
-            // Account endpoints
-            .post(AccountRegisterHandler.Path, SaneHandler.around(new AccountRegisterHandler(m.getAccMgr())))
-            .get(AccountGetUserInfoHandler.Path,
-                SaneHandler.around(AuthorizationHandler.around(m.getAccMgr(), new AccountGetUserInfoHandler(m.getAccMgr()))))
-            .post(AccountLogoutHandler.Path,
-                SaneHandler.around(AuthorizationHandler.around(m.getAccMgr(), new AccountLogoutHandler(m.getAccMgr()))))
-
             // Directory endpoints
             .post(UserDirectorySearchHandler.Path, SaneHandler.around(new UserDirectorySearchHandler(m.getDirectory())))
 
@@ -151,6 +144,7 @@ public class HttpMxisd {
         identityEndpoints(handler);
         termsEndpoints(handler);
         hashEndpoints(handler);
+        accountEndpoints(handler);
         httpSrv = Undertow.builder().addHttpListener(m.getConfig().getServer().getPort(), "0.0.0.0").setHandler(handler).build();
 
         httpSrv.start();
@@ -194,17 +188,25 @@ public class HttpMxisd {
         );
     }
 
+    private void accountEndpoints(RoutingHandler routingHandler) {
+        routingHandler.post(AccountRegisterHandler.Path, SaneHandler.around(new AccountRegisterHandler(m.getAccMgr())));
+        wrapWithTokenAndAuthorizationHandlers(routingHandler, Methods.GET, sane(new AccountGetUserInfoHandler(m.getAccMgr())),
+            AccountGetUserInfoHandler.Path, true);
+        wrapWithTokenAndAuthorizationHandlers(routingHandler, Methods.GET, sane(new AccountLogoutHandler(m.getAccMgr())),
+            AccountLogoutHandler.Path, true);
+    }
+
     private void termsEndpoints(RoutingHandler routingHandler) {
         routingHandler.get(GetTermsHandler.PATH, new GetTermsHandler(m.getConfig().getPolicy()));
-        routingHandler
-            .post(AcceptTermsHandler.PATH, AuthorizationHandler.around(m.getAccMgr(), sane(new AcceptTermsHandler(m.getAccMgr()))));
+        wrapWithTokenAndAuthorizationHandlers(routingHandler, Methods.POST, sane(new AcceptTermsHandler(m.getAccMgr())),
+            AcceptTermsHandler.PATH, true);
     }
 
     private void hashEndpoints(RoutingHandler routingHandler) {
-        routingHandler
-            .get(HashDetailsHandler.PATH, AuthorizationHandler.around(m.getAccMgr(), sane(new HashDetailsHandler(m.getHashManager()))));
-        routingHandler.post(HashLookupHandler.Path,
-            AuthorizationHandler.around(m.getAccMgr(), sane(new HashLookupHandler(m.getIdentity(), m.getHashManager()))));
+        wrapWithTokenAndAuthorizationHandlers(routingHandler, Methods.GET, sane(new HashDetailsHandler(m.getHashManager())),
+            HashDetailsHandler.PATH, true);
+        wrapWithTokenAndAuthorizationHandlers(routingHandler, Methods.POST,
+            sane(new HashLookupHandler(m.getIdentity(), m.getHashManager())), HashLookupHandler.Path, true);
     }
 
     private void addEndpoints(RoutingHandler routingHandler, HttpString method, boolean useAuthorization, ApiHandler... handlers) {
@@ -220,27 +222,32 @@ public class HttpMxisd {
             routingHandler.add(method, apiHandler.getPath(IdentityServiceAPI.V1), httpHandler);
         }
         if (matrixConfig.isV2()) {
-            List<PolicyConfig.PolicyObject> policyObjects = getPolicyObjects(apiHandler);
-            boolean wrapWithTerms = !policyObjects.isEmpty();
-            HttpHandler wrappedHandler;
-            if (useAuthorization) {
-                wrappedHandler = wrapWithTerms ? CheckTermsHandler.around(m.getAccMgr(), httpHandler, policyObjects) : httpHandler;
-                wrappedHandler = AuthorizationHandler.around(m.getAccMgr(), wrappedHandler);
-            } else {
-                wrappedHandler = httpHandler;
-            }
-            routingHandler.add(method, apiHandler.getPath(IdentityServiceAPI.V2), wrappedHandler);
+            String path = apiHandler.getPath(IdentityServiceAPI.V2);
+            wrapWithTokenAndAuthorizationHandlers(routingHandler, method, httpHandler, path, useAuthorization);
         }
     }
 
+    private void wrapWithTokenAndAuthorizationHandlers(RoutingHandler routingHandler, HttpString method, HttpHandler httpHandler,
+                                                       String url, boolean useAuthorization) {
+        List<PolicyConfig.PolicyObject> policyObjects = getPolicyObjects(url);
+        HttpHandler wrappedHandler;
+        if (useAuthorization) {
+            wrappedHandler = policyObjects.isEmpty() ? httpHandler : CheckTermsHandler.around(m.getAccMgr(), httpHandler, policyObjects);
+            wrappedHandler = AuthorizationHandler.around(m.getAccMgr(), wrappedHandler);
+        } else {
+            wrappedHandler = httpHandler;
+        }
+        routingHandler.add(method, url, wrappedHandler);
+    }
+
     @NotNull
-    private List<PolicyConfig.PolicyObject> getPolicyObjects(ApiHandler apiHandler) {
+    private List<PolicyConfig.PolicyObject> getPolicyObjects(String url) {
         PolicyConfig policyConfig = m.getConfig().getPolicy();
         List<PolicyConfig.PolicyObject> policies = new ArrayList<>();
         if (!policyConfig.getPolicies().isEmpty()) {
             for (PolicyConfig.PolicyObject policy : policyConfig.getPolicies().values()) {
                 for (Pattern pattern : policy.getPatterns()) {
-                    if (pattern.matcher(apiHandler.getHandlerPath()).matches()) {
+                    if (pattern.matcher(url).matches()) {
                         policies.add(policy);
                     }
                 }

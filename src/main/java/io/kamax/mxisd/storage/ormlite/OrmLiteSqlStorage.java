@@ -294,6 +294,13 @@ public class OrmLiteSqlStorage implements IStorage {
     public void acceptTerm(String token, String url) {
         withCatcher(() -> {
             AccountDao account = findAccount(token).orElseThrow(InvalidCredentialsException::new);
+            List<AcceptedDao> acceptedTerms = acceptedDao.queryForEq("userId", account.getUserId());
+            for (AcceptedDao acceptedTerm : acceptedTerms) {
+                if (acceptedTerm.getUrl().equalsIgnoreCase(url)) {
+                    // already accepted
+                    return;
+                }
+            }
             int created = acceptedDao.create(new AcceptedDao(url, account.getUserId(), System.currentTimeMillis()));
             if (created != 1) {
                 throw new RuntimeException("Unexpected row count after DB action: " + created);
