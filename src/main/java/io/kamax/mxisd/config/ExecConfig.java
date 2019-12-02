@@ -309,6 +309,7 @@ public class ExecConfig {
         private Boolean enabled;
         private int priority;
         private Lookup lookup = new Lookup();
+        private boolean hashLookup = false;
 
         public Boolean isEnabled() {
             return enabled;
@@ -334,6 +335,13 @@ public class ExecConfig {
             this.lookup = lookup;
         }
 
+        public boolean isHashLookup() {
+            return hashLookup;
+        }
+
+        public void setHashLookup(boolean hashLookup) {
+            this.hashLookup = hashLookup;
+        }
     }
 
     public static class Profile {

@@ -27,6 +27,7 @@ public class MemoryStoreConfig {
 
     private boolean enabled;
     private List<MemoryIdentityConfig> identities = new ArrayList<>();
+    private boolean hashEnabled = false;
 
     public boolean isEnabled() {
         return enabled;
@@ -42,6 +43,14 @@ public class MemoryStoreConfig {
 
     public void setIdentities(List<MemoryIdentityConfig> identities) {
         this.identities = identities;
+    }
+
+    public boolean isHashEnabled() {
+        return hashEnabled;
+    }
+
+    public void setHashEnabled(boolean hashEnabled) {
+        this.hashEnabled = hashEnabled;
     }
 
     public void build() {

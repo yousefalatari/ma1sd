@@ -173,6 +173,10 @@ public class ExecIdentityStore extends ExecStore implements IThreePidProvider {
 
     @Override
     public Iterable<ThreePidMapping> populateHashes() {
+        if (!cfg.isHashLookup()) {
+            return Collections.emptyList();
+        }
+
         Processor<List<ThreePidMapping>> p = new Processor<>();
         p.withConfig(cfg.getLookup().getBulk());
 

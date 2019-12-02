@@ -15,6 +15,7 @@ public class HashingConfig {
     private RotationPolicyEnum rotationPolicy;
     private HashStorageEnum hashStorageType;
     private long delay = 10;
+    private int requests = 10;
     private List<Algorithm> algorithms = new ArrayList<>();
 
     public void build() {
@@ -25,6 +26,9 @@ public class HashingConfig {
             LOGGER.info("   Hash storage type: {}", getHashStorageType());
             if (RotationPolicyEnum.per_seconds == rotationPolicy) {
                 LOGGER.info("   Rotation delay: {}", delay);
+            }
+            if (RotationPolicyEnum.per_requests == rotationPolicy) {
+                LOGGER.info("   Rotation after requests: {}", requests);
             }
             LOGGER.info("   Algorithms: {}", algorithms);
         } else {
@@ -85,6 +89,14 @@ public class HashingConfig {
 
     public void setDelay(long delay) {
         this.delay = delay;
+    }
+
+    public int getRequests() {
+        return requests;
+    }
+
+    public void setRequests(int requests) {
+        this.requests = requests;
     }
 
     public List<Algorithm> getAlgorithms() {

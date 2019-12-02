@@ -58,7 +58,7 @@ public class HashManager {
         if (config.isEnabled()) {
             switch (config.getRotationPolicy()) {
                 case per_requests:
-                    this.rotationStrategy = new RotationPerRequests();
+                    this.rotationStrategy = new RotationPerRequests(config.getRequests());
                     break;
                 case per_seconds:
                     this.rotationStrategy = new TimeBasedRotation(config.getDelay());

@@ -174,6 +174,10 @@ public class MemoryIdentityStore implements AuthenticatorProvider, DirectoryProv
 
     @Override
     public Iterable<ThreePidMapping> populateHashes() {
+        if (!cfg.isHashEnabled()) {
+            return Collections.emptyList();
+        }
+
         return cfg.getIdentities().stream()
             .map(mic -> mic.getThreepids().stream().map(mtp -> new ThreePidMapping(mtp.getMedium(), mtp.getAddress(), mic.getUsername())))
             .flatMap(s -> s).collect(
