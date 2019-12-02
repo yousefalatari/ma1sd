@@ -12,6 +12,7 @@ public class SqlHashStorage implements HashStorage {
 
     public SqlHashStorage(IStorage storage) {
         this.storage = storage;
+        Runtime.getRuntime().addShutdownHook(new Thread(storage::clearHashes));
     }
 
     @Override

@@ -198,8 +198,7 @@ public class HttpMxisd {
 
     private void termsEndpoints(RoutingHandler routingHandler) {
         routingHandler.get(GetTermsHandler.PATH, new GetTermsHandler(m.getConfig().getPolicy()));
-        wrapWithTokenAndAuthorizationHandlers(routingHandler, Methods.POST, sane(new AcceptTermsHandler(m.getAccMgr())),
-            AcceptTermsHandler.PATH, true);
+        routingHandler.post(AcceptTermsHandler.PATH, sane(new AcceptTermsHandler(m.getAccMgr())));
     }
 
     private void hashEndpoints(RoutingHandler routingHandler) {
