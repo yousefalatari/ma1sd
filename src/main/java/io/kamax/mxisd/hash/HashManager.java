@@ -61,7 +61,7 @@ public class HashManager {
                     this.rotationStrategy = new RotationPerRequests(config.getRequests());
                     break;
                 case per_seconds:
-                    this.rotationStrategy = new TimeBasedRotation(config.getDelay());
+                    this.rotationStrategy = new TimeBasedRotation(config.getDelayInSeconds());
                     break;
                 default:
                     throw new IllegalArgumentException("Unknown rotation type: " + config.getHashStorageType());

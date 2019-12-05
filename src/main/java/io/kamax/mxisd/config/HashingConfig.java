@@ -14,7 +14,8 @@ public class HashingConfig {
     private int pepperLength = 20;
     private RotationPolicyEnum rotationPolicy;
     private HashStorageEnum hashStorageType;
-    private long delay = 10;
+    private String delay = "10s";
+    private transient long delayInSeconds = 10;
     private int requests = 10;
     private List<Algorithm> algorithms = new ArrayList<>();
 
@@ -24,13 +25,15 @@ public class HashingConfig {
             LOGGER.info("   Pepper length: {}", getPepperLength());
             LOGGER.info("   Rotation policy: {}", getRotationPolicy());
             LOGGER.info("   Hash storage type: {}", getHashStorageType());
-            if (RotationPolicyEnum.per_seconds == rotationPolicy) {
-                LOGGER.info("   Rotation delay: {}", delay);
+            if (RotationPolicyEnum.per_seconds == getRotationPolicy()) {
+                setDelayInSeconds(new DurationDeserializer().deserialize(getDelay()));
+                LOGGER.info("   Rotation delay: {}", getDelay());
+                LOGGER.info("   Rotation delay in seconds: {}", getDelayInSeconds());
             }
-            if (RotationPolicyEnum.per_requests == rotationPolicy) {
-                LOGGER.info("   Rotation after requests: {}", requests);
+            if (RotationPolicyEnum.per_requests == getRotationPolicy()) {
+                LOGGER.info("   Rotation after requests: {}", getRequests());
             }
-            LOGGER.info("   Algorithms: {}", algorithms);
+            LOGGER.info("   Algorithms: {}", getAlgorithms());
         } else {
             LOGGER.info("Hash configuration disabled, used only `none` pepper.");
         }
@@ -83,12 +86,20 @@ public class HashingConfig {
         this.hashStorageType = hashStorageType;
     }
 
-    public long getDelay() {
+    public String getDelay() {
         return delay;
     }
 
-    public void setDelay(long delay) {
+    public void setDelay(String delay) {
         this.delay = delay;
+    }
+
+    public long getDelayInSeconds() {
+        return delayInSeconds;
+    }
+
+    public void setDelayInSeconds(long delayInSeconds) {
+        this.delayInSeconds = delayInSeconds;
     }
 
     public int getRequests() {
