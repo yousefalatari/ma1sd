@@ -9,6 +9,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Base64;
 import java.util.List;
 
 public class HashEngine {
@@ -18,6 +19,7 @@ public class HashEngine {
     private final List<? extends IThreePidProvider> providers;
     private final HashStorage hashStorage;
     private final HashingConfig config;
+    private final Base64.Encoder base64 = Base64.getUrlEncoder().withoutPadding();
     private String pepper;
 
     public HashEngine(List<? extends IThreePidProvider> providers, HashStorage hashStorage, HashingConfig config) {
@@ -51,7 +53,7 @@ public class HashEngine {
     }
 
     protected String hash(ThreePidMapping pidMapping) {
-        return DigestUtils.sha256Hex(pidMapping.getValue() + " " + pidMapping.getMedium() + " " + getPepper());
+        return base64.encodeToString(DigestUtils.sha256(pidMapping.getValue() + " " + pidMapping.getMedium() + " " + getPepper()));
     }
 
     protected String newPepper() {
