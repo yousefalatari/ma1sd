@@ -22,7 +22,7 @@
 matrix:
   domain: ''
   v1: true   # deprecated
-  v2: true   # MSC2140 API v2
+  v2: false  # MSC2140 API v2. Disabled by default in order to preserve backward compatibility.
 
 
 ################
@@ -115,16 +115,16 @@ threepid:
 
 #### MSC2134 (hash lookup)
 
-hashing:
-  enabled: false # enable or disable the hash lookup MSC2140 (default is false)
-  pepperLength: 20 # length of the pepper value (default is 20)
-  rotationPolicy: per_requests # or `per_seconds` how often the hashes will be updating
-  hashStorageType: sql # or `in_memory` where the hashes will be stored
-  algorithms:
-    - none   # the same as v1 bulk lookup
-    - sha256 # hash the 3PID and pepper.
-  delay: 2m # how often hashes will be updated if rotation policy = per_seconds (default is 10s)
-  requests: 10 # how many lookup requests will be performed before updating hashes if rotation policy = per_requests (default is 10)
+#hashing:
+#  enabled: false # enable or disable the hash lookup MSC2140 (default is false)
+#  pepperLength: 20 # length of the pepper value (default is 20)
+#  rotationPolicy: per_requests # or `per_seconds` how often the hashes will be updating
+#  hashStorageType: sql # or `in_memory` where the hashes will be stored
+#  algorithms:
+#    - none   # the same as v1 bulk lookup
+#    - sha256 # hash the 3PID and pepper.
+#  delay: 2m # how often hashes will be updated if rotation policy = per_seconds (default is 10s)
+#  requests: 10 # how many lookup requests will be performed before updating hashes if rotation policy = per_requests (default is 10)
 
 ### hash lookup for synapseSql provider.
 # synapseSql:
@@ -132,19 +132,19 @@ hashing:
 #     query: 'select user_id as mxid, medium, address from user_threepids' # query for retrive 3PIDs for hashes.
 
 #### MSC2140 (Terms)
-policy:
-  policies:
-    term_name: # term name
-      version: 1.0 # version
-      terms:
-        en:  # lang
-          name: term name en  # localized name
-          url: https://ma1sd.host.tld/term_en.html  # localized url
-        fe:  # lang
-          name: term name fr  # localized name
-          url: https://ma1sd.host.tld/term_fr.html  # localized url
-      regexp:
-        - '/_matrix/identity/v2/account.*'
-        - '/_matrix/identity/v2/hash_details'
-        - '/_matrix/identity/v2/lookup'
-
+#policy:
+#  policies:
+#    term_name: # term name
+#      version: 1.0 # version
+#      terms:
+#        en:  # lang
+#          name: term name en  # localized name
+#          url: https://ma1sd.host.tld/term_en.html  # localized url
+#        fe:  # lang
+#          name: term name fr  # localized name
+#          url: https://ma1sd.host.tld/term_fr.html  # localized url
+#      regexp:
+#        - '/_matrix/identity/v2/account.*'
+#        - '/_matrix/identity/v2/hash_details'
+#        - '/_matrix/identity/v2/lookup'
+#

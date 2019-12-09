@@ -77,7 +77,8 @@ public class HomeserverVerifier implements HostnameVerifier {
 
     private boolean match(String altSubjectName) {
         if (altSubjectName.startsWith("*.")) {
-            return altSubjectName.toLowerCase().endsWith(matrixHostname.toLowerCase());
+            String subjectNameWithoutMask = altSubjectName.substring(1); // remove wildcard
+            return matrixHostname.toLowerCase().endsWith(subjectNameWithoutMask.toLowerCase());
         } else {
             return matrixHostname.equalsIgnoreCase(altSubjectName);
         }

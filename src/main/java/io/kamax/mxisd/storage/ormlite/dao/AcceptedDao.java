@@ -26,7 +26,7 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "accepted")
 public class AcceptedDao {
 
-    @DatabaseField(canBeNull = false, id = true)
+    @DatabaseField(canBeNull = false)
     private String url;
 
     @DatabaseField(canBeNull = false)

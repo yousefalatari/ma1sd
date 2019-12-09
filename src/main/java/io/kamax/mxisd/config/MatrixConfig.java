@@ -64,7 +64,7 @@ public class MatrixConfig {
     private String domain;
     private Identity identity = new Identity();
     private boolean v1 = true;
-    private boolean v2 = true;
+    private boolean v2 = false;
 
     public String getDomain() {
         return domain;

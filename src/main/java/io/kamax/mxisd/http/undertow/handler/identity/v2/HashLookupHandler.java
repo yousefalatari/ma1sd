@@ -31,6 +31,8 @@ import io.kamax.mxisd.http.undertow.handler.ApiHandler;
 import io.kamax.mxisd.http.undertow.handler.identity.share.LookupHandler;
 import io.kamax.mxisd.lookup.BulkLookupRequest;
 import io.kamax.mxisd.lookup.HashLookupRequest;
+import io.kamax.mxisd.lookup.SingleLookupReply;
+import io.kamax.mxisd.lookup.SingleLookupRequest;
 import io.kamax.mxisd.lookup.ThreePidMapping;
 import io.kamax.mxisd.lookup.strategy.LookupStrategy;
 import io.undertow.server.HttpServerExchange;
@@ -40,6 +42,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class HashLookupHandler extends LookupHandler implements ApiHandler {
 
@@ -89,6 +92,18 @@ public class HashLookupHandler extends LookupHandler implements ApiHandler {
             throw new InvalidParamException();
         }
 
+        ClientHashLookupAnswer answer = null;
+        if (input.getAddresses() != null && input.getAddresses().size() > 0) {
+            if (input.getAddresses().size() == 1) {
+                answer = noneSingleLookup(request, input);
+            } else {
+                answer = noneBulkLookup(request, input);
+            }
+        }
+        respondJson(exchange, answer != null ? answer : new ClientHashLookupAnswer());
+    }
+
+    private ClientHashLookupAnswer noneBulkLookup(HashLookupRequest request, ClientHashLookupRequest input) throws Exception {
         BulkLookupRequest bulkLookupRequest = new BulkLookupRequest();
         List<ThreePidMapping> mappings = new ArrayList<>();
         for (String address : input.getAddresses()) {
@@ -107,7 +122,26 @@ public class HashLookupHandler extends LookupHandler implements ApiHandler {
         }
         log.info("Finished bulk lookup request from {}", request.getRequester());
 
-        respondJson(exchange, answer);
+        return answer;
+    }
+
+    private ClientHashLookupAnswer noneSingleLookup(HashLookupRequest request, ClientHashLookupRequest input) {
+        SingleLookupRequest singleLookupRequest = new SingleLookupRequest();
+        String address = input.getAddresses().get(0);
+        String[] parts = address.split(" ");
+        singleLookupRequest.setThreePid(parts[0]);
+        singleLookupRequest.setType(parts[1]);
+
+        ClientHashLookupAnswer answer = new ClientHashLookupAnswer();
+
+        Optional<SingleLookupReply> singleLookupReply = strategy.find(singleLookupRequest);
+        if (singleLookupReply.isPresent()) {
+            SingleLookupReply reply = singleLookupReply.get();
+            answer.getMappings().put(address, reply.getMxid().toString());
+        }
+        log.info("Finished single lookup request from {}", request.getRequester());
+
+        return answer;
     }
 
     private void sha256Algorithm(HttpServerExchange exchange, HashLookupRequest request, ClientHashLookupRequest input) {

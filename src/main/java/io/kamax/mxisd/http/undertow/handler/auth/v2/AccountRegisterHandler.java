@@ -48,7 +48,7 @@ public class AccountRegisterHandler extends BasicHttpHandler {
 
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("Registration from domain: {}, expired at {}", openIdToken.getMatrixServerName(),
-                new Date(openIdToken.getExpiresIn()));
+                new Date(System.currentTimeMillis() + openIdToken.getExpiresIn()));
         }
 
         String token = accountManager.register(openIdToken);

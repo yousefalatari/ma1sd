@@ -189,23 +189,32 @@ public class HttpMxisd {
     }
 
     private void accountEndpoints(RoutingHandler routingHandler) {
-        routingHandler.post(AccountRegisterHandler.Path, SaneHandler.around(new AccountRegisterHandler(m.getAccMgr())));
-        wrapWithTokenAndAuthorizationHandlers(routingHandler, Methods.GET, sane(new AccountGetUserInfoHandler(m.getAccMgr())),
-            AccountGetUserInfoHandler.Path, true);
-        wrapWithTokenAndAuthorizationHandlers(routingHandler, Methods.GET, sane(new AccountLogoutHandler(m.getAccMgr())),
-            AccountLogoutHandler.Path, true);
+        MatrixConfig matrixConfig = m.getConfig().getMatrix();
+        if (matrixConfig.isV2()) {
+            routingHandler.post(AccountRegisterHandler.Path, SaneHandler.around(new AccountRegisterHandler(m.getAccMgr())));
+            wrapWithTokenAndAuthorizationHandlers(routingHandler, Methods.GET, sane(new AccountGetUserInfoHandler(m.getAccMgr())),
+                AccountGetUserInfoHandler.Path, true);
+            wrapWithTokenAndAuthorizationHandlers(routingHandler, Methods.GET, sane(new AccountLogoutHandler(m.getAccMgr())),
+                AccountLogoutHandler.Path, true);
+        }
     }
 
     private void termsEndpoints(RoutingHandler routingHandler) {
-        routingHandler.get(GetTermsHandler.PATH, new GetTermsHandler(m.getConfig().getPolicy()));
-        routingHandler.post(AcceptTermsHandler.PATH, sane(new AcceptTermsHandler(m.getAccMgr())));
+        MatrixConfig matrixConfig = m.getConfig().getMatrix();
+        if (matrixConfig.isV2()) {
+            routingHandler.get(GetTermsHandler.PATH, new GetTermsHandler(m.getConfig().getPolicy()));
+            routingHandler.post(AcceptTermsHandler.PATH, sane(new AcceptTermsHandler(m.getAccMgr())));
+        }
     }
 
     private void hashEndpoints(RoutingHandler routingHandler) {
-        wrapWithTokenAndAuthorizationHandlers(routingHandler, Methods.GET, sane(new HashDetailsHandler(m.getHashManager())),
-            HashDetailsHandler.PATH, true);
-        wrapWithTokenAndAuthorizationHandlers(routingHandler, Methods.POST,
-            sane(new HashLookupHandler(m.getIdentity(), m.getHashManager())), HashLookupHandler.Path, true);
+        MatrixConfig matrixConfig = m.getConfig().getMatrix();
+        if (matrixConfig.isV2()) {
+            wrapWithTokenAndAuthorizationHandlers(routingHandler, Methods.GET, sane(new HashDetailsHandler(m.getHashManager())),
+                HashDetailsHandler.PATH, true);
+            wrapWithTokenAndAuthorizationHandlers(routingHandler, Methods.POST,
+                sane(new HashLookupHandler(m.getIdentity(), m.getHashManager())), HashLookupHandler.Path, true);
+        }
     }
 
     private void addEndpoints(RoutingHandler routingHandler, HttpString method, boolean useAuthorization, ApiHandler... handlers) {

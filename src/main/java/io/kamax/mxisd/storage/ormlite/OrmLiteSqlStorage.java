@@ -39,6 +39,7 @@ import io.kamax.mxisd.storage.IStorage;
 import io.kamax.mxisd.storage.dao.IThreePidSessionDao;
 import io.kamax.mxisd.storage.ormlite.dao.ASTransactionDao;
 import io.kamax.mxisd.storage.ormlite.dao.AccountDao;
+import io.kamax.mxisd.storage.ormlite.dao.ChangelogDao;
 import io.kamax.mxisd.storage.ormlite.dao.HashDao;
 import io.kamax.mxisd.storage.ormlite.dao.HistoricalThreePidInviteIO;
 import io.kamax.mxisd.storage.ormlite.dao.AcceptedDao;
@@ -52,6 +53,7 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -73,13 +75,18 @@ public class OrmLiteSqlStorage implements IStorage {
 
     }
 
+    public static class Migrations {
+        public static final String FIX_ACCEPTED_DAO = "2019_12_09__2254__fix_accepted_dao";
+    }
+
     private Dao<ThreePidInviteIO, String> invDao;
     private Dao<HistoricalThreePidInviteIO, String> expInvDao;
     private Dao<ThreePidSessionDao, String> sessionDao;
     private Dao<ASTransactionDao, String> asTxnDao;
     private Dao<AccountDao, String> accountDao;
-    private Dao<AcceptedDao, String> acceptedDao;
+    private Dao<AcceptedDao, Long> acceptedDao;
     private Dao<HashDao, String> hashDao;
+    private Dao<ChangelogDao, String> changelogDao;
 
     public OrmLiteSqlStorage(MxisdConfig cfg) {
         this(cfg.getStorage().getBackend(), cfg.getStorage().getProvider().getSqlite().getDatabase());
@@ -96,6 +103,7 @@ public class OrmLiteSqlStorage implements IStorage {
 
         withCatcher(() -> {
             ConnectionSource connPool = new JdbcConnectionSource("jdbc:" + backend + ":" + path);
+            changelogDao = createDaoAndTable(connPool, ChangelogDao.class);
             invDao = createDaoAndTable(connPool, ThreePidInviteIO.class);
             expInvDao = createDaoAndTable(connPool, HistoricalThreePidInviteIO.class);
             sessionDao = createDaoAndTable(connPool, ThreePidSessionDao.class);
@@ -103,7 +111,21 @@ public class OrmLiteSqlStorage implements IStorage {
             accountDao = createDaoAndTable(connPool, AccountDao.class);
             acceptedDao = createDaoAndTable(connPool, AcceptedDao.class);
             hashDao = createDaoAndTable(connPool, HashDao.class);
+            runMigration(connPool);
         });
+    }
+
+    private void runMigration(ConnectionSource connPol) throws SQLException {
+        ChangelogDao fixAcceptedDao = changelogDao.queryForId(Migrations.FIX_ACCEPTED_DAO);
+        if (fixAcceptedDao == null) {
+            fixAcceptedDao(connPol);
+            changelogDao.create(new ChangelogDao(Migrations.FIX_ACCEPTED_DAO, new Date(), "Recreate the accepted table."));
+        }
+    }
+
+    private void fixAcceptedDao(ConnectionSource connPool) throws SQLException {
+        TableUtils.dropTable(acceptedDao, true);
+        TableUtils.createTableIfNotExists(connPool, AcceptedDao.class);
     }
 
     private <V, K> Dao<V, K> createDaoAndTable(ConnectionSource connPool, Class<V> c) throws SQLException {
