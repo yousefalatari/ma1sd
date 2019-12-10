@@ -26,6 +26,9 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "accepted")
 public class AcceptedDao {
 
+    @DatabaseField(generatedId = true)
+    private Long id;
+
     @DatabaseField(canBeNull = false)
     private String url;
 
@@ -43,6 +46,14 @@ public class AcceptedDao {
         this.url = url;
         this.userId = userId;
         this.acceptedAt = acceptedAt;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getUrl() {

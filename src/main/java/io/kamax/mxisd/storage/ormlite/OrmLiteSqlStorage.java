@@ -47,6 +47,8 @@ import io.kamax.mxisd.storage.ormlite.dao.ThreePidInviteIO;
 import io.kamax.mxisd.storage.ormlite.dao.ThreePidSessionDao;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -60,6 +62,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class OrmLiteSqlStorage implements IStorage {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrmLiteSqlStorage.class);
 
     @FunctionalInterface
     private interface Getter<T> {
@@ -124,11 +128,13 @@ public class OrmLiteSqlStorage implements IStorage {
     }
 
     private void fixAcceptedDao(ConnectionSource connPool) throws SQLException {
+        LOGGER.info("Migration: {}", Migrations.FIX_ACCEPTED_DAO);
         TableUtils.dropTable(acceptedDao, true);
         TableUtils.createTableIfNotExists(connPool, AcceptedDao.class);
     }
 
     private <V, K> Dao<V, K> createDaoAndTable(ConnectionSource connPool, Class<V> c) throws SQLException {
+        LOGGER.info("Create the dao: {}", c.getSimpleName());
         Dao<V, K> dao = DaoManager.createDao(connPool, c);
         TableUtils.createTableIfNotExists(connPool, c);
         return dao;
