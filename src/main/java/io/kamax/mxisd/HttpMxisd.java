@@ -104,30 +104,30 @@ public class HttpMxisd {
         HttpHandler asNotFoundHandler = SaneHandler.around(new AsNotFoundHandler(m.getAs()));
 
         final RoutingHandler handler = Handlers.routing()
-            .add("OPTIONS", "/**", SaneHandler.around(new OptionsHandler()))
+            .add("OPTIONS", "/**", sane(new OptionsHandler()))
 
             // Status endpoints
-            .get(StatusHandler.Path, SaneHandler.around(new StatusHandler()))
-            .get(VersionHandler.Path, SaneHandler.around(new VersionHandler()))
+            .get(StatusHandler.Path, sane(new StatusHandler()))
+            .get(VersionHandler.Path, sane(new VersionHandler()))
 
             // Authentication endpoints
-            .get(LoginHandler.Path, SaneHandler.around(new LoginGetHandler(m.getAuth(), m.getHttpClient())))
-            .post(LoginHandler.Path, SaneHandler.around(new LoginPostHandler(m.getAuth())))
-            .post(RestAuthHandler.Path, SaneHandler.around(new RestAuthHandler(m.getAuth())))
+            .get(LoginHandler.Path, sane(new LoginGetHandler(m.getAuth(), m.getHttpClient())))
+            .post(LoginHandler.Path, sane(new LoginPostHandler(m.getAuth())))
+            .post(RestAuthHandler.Path, sane(new RestAuthHandler(m.getAuth())))
 
             // Directory endpoints
-            .post(UserDirectorySearchHandler.Path, SaneHandler.around(new UserDirectorySearchHandler(m.getDirectory())))
+            .post(UserDirectorySearchHandler.Path, sane(new UserDirectorySearchHandler(m.getDirectory())))
 
             // Profile endpoints
-            .get(ProfileHandler.Path, SaneHandler.around(new ProfileHandler(m.getProfile())))
-            .get(InternalProfileHandler.Path, SaneHandler.around(new InternalProfileHandler(m.getProfile())))
+            .get(ProfileHandler.Path, sane(new ProfileHandler(m.getProfile())))
+            .get(InternalProfileHandler.Path, sane(new InternalProfileHandler(m.getProfile())))
 
             // Registration endpoints
             .post(Register3pidRequestTokenHandler.Path,
-                SaneHandler.around(new Register3pidRequestTokenHandler(m.getReg(), m.getClientDns(), m.getHttpClient())))
+                sane(new Register3pidRequestTokenHandler(m.getReg(), m.getClientDns(), m.getHttpClient())))
 
             // Invite endpoints
-            .post(RoomInviteHandler.Path, SaneHandler.around(new RoomInviteHandler(m.getHttpClient(), m.getClientDns(), m.getInvite())))
+            .post(RoomInviteHandler.Path, sane(new RoomInviteHandler(m.getHttpClient(), m.getClientDns(), m.getInvite())))
 
             // Application Service endpoints
             .get(AsUserHandler.Path, asUserHandler)
@@ -139,7 +139,7 @@ public class HttpMxisd {
             .put("/transactions/{" + AsTransactionHandler.ID + "}", asTxnHandler) // Legacy endpoint
 
             // Banned endpoints
-            .get(InternalInfoHandler.Path, SaneHandler.around(new InternalInfoHandler()));
+            .get(InternalInfoHandler.Path, sane(new InternalInfoHandler()));
         keyEndpoints(handler);
         identityEndpoints(handler);
         termsEndpoints(handler);
@@ -191,10 +191,10 @@ public class HttpMxisd {
     private void accountEndpoints(RoutingHandler routingHandler) {
         MatrixConfig matrixConfig = m.getConfig().getMatrix();
         if (matrixConfig.isV2()) {
-            routingHandler.post(AccountRegisterHandler.Path, SaneHandler.around(new AccountRegisterHandler(m.getAccMgr())));
-            wrapWithTokenAndAuthorizationHandlers(routingHandler, Methods.GET, sane(new AccountGetUserInfoHandler(m.getAccMgr())),
+            routingHandler.post(AccountRegisterHandler.Path, sane(new AccountRegisterHandler(m.getAccMgr())));
+            wrapWithTokenAndAuthorizationHandlers(routingHandler, Methods.GET, new AccountGetUserInfoHandler(m.getAccMgr()),
                 AccountGetUserInfoHandler.Path, true);
-            wrapWithTokenAndAuthorizationHandlers(routingHandler, Methods.GET, sane(new AccountLogoutHandler(m.getAccMgr())),
+            wrapWithTokenAndAuthorizationHandlers(routingHandler, Methods.GET, new AccountLogoutHandler(m.getAccMgr()),
                 AccountLogoutHandler.Path, true);
         }
     }
@@ -202,7 +202,7 @@ public class HttpMxisd {
     private void termsEndpoints(RoutingHandler routingHandler) {
         MatrixConfig matrixConfig = m.getConfig().getMatrix();
         if (matrixConfig.isV2()) {
-            routingHandler.get(GetTermsHandler.PATH, new GetTermsHandler(m.getConfig().getPolicy()));
+            routingHandler.get(GetTermsHandler.PATH, sane(new GetTermsHandler(m.getConfig().getPolicy())));
             routingHandler.post(AcceptTermsHandler.PATH, sane(new AcceptTermsHandler(m.getAccMgr())));
         }
     }
@@ -210,10 +210,10 @@ public class HttpMxisd {
     private void hashEndpoints(RoutingHandler routingHandler) {
         MatrixConfig matrixConfig = m.getConfig().getMatrix();
         if (matrixConfig.isV2()) {
-            wrapWithTokenAndAuthorizationHandlers(routingHandler, Methods.GET, sane(new HashDetailsHandler(m.getHashManager())),
+            wrapWithTokenAndAuthorizationHandlers(routingHandler, Methods.GET, new HashDetailsHandler(m.getHashManager()),
                 HashDetailsHandler.PATH, true);
             wrapWithTokenAndAuthorizationHandlers(routingHandler, Methods.POST,
-                sane(new HashLookupHandler(m.getIdentity(), m.getHashManager())), HashLookupHandler.Path, true);
+                new HashLookupHandler(m.getIdentity(), m.getHashManager()), HashLookupHandler.Path, true);
         }
     }
 
@@ -227,11 +227,11 @@ public class HttpMxisd {
                                HttpHandler httpHandler) {
         MatrixConfig matrixConfig = m.getConfig().getMatrix();
         if (matrixConfig.isV1()) {
-            routingHandler.add(method, apiHandler.getPath(IdentityServiceAPI.V1), httpHandler);
+            routingHandler.add(method, apiHandler.getPath(IdentityServiceAPI.V1), sane(httpHandler));
         }
         if (matrixConfig.isV2()) {
-            String path = apiHandler.getPath(IdentityServiceAPI.V2);
-            wrapWithTokenAndAuthorizationHandlers(routingHandler, method, httpHandler, path, useAuthorization);
+            wrapWithTokenAndAuthorizationHandlers(routingHandler, method, httpHandler, apiHandler.getPath(IdentityServiceAPI.V2),
+                useAuthorization);
         }
     }
 
@@ -245,7 +245,7 @@ public class HttpMxisd {
         } else {
             wrappedHandler = httpHandler;
         }
-        routingHandler.add(method, url, wrappedHandler);
+        routingHandler.add(method, url, sane(wrappedHandler));
     }
 
     @NotNull
