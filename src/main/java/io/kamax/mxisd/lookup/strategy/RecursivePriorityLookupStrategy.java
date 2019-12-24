@@ -26,17 +26,23 @@ import io.kamax.matrix.json.MatrixJson;
 import io.kamax.mxisd.config.MxisdConfig;
 import io.kamax.mxisd.exception.ConfigurationException;
 import io.kamax.mxisd.hash.HashManager;
-import io.kamax.mxisd.hash.storage.HashStorage;
-import io.kamax.mxisd.lookup.*;
+import io.kamax.mxisd.lookup.ALookupRequest;
+import io.kamax.mxisd.lookup.BulkLookupRequest;
+import io.kamax.mxisd.lookup.SingleLookupReply;
+import io.kamax.mxisd.lookup.SingleLookupRequest;
+import io.kamax.mxisd.lookup.ThreePidMapping;
 import io.kamax.mxisd.lookup.fetcher.IBridgeFetcher;
 import io.kamax.mxisd.lookup.provider.IThreePidProvider;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -237,14 +243,5 @@ public class RecursivePriorityLookupStrategy implements LookupStrategy {
         log.info("Processed Payload ID {}", payloadId);
         result.complete(mapFoundAll);
         return bulkLookupInProgress.remove(payloadId);
-    }
-
-    @Override
-    public CompletableFuture<List<ThreePidMapping>> find(HashLookupRequest request) {
-        HashStorage hashStorage = hashManager.getHashStorage();
-        CompletableFuture<List<ThreePidMapping>> result = new CompletableFuture<>();
-        result.complete(hashStorage.find(request.getHashes()).stream().map(Pair::getValue).collect(Collectors.toList()));
-        hashManager.getRotationStrategy().newRequest();
-        return result;
     }
 }

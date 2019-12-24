@@ -41,7 +41,10 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class LdapThreePidProvider extends LdapBackend implements IThreePidProvider {
 
@@ -137,4 +140,61 @@ public class LdapThreePidProvider extends LdapBackend implements IThreePidProvid
         return mappingsFound;
     }
 
+    private List<String> getAttributes() {
+        final List<String> attributes = getCfg().getAttribute().getThreepid().values().stream().flatMap(List::stream)
+            .collect(Collectors.toList());
+        attributes.add(getUidAtt());
+        return attributes;
+    }
+
+    private Optional<String> getAttributeValue(Entry entry, List<String> attributes) {
+        return attributes.stream()
+            .map(attr -> getAttribute(entry, attr))
+            .filter(Objects::nonNull)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst();
+    }
+
+    @Override
+    public Iterable<ThreePidMapping> populateHashes() {
+        List<ThreePidMapping> result = new ArrayList<>();
+        String filter = getCfg().getIdentity().getFilter();
+
+        try (LdapConnection conn = getConn()) {
+            bind(conn);
+
+            log.debug("Query: {}", filter);
+            List<String> attributes = getAttributes();
+            log.debug("Attributes: {}", GsonUtil.build().toJson(attributes));
+
+            for (String baseDN : getBaseDNs()) {
+                log.debug("Base DN: {}", baseDN);
+
+                try (EntryCursor cursor = conn.search(baseDN, filter, SearchScope.SUBTREE, attributes.toArray(new String[0]))) {
+                    while (cursor.next()) {
+                        Entry entry = cursor.get();
+                        log.info("Found possible match, DN: {}", entry.getDn().getName());
+                        Optional<String> mxid = getAttribute(entry, getUidAtt());
+                        if (!mxid.isPresent()) {
+                            continue;
+                        }
+
+                        for (Map.Entry<String, List<String>> attributeEntry : getCfg().getAttribute().getThreepid().entrySet()) {
+                            String medium = attributeEntry.getKey();
+                            getAttributeValue(entry, attributeEntry.getValue())
+                                .ifPresent(s -> result.add(new ThreePidMapping(medium, s, buildMatrixIdFromUid(mxid.get()))));
+                        }
+                    }
+                } catch (CursorLdapReferralException e) {
+                    log.warn("3PID is only available via referral, skipping", e);
+                } catch (IOException | LdapException | CursorException e) {
+                    log.error("Unable to fetch 3PID mappings", e);
+                }
+            }
+        } catch (LdapException | IOException e) {
+            log.error("Unable to fetch 3PID mappings", e);
+        }
+        return result;
+    }
 }

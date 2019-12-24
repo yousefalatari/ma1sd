@@ -107,14 +107,16 @@ public abstract class SqlThreePidProvider implements IThreePidProvider {
 
     @Override
     public Iterable<ThreePidMapping> populateHashes() {
-        if (StringUtils.isBlank(cfg.getLookup().getQuery())) {
+        String query = cfg.getLookup().getQuery();
+        if (StringUtils.isBlank(query)) {
             log.warn("Lookup query not configured, skip.");
             return Collections.emptyList();
         }
 
+        log.debug("Uses query to match users: {}", query);
         List<ThreePidMapping> result = new ArrayList<>();
         try (Connection connection = pool.get()) {
-            PreparedStatement statement = connection.prepareStatement(cfg.getLookup().getQuery());
+            PreparedStatement statement = connection.prepareStatement(query);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     String mxid = resultSet.getString("mxid");

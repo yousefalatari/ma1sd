@@ -85,6 +85,7 @@ public class HashLookupHandler extends LookupHandler implements ApiHandler {
             default:
                 throw new InvalidParamException();
         }
+        hashManager.getRotationStrategy().newRequest();
     }
 
     private void noneAlgorithm(HttpServerExchange exchange, HashLookupRequest request, ClientHashLookupRequest input) throws Exception {

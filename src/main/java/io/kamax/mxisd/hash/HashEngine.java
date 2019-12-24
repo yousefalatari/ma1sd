@@ -35,7 +35,9 @@ public class HashEngine {
             hashStorage.clear();
             for (IThreePidProvider provider : providers) {
                 try {
+                    LOGGER.info("Populate hashes from the handler: {}", provider.getClass().getCanonicalName());
                     for (ThreePidMapping pidMapping : provider.populateHashes()) {
+                        LOGGER.debug("Found 3PID: {}", pidMapping);
                         hashStorage.add(pidMapping, hash(pidMapping));
                     }
                 } catch (Exception e) {

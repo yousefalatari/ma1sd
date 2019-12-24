@@ -46,6 +46,4 @@ public interface LookupStrategy {
     Optional<SingleLookupReply> findRecursive(SingleLookupRequest request);
 
     CompletableFuture<List<ThreePidMapping>> find(BulkLookupRequest requests);
-
-    CompletableFuture<List<ThreePidMapping>> find(HashLookupRequest request);
 }
