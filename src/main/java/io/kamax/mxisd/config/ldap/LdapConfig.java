@@ -233,6 +233,7 @@ public abstract class LdapConfig {
         private String filter;
         private String token = "%3pid";
         private Map<String, String> medium = new HashMap<>();
+        private boolean lookup = false;
 
         public String getFilter() {
             return filter;
@@ -262,6 +263,13 @@ public abstract class LdapConfig {
             this.medium = medium;
         }
 
+        public boolean isLookup() {
+            return lookup;
+        }
+
+        public void setLookup(boolean lookup) {
+            this.lookup = lookup;
+        }
     }
 
     public static class Profile {

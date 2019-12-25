@@ -159,6 +159,10 @@ public class LdapThreePidProvider extends LdapBackend implements IThreePidProvid
     @Override
     public Iterable<ThreePidMapping> populateHashes() {
         List<ThreePidMapping> result = new ArrayList<>();
+        if (!getCfg().getIdentity().isLookup()) {
+            return result;
+        }
+
         String filter = getCfg().getIdentity().getFilter();
 
         try (LdapConnection conn = getConn()) {
