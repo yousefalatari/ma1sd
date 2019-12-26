@@ -131,6 +131,25 @@ threepid:
 #   lookup:
 #     query: 'select user_id as mxid, medium, address from user_threepids' # query for retrive 3PIDs for hashes.
 
+### hash lookup for ldap provider (with example of the ldap configuration)
+# ldap:
+#   enabled: true
+#   lookup: true # hash lookup
+#   connection:
+#     host: 'ldap.domain.tld'
+#     port: 389
+#     bindDn: 'cn=admin,dc=domain,dc=tld'
+#     bindPassword: 'Secret'
+#     baseDNs:
+#       - 'dc=domain,dc=tld'
+#   attribute:
+#     uid:
+#       type: 'uid' # or mxid
+#       value: 'cn'
+#     name: 'displayName'
+#   identity:
+#     filter: '(objectClass=inetOrgPerson)'
+
 #### MSC2140 (Terms)
 #policy:
 #  policies:
