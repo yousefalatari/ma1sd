@@ -144,7 +144,13 @@ public class MembershipEventProcessor implements EventTypeProcessor {
                 .collect(Collectors.toList());
         log.info("Found {} email(s) in identity store for {}", tpids.size(), inviteeId);
 
-        for (_ThreePid tpid : tpids) {
+        log.info("Removing duplicates from identity store");
+        List<_ThreePid> uniqueTpids = tpids.stream()
+                .distinct()
+                .collect(Collectors.toList());
+        log.info("There are {} unique email(s) in identity store for {}", uniqueTpids.size(), inviteeId);        
+
+        for (_ThreePid tpid : uniqueTpids) {
             log.info("Found Email to notify about room invitation: {}", tpid.getAddress());
             Map<String, String> properties = new HashMap<>();
             profiler.getDisplayName(sender).ifPresent(name -> properties.put("sender_display_name", name));
