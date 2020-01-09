@@ -359,6 +359,7 @@ public class MxisdConfig {
         getAuth().build();
         getAccountConfig().build();
         getDirectory().build();
+        getDns().build();
         getExec().build();
         getFirebase().build();
         getForward().build();
