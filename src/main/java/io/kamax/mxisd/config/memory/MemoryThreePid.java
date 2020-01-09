@@ -45,4 +45,21 @@ public class MemoryThreePid implements _ThreePid {
         this.address = address;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MemoryThreePid threePid = (MemoryThreePid) o;
+
+        if (!medium.equals(threePid.medium)) return false;
+        return address.equals(threePid.address);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = medium.hashCode();
+        result = 31 * result + address.hashCode();
+        return result;
+    }
 }
