@@ -28,8 +28,8 @@ import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import io.kamax.matrix.ThreePid;
-import io.kamax.mxisd.config.MxisdConfig;
 import io.kamax.mxisd.config.PolicyConfig;
+import io.kamax.mxisd.config.StorageConfig;
 import io.kamax.mxisd.exception.ConfigurationException;
 import io.kamax.mxisd.exception.InternalServerError;
 import io.kamax.mxisd.exception.InvalidCredentialsException;
@@ -92,21 +92,21 @@ public class OrmLiteSqlStorage implements IStorage {
     private Dao<HashDao, String> hashDao;
     private Dao<ChangelogDao, String> changelogDao;
 
-    public OrmLiteSqlStorage(MxisdConfig cfg) {
-        this(cfg.getStorage().getBackend(), cfg.getStorage().getProvider().getSqlite().getDatabase());
+    public OrmLiteSqlStorage(StorageConfig.BackendEnum backend, String path) {
+        this(backend, path, null, null);
     }
 
-    public OrmLiteSqlStorage(String backend, String path) {
-        if (StringUtils.isBlank(backend)) {
+    public OrmLiteSqlStorage(StorageConfig.BackendEnum backend, String database, String username, String password) {
+        if (backend == null) {
             throw new ConfigurationException("storage.backend");
         }
 
-        if (StringUtils.isBlank(path)) {
+        if (StringUtils.isBlank(database)) {
             throw new ConfigurationException("Storage destination cannot be empty");
         }
 
         withCatcher(() -> {
-            ConnectionSource connPool = new JdbcConnectionSource("jdbc:" + backend + ":" + path);
+            ConnectionSource connPool = new JdbcConnectionSource("jdbc:" + backend + ":" + database, username, password);
             changelogDao = createDaoAndTable(connPool, ChangelogDao.class);
             invDao = createDaoAndTable(connPool, ThreePidInviteIO.class);
             expInvDao = createDaoAndTable(connPool, HistoricalThreePidInviteIO.class);
