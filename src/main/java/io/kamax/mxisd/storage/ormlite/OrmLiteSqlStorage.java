@@ -91,6 +91,7 @@ public class OrmLiteSqlStorage implements IStorage {
     private Dao<AcceptedDao, Long> acceptedDao;
     private Dao<HashDao, String> hashDao;
     private Dao<ChangelogDao, String> changelogDao;
+    private StorageConfig.BackendEnum backend;
 
     public OrmLiteSqlStorage(StorageConfig.BackendEnum backend, String path) {
         this(backend, path, null, null);
@@ -100,6 +101,7 @@ public class OrmLiteSqlStorage implements IStorage {
         if (backend == null) {
             throw new ConfigurationException("storage.backend");
         }
+        this.backend = backend;
 
         if (StringUtils.isBlank(database)) {
             throw new ConfigurationException("Storage destination cannot be empty");
@@ -113,7 +115,7 @@ public class OrmLiteSqlStorage implements IStorage {
             sessionDao = createDaoAndTable(connPool, ThreePidSessionDao.class);
             asTxnDao = createDaoAndTable(connPool, ASTransactionDao.class);
             accountDao = createDaoAndTable(connPool, AccountDao.class);
-            acceptedDao = createDaoAndTable(connPool, AcceptedDao.class);
+            acceptedDao = createDaoAndTable(connPool, AcceptedDao.class, true);
             hashDao = createDaoAndTable(connPool, HashDao.class);
             runMigration(connPool);
         });
@@ -134,9 +136,27 @@ public class OrmLiteSqlStorage implements IStorage {
     }
 
     private <V, K> Dao<V, K> createDaoAndTable(ConnectionSource connPool, Class<V> c) throws SQLException {
+        return createDaoAndTable(connPool, c, false);
+    }
+
+    /**
+     * Workaround for https://github.com/j256/ormlite-core/issues/20.
+     */
+    private <V, K> Dao<V, K> createDaoAndTable(ConnectionSource connPool, Class<V> c, boolean workaround) throws SQLException {
         LOGGER.info("Create the dao: {}", c.getSimpleName());
         Dao<V, K> dao = DaoManager.createDao(connPool, c);
-        TableUtils.createTableIfNotExists(connPool, c);
+        if (workaround && StorageConfig.BackendEnum.postgresql.equals(backend)) {
+            LOGGER.info("Workaround for postgresql on dao: {}", c.getSimpleName());
+            try {
+                dao.countOf();
+                LOGGER.info("Table exists, do nothing");
+            } catch (SQLException e) {
+                LOGGER.info("Table doesn't exist, create");
+                TableUtils.createTableIfNotExists(connPool, c);
+            }
+        } else {
+            TableUtils.createTableIfNotExists(connPool, c);
+        }
         return dao;
     }
 
