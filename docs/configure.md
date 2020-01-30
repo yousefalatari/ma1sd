@@ -76,6 +76,8 @@ storage:
       username: ma1sd
       password: secret_password
 ```
+See [the migration instruction](migration-to-postgresql.md) from sqlite to postgresql
+
 
 ## Logging
 ```yaml
