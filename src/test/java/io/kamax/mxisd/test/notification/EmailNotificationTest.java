@@ -60,7 +60,7 @@ public class EmailNotificationTest {
     private final String user = "mxisd";
     private final String notifiee = "john";
     private final String sender = user + "@" + domain;
-    private final String senderName = "\"Mxisd Server あ (Unit Test)\" <" + sender + ">";
+   private final String senderName = "test";
     private final String senderNameEncoded = "=?UTF-8?Q?=22Mxisd_Server_=E3=81=82_=28Unit_T?= =?UTF-8?Q?est=29=22_=3Cmxisd=40localhost=3E?= <mxisd@localhost>";
     private final String target = notifiee + "@" + domain;
 

@@ -20,9 +20,13 @@
 
 package io.kamax.mxisd.threepid.connector.phone;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class BlackholePhoneConnector implements PhoneConnector {
 
     public static final String ID = "none";
+    private static final Logger log = LoggerFactory.getLogger("App");
 
     @Override
     public String getId() {
@@ -32,6 +36,7 @@ public class BlackholePhoneConnector implements PhoneConnector {
     @Override
     public void send(String recipient, String content) {
         //dev/null
+        log.info("verification token is  {}", content);
     }
 
 }

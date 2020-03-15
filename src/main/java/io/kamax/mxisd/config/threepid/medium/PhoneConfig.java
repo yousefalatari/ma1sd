@@ -20,13 +20,15 @@
 
 package io.kamax.mxisd.config.threepid.medium;
 
+import io.kamax.mxisd.threepid.connector.phone.BlackholePhoneConnector;
 import io.kamax.mxisd.threepid.connector.phone.PhoneSmsTwilioConnector;
 import io.kamax.mxisd.threepid.generator.phone.SmsNotificationGenerator;
 
 public class PhoneConfig extends MediumConfig {
 
     public PhoneConfig() {
-        setConnector(PhoneSmsTwilioConnector.ID);
+      //  setConnector(PhoneSmsTwilioConnector.ID);
+        setConnector(BlackholePhoneConnector.ID);
         setGenerator(SmsNotificationGenerator.ID);
     }
 

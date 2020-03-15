@@ -1,14 +1,14 @@
 # Build directories
-.gradle/
-build/
-out/
+.gradle\
+build\
+out\
 
 # IDEs directories
-.idea/
+.idea\
 
 # Local dev config
-/ma1sd.yaml
-/application.yaml
+\ma1sd.yaml
+\application.yaml
 
 # Local dev storage
-/ma1sd.db
+\ma1sd.db
