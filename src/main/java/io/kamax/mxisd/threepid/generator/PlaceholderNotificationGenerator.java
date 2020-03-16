@@ -123,7 +123,7 @@ public abstract class PlaceholderNotificationGenerator {
 
         return populateForCommon(session.getThreePid(), input)
                 .replace("%VALIDATION_LINK%", validationLink)
-                .replace("%VALIDATION_TOKEN%", /*session.getToken()*/"123456")
+                .replace("%VALIDATION_TOKEN%", /*session.getToken()*/ "123456")
                 .replace("%NEXT_URL%", validationLink);
     }
 
